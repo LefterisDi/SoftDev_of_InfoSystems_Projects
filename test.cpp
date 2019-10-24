@@ -2,12 +2,14 @@
 #include <cstdlib> 
 #include <ctime> 
 #include <bitset>
+#include <climits>
 
 using namespace std;
 
 void TestSort(uint64_t* row , int size){
 
-    u_char table1[size][8] , table2[size][8];
+    unsigned int table1[size][8] , table2[size][8];
+    unsigned int hist[UCHAR_MAX+1] = {};
 
     for (int i = 0 ; i < size ; i++){
         uint64_t num = row[i];
@@ -23,6 +25,17 @@ void TestSort(uint64_t* row , int size){
         // }
 
         // cout << endl;
+    }
+
+    for (int i = 0 ; i < size ; i++){
+        cout << table1[i][0] << endl;
+        hist[table1[i][0]]++;
+    }
+
+    for (int i = 0 ; i <= UCHAR_MAX ; i++){
+        if (hist[i] != 0){
+            cout << i << " " << hist[i] << endl;
+        }
     }
 }
 
