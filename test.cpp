@@ -97,14 +97,73 @@ void BitConversion(uint64_t* table , unsigned int** resTable, int size){
             num = num >> 8;
         }
 
-        // for (int j = 0; j < 8 ; j++){
-        //     std::bitset<8> x(resTable[i][j]);
-        //     cout << x;
-        // }
+        for (int j = 0; j < 8 ; j++){
+            std::bitset<8> x(resTable[i][j]);
+            cout << x;
+        }
 
-        // cout << endl;
+        cout << endl;
     }
 
+
+}
+
+void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size){
+
+    unsigned int hist[UCHAR_MAX+1] = {};
+
+    for (int i = 0 ; i < size ; i++){
+        // cout << table1[i][0] << endl;//prints first field
+        hist[table1[i][0]]++;
+    }
+
+    int psumCount = 0;
+    for (int i = 0 ; i <= UCHAR_MAX ; i++){
+        if (hist[i] != 0){
+            psumCount++;
+        }
+    }
+
+    unsigned int psum[psumCount][2] = {};
+
+    int ind = 0;
+    int itCount = 0;
+    for (int i = 0 ; i <= UCHAR_MAX ; i++){
+        if (hist[i] != 0){
+            psum[ind][0] = i;
+            psum[ind][1] = itCount;
+            itCount += hist[i];
+            ind++;
+
+            // cout << i << " " << hist[i] << endl;
+        }
+    }
+
+    int table2Ind = 0;
+    for(int i = 0 ; i < psumCount ; i++){
+        for (int j = 0 ; j < size ; j++){
+            if (psum[i][0] == table1[j][0]){
+                for (int k = 0 ; k < 8 ; k++){
+                    table2[table2Ind][k] = table1[j][k];
+                }
+                table2Ind++;
+            }
+        }
+    }
+
+    for (int i = 0 ; i < size ; i++){
+        cout << table1[i][0] << endl;
+    }
+    cout << endl;
+
+    for (int i = 0 ; i < size ; i++){
+        cout << table2[i][0] << endl;
+    }
+
+
+    for (int i = 0 ; i < psumCount ; i++){
+
+    }
 
 }
 
@@ -124,6 +183,7 @@ void TestSort(uint64_t** tableMain , int sizeX , int sizeY , int key){
         table2[i] = new unsigned int[8];
 
     BitConversion(tableMain[key] , table1 , sizeX);
+    SimpleSortRec(table1 , table2 , sizeX);
 
     // for (int i = 0 ; i < sizeX ; i++){
     //     // uint64_t num = tableMain[0][i];
@@ -143,60 +203,60 @@ void TestSort(uint64_t** tableMain , int sizeX , int sizeY , int key){
     // }
     
 
-    for (int i = 0 ; i < sizeX ; i++){
-        // cout << table1[i][0] << endl;//prints first field
-        hist[table1[i][0]]++;
-    }
-
-    int psumCount = 0;
-    for (int i = 0 ; i <= UCHAR_MAX ; i++){
-        if (hist[i] != 0){
-            psumCount++;
-        }
-    }
-
-    // cout << psumCount << endl;
-
-    unsigned int psum[psumCount][2] = {};
-
-    int ind = 0;
-    int itCount = 0;
-    for (int i = 0 ; i <= UCHAR_MAX ; i++){
-        if (hist[i] != 0){
-            psum[ind][0] = i;
-            psum[ind][1] = itCount;
-            itCount += hist[i];
-            ind++;
-
-            // cout << i << " " << hist[i] << endl;
-        }
-    }
-
-    // cout << endl;
-    // for (int i = 0 ; i < psumCount ; i++){
-    //     cout << psum[i][0] << " " << psum[i][1] << endl;
+    // for (int i = 0 ; i < sizeX ; i++){
+    //     // cout << table1[i][0] << endl;//prints first field
+    //     hist[table1[i][0]]++;
     // }
 
-    int table2Ind = 0;
-    for(int i = 0 ; i < psumCount ; i++){
-        for (int j = 0 ; j < sizeX ; j++){
-            if (psum[i][0] == table1[j][0]){
-                for (int k = 0 ; k < 8 ; k++){
-                    table2[table2Ind][k] = table1[j][k];
-                }
-                table2Ind++;
-            }
-        }
-    }
+    // int psumCount = 0;
+    // for (int i = 0 ; i <= UCHAR_MAX ; i++){
+    //     if (hist[i] != 0){
+    //         psumCount++;
+    //     }
+    // }
 
-    for (int i = 0 ; i < sizeX ; i++){
-        cout << table1[i][0] << endl;
-    }
-    cout << endl;
+    // // cout << psumCount << endl;
 
-    for (int i = 0 ; i < sizeX ; i++){
-        cout << table2[i][0] << endl;
-    }
+    // unsigned int psum[psumCount][2] = {};
+
+    // int ind = 0;
+    // int itCount = 0;
+    // for (int i = 0 ; i <= UCHAR_MAX ; i++){
+    //     if (hist[i] != 0){
+    //         psum[ind][0] = i;
+    //         psum[ind][1] = itCount;
+    //         itCount += hist[i];
+    //         ind++;
+
+    //         // cout << i << " " << hist[i] << endl;
+    //     }
+    // }
+
+    // // cout << endl;
+    // // for (int i = 0 ; i < psumCount ; i++){
+    // //     cout << psum[i][0] << " " << psum[i][1] << endl;
+    // // }
+
+    // int table2Ind = 0;
+    // for(int i = 0 ; i < psumCount ; i++){
+    //     for (int j = 0 ; j < sizeX ; j++){
+    //         if (psum[i][0] == table1[j][0]){
+    //             for (int k = 0 ; k < 8 ; k++){
+    //                 table2[table2Ind][k] = table1[j][k];
+    //             }
+    //             table2Ind++;
+    //         }
+    //     }
+    // }
+
+    // for (int i = 0 ; i < sizeX ; i++){
+    //     cout << table1[i][0] << endl;
+    // }
+    // cout << endl;
+
+    // for (int i = 0 ; i < sizeX ; i++){
+    //     cout << table2[i][0] << endl;
+    // }
 
     
 
