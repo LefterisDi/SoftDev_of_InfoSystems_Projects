@@ -124,6 +124,7 @@ void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , in
 
     unsigned int hist[UCHAR_MAX+1] = {};
 
+        cout << endl;
         cout << "KEY " << key << " SIZE " << size << endl;
         cout << "Previous table " << endl;
         for (int i = 0 ; i < size ; i++){
@@ -134,7 +135,10 @@ void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , in
             cout << table1[i][key] << endl;
         }
 
-    if (key == 8 || size < 2){
+    if (size < 2){
+        return ;
+    }
+    if (key == 8 || size == 2/*64KB or 8192 entries*/){
         uint64_t fusionTable[size];
         for (int k = 0 ; k < size ; k++){
             fusionTable[k] = BitDeconvertion(table1[k]);
@@ -143,6 +147,10 @@ void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , in
         cout << endl;
         //quicksort
         quickSort(fusionTable , 0 , size - 1);
+        cout << "QUICKSORTED" << endl;
+        for (int k = 0; k < size ; k++){
+            cout << fusionTable[k] << endl;
+        }
         cout << "ENDED " << endl << endl;
         return;
     }
@@ -191,6 +199,7 @@ void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , in
     }
 
     if (key == 0){
+        cout << endl;
         for (int i = 0 ; i < size ; i++){
             cout << table2[i][key] << endl;
         }
@@ -225,7 +234,6 @@ void TestSort(uint64_t** tableMain , int sizeX , int sizeY , int key){
 
     unsigned int** table1;
     unsigned int** table2;
-    unsigned int hist[UCHAR_MAX+1] = {};
 
     table1 = new unsigned int*[sizeX];
     for(int i = 0; i < sizeX; i++)
@@ -320,7 +328,7 @@ void TestSort(uint64_t** tableMain , int sizeX , int sizeY , int key){
 
 int main(int argc , char* argv[]){
 
-    int size1x = 30 , size1y = 4;
+    int size1x = 20 , size1y = 4;
     int size2x = 3 , size2y = 2;    
     uint64_t** table1;
     uint64_t** table2;
@@ -357,6 +365,19 @@ int main(int argc , char* argv[]){
     }
 
     cout << "DONE" << endl;
+
+    // uint64_t* t = new uint64_t[size1x];
+    // for (int k = 0; k < size1x ; k++){
+    //     t[k] = table1[0][k];
+    //     cout << t[k] << endl;
+    // }
+
+
+    // quickSort(t , 0 , size1x-1);
+    // cout << endl;
+    // for (int k = 0; k < size1x ; k++){
+    //     cout << t[k] << endl;
+    // }
 
     TestSort(table1 , size1x , size1y , 0);
     
