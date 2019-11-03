@@ -15,6 +15,7 @@ MAIN_OUT    = main
 CC         = g++ -Wall #-Wno-unused-variable
 FLAGS      = -c
 DEBUG      = -g3
+
 # ------------------------------------------------- #
 
 all: $(OBJECTS) $(MAIN_OUT)
