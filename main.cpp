@@ -248,7 +248,7 @@ void SwitchElements(uint64_t** tableMain , int sizeY , int firstElem , int secon
 }
 
 
-void TestSort(uint64_t** tableMain , int sizeX , int sizeY , int key){
+void TableSortOnKey(uint64_t** tableMain , int sizeX , int sizeY , int key){
 
     unsigned int** table1;
     unsigned int** table2;
@@ -371,8 +371,8 @@ int main(int argc , char* argv[]){
     // }
 
 
-    TestSort(table1 , size1x , size1y , 0);
-    TestSort(table2 , size2x , size2y , 0);
+    TableSortOnKey(table1 , size1x , size1y , 0);
+    TableSortOnKey(table2 , size2x , size2y , 0);
     
     for(int i = 0; i < size1y; ++i)
         delete[] table1[i];
