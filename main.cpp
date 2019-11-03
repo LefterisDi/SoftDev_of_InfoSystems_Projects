@@ -99,12 +99,12 @@ void BitConversion(uint64_t* table , unsigned int** resTable, int size){
             num = num >> 8;
         }
 
-        for (int j = 0; j < 8 ; j++){
-            std::bitset<8> x(resTable[i][j]);
-            cout << x;
-        }
+        // for (int j = 0; j < 8 ; j++){
+        //     std::bitset<8> x(resTable[i][j]);
+        //     cout << x;
+        // }
 
-        cout << endl;
+        // cout << endl;
     }
 
 }
@@ -120,45 +120,45 @@ uint64_t BitDeconvertion(unsigned int* givenTable){
     return res;
 }
 
-void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , int key){
+void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , int key , int qsAfterNumOfEntries){
 
     unsigned int hist[UCHAR_MAX+1] = {};
 
-        cout << endl;
-        cout << "KEY " << key << " SIZE " << size << endl;
-        cout << "Previous table " << endl;
-        for (int i = 0 ; i < size ; i++){
-            cout << table1[i][0] << endl;
-        }
-        cout << endl << "Current table " << endl;
-        for (int i = 0 ; i < size ; i++){
-            cout << table1[i][key] << endl;
-        }
+        // cout << endl;
+        // cout << "KEY " << key << " SIZE " << size << endl;
+        // cout << "Previous table " << endl;
+        // for (int i = 0 ; i < size ; i++){
+        //     cout << table1[i][0] << endl;
+        // }
+        // cout << endl << "Current table " << endl;
+        // for (int i = 0 ; i < size ; i++){
+        //     cout << table1[i][key] << endl;
+        // }
 
-    if (size < 2){
+    if (size < 2 || key == 8){
         return ;
     }
-    if (key == 8 || size == 2/*64KB or 8192 entries*/){
+
+    if (size <= qsAfterNumOfEntries/*64KB or 8192 entries*/){
         uint64_t fusionTable[size];
         for (int k = 0 ; k < size ; k++){
             fusionTable[k] = BitDeconvertion(table1[k]);
-            cout << fusionTable[k] << endl;
+            // cout << fusionTable[k] << endl;
         }
-        cout << endl;
-        //quicksort
+        // cout << endl;
         quickSort(fusionTable , 0 , size - 1);
-        cout << "QUICKSORTED" << endl;
-        for (int k = 0; k < size ; k++){
-            cout << fusionTable[k] << endl;
-        }
-        cout << "ENDED " << endl << endl;
+        // cout << "QUICKSORTED" << endl;
+        // for (int k = 0; k < size ; k++){
+        //     cout << fusionTable[k] << endl;
+        // }
+        BitConversion(fusionTable , table1 , size);
         return;
     }
 
     for (int i = 0 ; i < size ; i++){
-        // cout << table1[i][key] << endl;//prints first field
         hist[table1[i][key]]++;
     }
+
 
     int psumCount = 0;
     for (int i = 0 ; i <= UCHAR_MAX ; i++){
@@ -166,6 +166,7 @@ void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , in
             psumCount++;
         }
     }
+
 
     unsigned int psum[psumCount][2] = {};
 
@@ -177,10 +178,9 @@ void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , in
             psum[ind][1] = itCount;
             itCount += hist[i];
             ind++;
-
-            // cout << i << " " << hist[i] << endl;
         }
     }
+
 
     int table2Ind = 0;
     for(int i = 0 ; i < psumCount ; i++){
@@ -198,13 +198,20 @@ void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , in
 
     }
 
-    if (key == 0){
-        cout << endl;
-        for (int i = 0 ; i < size ; i++){
-            cout << table2[i][key] << endl;
+    for (int i = 0 ; i < size ; i++){
+        for (int j = 0 ; j < 8 ; j++){
+            table1[i][j] = table2[i][j];
         }
-        cout << endl;
     }
+
+
+    // if (key == 0){
+    //     cout << endl;
+    //     for (int i = 0 ; i < size ; i++){
+    //         cout << table2[i][key] << endl;
+    //     }
+    //     cout << endl;
+    // }
 
 
     // for (int i = 0 ; i < size ; i++){
@@ -220,13 +227,24 @@ void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , in
     int newKey = key + 1;
     for (int i = 0 ; i < psumCount ; i++){
         if (i < psumCount-1){
-            SimpleSortRec(&table2[psum[i][1]] , &table1[psum[i][1]] , psum[i+1][1] - psum[i][1] , newKey);
+            SimpleSortRec(&table2[psum[i][1]] , &table1[psum[i][1]] , psum[i+1][1] - psum[i][1] , newKey , qsAfterNumOfEntries);
         }
         else if (i == psumCount-1){
-            SimpleSortRec(&table2[psum[i][1]] , &table1[psum[i][1]] , ((unsigned int)size) - psum[i][1] , newKey);            
+            SimpleSortRec(&table2[psum[i][1]] , &table1[psum[i][1]] , ((unsigned int)size) - psum[i][1] , newKey , qsAfterNumOfEntries);            
         }
     }
 
+}
+
+void SwitchElements(uint64_t** tableMain , int sizeY , int firstElem , int secondElem){
+
+    uint64_t temp;
+    for (int k = 0 ; k < sizeY ; k++){
+        temp = tableMain[k][firstElem];
+        tableMain[k][firstElem] = tableMain[k][secondElem];
+        tableMain[k][secondElem] = temp;
+        cout << temp << "->" <<  tableMain[k][firstElem] << endl;
+    }
 }
 
 
@@ -234,6 +252,7 @@ void TestSort(uint64_t** tableMain , int sizeX , int sizeY , int key){
 
     unsigned int** table1;
     unsigned int** table2;
+    int entriesQuicksort = sizeX-1;
 
     table1 = new unsigned int*[sizeX];
     for(int i = 0; i < sizeX; i++)
@@ -244,91 +263,71 @@ void TestSort(uint64_t** tableMain , int sizeX , int sizeY , int key){
         table2[i] = new unsigned int[8];
 
     BitConversion(tableMain[key] , table1 , sizeX);
+
+    // cout << endl;
     // for (int i = 0 ; i < sizeX ; i++){
     //     cout << BitDeconvertion(table1[i]) << endl;
     // }
-    SimpleSortRec(table1 , table2 , sizeX , 0);
 
-    // for (int i = 0 ; i < sizeX ; i++){
-    //     // uint64_t num = tableMain[0][i];
-    //     //  std::bitset<64> r(num);
-    //     //  cout << "Starting" << endl << r << endl;
-    //     // for (int j = 0; j < 8 ; j++){
-    //     //     table1[i][7-j] = num & ((1 << 8) - 1);
-    //     //     num = num >> 8;
-    //     // }
-    //     cout << "TWO" << endl;
-    //     for (int j = 0; j < 8 ; j++){
-    //         std::bitset<8> x(table1[i][j]);
-    //         cout << x;
-    //     }
+    SimpleSortRec(table1 , table2 , sizeX , 0 , entriesQuicksort);
 
-    //     cout << endl;
-    // }
+       // cout << endl;
+    for (int i = 0 ; i < sizeX ; i++){
+        cout << BitDeconvertion(table2[i]) << endl;
+    }
+
+    cout << endl;
+
+    for (int i = 0 ; i < sizeY ; i++){
+        for (int j = 0 ; j < sizeX ; j++){
+            cout << tableMain[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    for (int i = 0 ; i < sizeX ; i++){
+        uint64_t tmp = BitDeconvertion(table2[i]);
+        for (int j = i ; j < sizeX ; j++){
+            if (tmp == tableMain[key][j]){
+                cout << "FOUND " << i+1 << " " << tmp << endl;
+
+                if (i == j){
+                    break;
+                }
+                SwitchElements(tableMain , sizeY , i , j);
+                
+            }
+        }
+    }
     
 
-    // for (int i = 0 ; i < sizeX ; i++){
-    //     // cout << table1[i][0] << endl;//prints first field
-    //     hist[table1[i][0]]++;
-    // }
+    for (int i = 0 ; i < sizeY ; i++){
+        for (int j = 0 ; j < sizeX ; j++){
+            cout << tableMain[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
 
-    // int psumCount = 0;
-    // for (int i = 0 ; i <= UCHAR_MAX ; i++){
-    //     if (hist[i] != 0){
-    //         psumCount++;
-    //     }
-    // }
-
-    // // cout << psumCount << endl;
-
-    // unsigned int psum[psumCount][2] = {};
-
-    // int ind = 0;
-    // int itCount = 0;
-    // for (int i = 0 ; i <= UCHAR_MAX ; i++){
-    //     if (hist[i] != 0){
-    //         psum[ind][0] = i;
-    //         psum[ind][1] = itCount;
-    //         itCount += hist[i];
-    //         ind++;
-
-    //         // cout << i << " " << hist[i] << endl;
-    //     }
-    // }
-
-    // // cout << endl;
-    // // for (int i = 0 ; i < psumCount ; i++){
-    // //     cout << psum[i][0] << " " << psum[i][1] << endl;
-    // // }
-
-    // int table2Ind = 0;
-    // for(int i = 0 ; i < psumCount ; i++){
-    //     for (int j = 0 ; j < sizeX ; j++){
-    //         if (psum[i][0] == table1[j][0]){
-    //             for (int k = 0 ; k < 8 ; k++){
-    //                 table2[table2Ind][k] = table1[j][k];
-    //             }
-    //             table2Ind++;
-    //         }
-    //     }
-    // }
-
-    // for (int i = 0 ; i < sizeX ; i++){
-    //     cout << table1[i][0] << endl;
-    // }
-    // cout << endl;
 
     // for (int i = 0 ; i < sizeX ; i++){
     //     cout << table2[i][0] << endl;
     // }
 
-    
+    for(int i = 0; i < sizeX; ++i)
+        delete[] table1[i];
+    delete[] table1;
+
+    for(int i = 0; i < sizeX; ++i)
+        delete[] table2[i];
+    delete[] table2;
 
 }
 
 int main(int argc , char* argv[]){
 
-    int size1x = 20 , size1y = 4;
+    int size1x = 5 , size1y = 4;
     int size2x = 3 , size2y = 2;    
     uint64_t** table1;
     uint64_t** table2;
@@ -350,21 +349,20 @@ int main(int argc , char* argv[]){
     for (int i = 0 ; i < size1y ; i++){
         for (int j = 0 ; j < size1x ; j++){
             table1[i][j] = distribution(gen);
-            cout << table1[i][j] << " ";
+            // cout << table1[i][j] << " ";
         }
-        cout << endl;
+        // cout << endl;
     }
-    cout << endl;
+    // cout << endl;
 
     for (int i = 0 ; i < size2y ; i++){
         for (int j = 0 ; j < size2x ; j++){
             table2[i][j] = distribution(gen);
-            cout << table2[i][j] << " ";
+            // cout << table2[i][j] << " ";
         }
-        cout << endl;
+        // cout << endl;
     }
 
-    cout << "DONE" << endl;
 
     // uint64_t* t = new uint64_t[size1x];
     // for (int k = 0; k < size1x ; k++){
@@ -373,13 +371,8 @@ int main(int argc , char* argv[]){
     // }
 
 
-    // quickSort(t , 0 , size1x-1);
-    // cout << endl;
-    // for (int k = 0; k < size1x ; k++){
-    //     cout << t[k] << endl;
-    // }
-
     TestSort(table1 , size1x , size1y , 0);
+    TestSort(table2 , size2x , size2y , 0);
     
     for(int i = 0; i < size1y; ++i)
         delete[] table1[i];
