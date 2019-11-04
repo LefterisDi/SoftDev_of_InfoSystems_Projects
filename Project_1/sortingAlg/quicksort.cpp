@@ -1,6 +1,8 @@
 #include <iostream>
 #include <cstdlib> 
 
+#include "./quicksort.hpp"
+
 using namespace std;
 
 void swap(uint64_t* a, uint64_t* b)  
