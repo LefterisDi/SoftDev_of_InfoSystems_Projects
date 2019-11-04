@@ -153,10 +153,7 @@ void TableSortOnKey(uint64_t** tableMain , int sizeX , int sizeY , int key){
         table1[i] = tableMain[key][i];
     }
 
-    cout << "SORTING..." << endl;
     SimpleSortRec(table1 , table2 , sizeX , 0 , entriesQuicksort);
-
-    cout << "SORTED" << endl;
 
     // for (int i = 0 ; i < sizeY ; i++){
     //     for (int j = 0 ; j < sizeX ; j++){
@@ -167,19 +164,17 @@ void TableSortOnKey(uint64_t** tableMain , int sizeX , int sizeY , int key){
     // cout << endl;
 
 
-    cout << "SWITCHING..." << endl;
     for (int i = 0 ; i < sizeX ; i++){
         int index = binarySearch(table2 , 0 , sizeX-1 , tableMain[key][i]);
         if (index == -1){
             cout << "ELEMENT NOT FOUND ERROR!" << endl;
             exit(1);
         }
-        cout << "FOUND " << i+1 << " " << tableMain[key][i] << endl;
+        // cout << "FOUND " << i+1 << " " << tableMain[key][i] << endl;
         if (index != i){
             SwitchElements(tableMain , sizeY , i , index);
         }
     }
-    cout << "SWITCHED" << endl;
     
 
     // for (int i = 0 ; i < sizeY ; i++){
