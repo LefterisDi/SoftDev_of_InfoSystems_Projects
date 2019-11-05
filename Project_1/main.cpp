@@ -88,10 +88,10 @@ using namespace std;
 
 // }
 
-void BitConversion(uint64_t* table , unsigned int** resTable, int size){
-
-
-    for (int i = 0 ; i < size ; i++){
+void BitConversion(uint64_t* table , unsigned int** resTable, int size)
+{
+    for (int i = 0 ; i < size ; i++)
+    {
         uint64_t num = table[i];
 
         for (int j = 0; j < 8 ; j++){
@@ -109,8 +109,8 @@ void BitConversion(uint64_t* table , unsigned int** resTable, int size){
 
 }
 
-uint64_t BitDeconvertion(unsigned int* givenTable){
-
+uint64_t BitDeconvertion(unsigned int* givenTable)
+{
     uint64_t res = 0;
     for (int j = 0 ; j < 8 ; j++){
        res = res << 8;
@@ -120,8 +120,8 @@ uint64_t BitDeconvertion(unsigned int* givenTable){
     return res;
 }
 
-void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , int key , int qsAfterNumOfEntries){
-
+void SimpleSortRec(unsigned int** table1 , unsigned int** table2 , int size , int key , int qsAfterNumOfEntries)
+{
     unsigned int hist[UCHAR_MAX+1] = {};
 
         // cout << endl;
@@ -325,8 +325,8 @@ void TableSortOnKey(uint64_t** tableMain , int sizeX , int sizeY , int key){
 
 }
 
-int main(int argc , char* argv[]){
-
+int main(int argc , char* argv[])
+{
     int size1x = 5 , size1y = 4;
     int size2x = 3 , size2y = 2;    
     uint64_t** table1;
