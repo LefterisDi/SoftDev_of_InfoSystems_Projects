@@ -48,16 +48,6 @@ void SimpleSortRec(uint64_t* table1 , uint64_t* table2 , int size , int key , in
 
     unsigned int hist[UCHAR_MAX+1] = {};
 
-        // cout << endl;
-        // cout << "KEY " << key << " SIZE " << size << endl;
-        // cout << "Previous table " << endl;
-        // for (int i = 0 ; i < size ; i++){
-        //     cout << BitConversion(table1[i] , 0) << endl;
-        // }
-        // cout << endl << "Current table " << endl;
-        // for (int i = 0 ; i < size ; i++){
-        //     cout << BitConversion(table1[i] , key) << endl;
-        // }
 
     if (size < 2 || key == 8){
         return ;
@@ -113,9 +103,9 @@ void SimpleSortRec(uint64_t* table1 , uint64_t* table2 , int size , int key , in
 
     }
 
-    for (int i = 0 ; i < size ; i++){
-        table1[i] = table2[i];
-    }
+    // for (int i = 0 ; i < size ; i++){
+    //     table1[i] = table2[i];
+    // }
 
 
     int newKey = key + 1;
@@ -182,18 +172,18 @@ void TableSortOnKey(uint64_t** tableMain ,uint* rowIDs , int sizeX , int sizeY ,
         }
     }
     
-    for (int i = 0 ; i < sizeX ; i++){
-        cout << rowIDs[i] << " ";
-    }
-    cout << endl;
+    // for (int i = 0 ; i < sizeX ; i++){
+    //     cout << rowIDs[i] << " ";
+    // }
+    // cout << endl;
 
-    for (int i = 0 ; i < sizeY ; i++){
-        for (int j = 0 ; j < sizeX ; j++){
-            cout << tableMain[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
+    // for (int i = 0 ; i < sizeY ; i++){
+    //     for (int j = 0 ; j < sizeX ; j++){
+    //         cout << tableMain[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
+    // cout << endl;
 
     for (int i = 0 ; i < sizeX ; i++){
         table1[i] = tableMain[key][i];
@@ -220,9 +210,13 @@ void TableSortOnKey(uint64_t** tableMain ,uint* rowIDs , int sizeX , int sizeY ,
 
 }
 
+void MergeTables(uint64_t** table1 , uint* rowIDs1 , int size1 ,uint64_t** table2 , uint* rowIDs2 , int size2){
+
+}
+
 int main(int argc , char* argv[]){
 
-    int size1x = 5 , size1y = 4;
+    int size1x = 50 , size1y = 4;
     int size2x = 3 , size2y = 2;    
     uint64_t** table1;
     uint64_t** table2;
@@ -244,8 +238,8 @@ int main(int argc , char* argv[]){
     rowIDs1 = new uint[size1x];
     rowIDs2 = new uint[size2x];
 
-    // gen.seed ((unsigned int) time (NULL));
-    gen.seed(2);
+    gen.seed ((unsigned int) time (NULL));
+    // gen.seed(2);
 
     for (int i = 0; i < size1x ; i++){
         rowIDs1[i] = i+1;
@@ -284,5 +278,8 @@ int main(int argc , char* argv[]){
     for(int i = 0; i < size2y; ++i)
         delete[] table2[i];
     delete[] table2;
+
+    delete[] rowIDs1;
+    delete[] rowIDs2;
 }
 
