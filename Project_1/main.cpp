@@ -5,6 +5,8 @@
 #include <climits>
 #include <random>
 
+#include <bits/stdc++.h>
+
 #include "./sortingAlg/quicksort.hpp"
 #include "./searchingAlg/binarySearch.hpp"
 
@@ -36,7 +38,7 @@ using namespace std;
 //     return res;
 // }
 
-unsigned int BitConversion(uint64_t num, int key){//key must be between 0 and 7
+inline unsigned int BitConversion(uint64_t num, int key){//key must be between 0 and 7
     return ( ( (1 << 8) - 1) & (num >> ((7-key) * 8) ) );
 }
 
@@ -139,11 +141,12 @@ void SwitchElements(uint64_t** tableMain , int sizeY , int firstElem , int secon
 }
 
 
-void TableSortOnKey(uint64_t** tableMain , int sizeX , int sizeY , int key){
+void TableSortOnKey(uint64_t** tableMain ,uint* rowIDs , int sizeX , int sizeY , int key){
 
     uint64_t* table1;
     uint64_t* table2;
-    int entriesQuicksort = 5000;
+     
+    int entriesQuicksort = 8192;
 
     table1 = new uint64_t[sizeX];
     table2 = new uint64_t[sizeX];
@@ -173,17 +176,43 @@ void TableSortOnKey(uint64_t** tableMain , int sizeX , int sizeY , int key){
         // cout << "FOUND " << i+1 << " " << tableMain[key][i] << endl;
         if (index != i){
             SwitchElements(tableMain , sizeY , i , index);
+            uint tmp = rowIDs[i];
+            rowIDs[i] = rowIDs[index];
+            rowIDs[index] = tmp;
         }
     }
     
+    for (int i = 0 ; i < sizeX ; i++){
+        cout << rowIDs[i] << " ";
+    }
+    cout << endl;
 
-    // for (int i = 0 ; i < sizeY ; i++){
-    //     for (int j = 0 ; j < sizeX ; j++){
-    //         cout << tableMain[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // cout << endl;
+    for (int i = 0 ; i < sizeY ; i++){
+        for (int j = 0 ; j < sizeX ; j++){
+            cout << tableMain[i][j] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    for (int i = 0 ; i < sizeX ; i++){
+        table1[i] = tableMain[key][i];
+    }
+
+    sort(&table1[0] , &table1[sizeX]);
+
+    bool error = false;
+    for (int i = 0 ; i < sizeX ; i++){
+        // cout << table2[i] << " " << table1[i] << endl;
+        if (table2[i] != table1[i]){
+            error = true;
+            cout << "ERROOOOOOR" << endl;
+            cin.get();
+            exit(1);
+        }
+    }
+
+    cout << error << endl;
 
 
     delete[] table1;
@@ -193,10 +222,13 @@ void TableSortOnKey(uint64_t** tableMain , int sizeX , int sizeY , int key){
 
 int main(int argc , char* argv[]){
 
-    int size1x = 20 , size1y = 4;
+    int size1x = 5 , size1y = 4;
     int size2x = 3 , size2y = 2;    
     uint64_t** table1;
     uint64_t** table2;
+    uint* rowIDs1;
+    uint* rowIDs2;
+    
 
     default_random_engine gen;
     uniform_int_distribution<uint64_t> distribution(1,ULLONG_MAX);
@@ -209,8 +241,19 @@ int main(int argc , char* argv[]){
     for(int i = 0; i < size2y; i++)
         table2[i] = new uint64_t[size2x];
 
+    rowIDs1 = new uint[size1x];
+    rowIDs2 = new uint[size2x];
+
     // gen.seed ((unsigned int) time (NULL));
     gen.seed(2);
+
+    for (int i = 0; i < size1x ; i++){
+        rowIDs1[i] = i+1;
+    }
+
+    for (int i = 0; i < size2x ; i++){
+        rowIDs2[i] = i+1;        
+    }
 
     for (int i = 0 ; i < size1y ; i++){
         for (int j = 0 ; j < size1x ; j++){
@@ -231,8 +274,8 @@ int main(int argc , char* argv[]){
 
 
 
-    TableSortOnKey(table1 , size1x , size1y , 0);
-    TableSortOnKey(table2 , size2x , size2y , 0);
+    TableSortOnKey(table1 , rowIDs1 , size1x , size1y , 0);
+    TableSortOnKey(table2 , rowIDs2 , size2x , size2y , 0);
     
     for(int i = 0; i < size1y; ++i)
         delete[] table1[i];
