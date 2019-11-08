@@ -32,6 +32,12 @@ main : $(MAIN_OBJS) $(UTILS_OBJS)
 ./main.o : ./main.cpp
 	@echo "\n\033[1;33mCompiling objects\033[0m";
 	$(CC) $(DEBUG) -o ./main.o $(FLAGS) ./main.cpp
+	
+./sortingAlg/quicksort.o: ./sortingAlg/quicksort.cpp
+	$(CC) $(DEBUG) -o ./sortingAlg/quicksort.o $(FLAGS) ./sortingAlg/quicksort.cpp
+	
+./searchingAlg/binarySearch.o: ./searchingAlg/binarySearch.cpp
+	$(CC) $(DEBUG) -o ./searchingAlg/binarySearch.o $(FLAGS) ./searchingAlg/binarySearch.cpp
 
 # ------------------------------------------------- #
 

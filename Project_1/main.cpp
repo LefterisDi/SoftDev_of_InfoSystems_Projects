@@ -103,11 +103,6 @@ void SimpleSortRec(uint64_t* table1 , uint64_t* table2 , int size , int key , in
 
     }
 
-    // for (int i = 0 ; i < size ; i++){
-    //     table1[i] = table2[i];
-    // }
-
-
     int newKey = key + 1;
     for (int i = 0 ; i < psumCount ; i++){
         if (i < psumCount-1){
@@ -135,6 +130,9 @@ void TableSortOnKey(uint64_t** tableMain ,uint* rowIDs , int sizeX , int sizeY ,
 
     uint64_t* table1;
     uint64_t* table2;
+    uint64_t* table3 =  new uint64_t[sizeX];
+
+    bool* correctionTable = new bool[sizeX];
      
     int entriesQuicksort = 8192;
 
@@ -144,59 +142,59 @@ void TableSortOnKey(uint64_t** tableMain ,uint* rowIDs , int sizeX , int sizeY ,
 
     for (int i = 0 ; i < sizeX ; i++){
         table1[i] = tableMain[key][i];
+        correctionTable[i] = false;
+        table3[i] = tableMain[key][i];
     }
 
     SimpleSortRec(table1 , table2 , sizeX , 0 , entriesQuicksort);
 
-    // for (int i = 0 ; i < sizeY ; i++){
-    //     for (int j = 0 ; j < sizeX ; j++){
-    //         cout << tableMain[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // cout << endl;
-
-
-    for (int i = 0 ; i < sizeX ; i++){
-        int index = binarySearch(table2 , 0 , sizeX-1 , tableMain[key][i]);
+    int sortedElems = 0;
+    int ElemInd = 0;
+    while (sortedElems < sizeX){
+        if (correctionTable[ElemInd] == true){
+            ElemInd++;
+            continue;
+        }
+        int index = binarySearch(table2 ,correctionTable , 0 , sizeX-1 , tableMain[key][ElemInd]);
         if (index == -1){
             cout << "ELEMENT NOT FOUND ERROR!" << endl;
             exit(1);
         }
-        // cout << "FOUND " << i+1 << " " << tableMain[key][i] << endl;
-        if (index != i){
-            SwitchElements(tableMain , sizeY , i , index);
-            uint tmp = rowIDs[i];
-            rowIDs[i] = rowIDs[index];
+
+        correctionTable[index] = true;
+        sortedElems++;
+
+        if (ElemInd != index){
+            SwitchElements(tableMain , sizeY , ElemInd , index);
+            uint tmp = rowIDs[ElemInd];
+            rowIDs[ElemInd] = rowIDs[index];
             rowIDs[index] = tmp;
         }
-    }
-    
-    // for (int i = 0 ; i < sizeX ; i++){
-    //     cout << rowIDs[i] << " ";
-    // }
-    // cout << endl;
 
-    // for (int i = 0 ; i < sizeY ; i++){
-    //     for (int j = 0 ; j < sizeX ; j++){
-    //         cout << tableMain[i][j] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // cout << endl;
 
-    for (int i = 0 ; i < sizeX ; i++){
-        table1[i] = tableMain[key][i];
+        // for (int i = 0 ; i < sizeY ; i++){
+        //     for (int j = 0 ; j < sizeX ; j++){
+        //         cout << tableMain[i][j] << " ";
+        //     }
+        //     cout << endl;
+        // }
+
+        //  for (int i = 0 ; i < sizeX ; i++){
+        //      cout << correctionTable[i] << " ";
+        //  }
+
+        //  cout << endl;
+        //  cout << endl;
     }
 
-    sort(&table1[0] , &table1[sizeX]);
+    sort(&table3[0] , &table3[sizeX]);
 
     bool error = false;
     for (int i = 0 ; i < sizeX ; i++){
         // cout << table2[i] << " " << table1[i] << endl;
-        if (table2[i] != table1[i]){
+        if (table2[i] != table3[i]){
             error = true;
-            cout << "ERROOOOOOR" << endl;
+            cout << "ERROR SORTING IS NOT CORRECT" << endl;
             cin.get();
             exit(1);
         }
@@ -207,17 +205,16 @@ void TableSortOnKey(uint64_t** tableMain ,uint* rowIDs , int sizeX , int sizeY ,
 
     delete[] table1;
     delete[] table2;
+    delete[] table3;
+    delete[] correctionTable;
 
 }
 
-void MergeTables(uint64_t** table1 , uint* rowIDs1 , int size1 ,uint64_t** table2 , uint* rowIDs2 , int size2){
-
-}
 
 int main(int argc , char* argv[]){
 
-    int size1x = 50 , size1y = 4;
-    int size2x = 3 , size2y = 2;    
+    int size1x = 1000000 , size1y = 4;
+    int size2x = 10 , size2y = 2;    
     uint64_t** table1;
     uint64_t** table2;
     uint* rowIDs1;
@@ -238,15 +235,15 @@ int main(int argc , char* argv[]){
     rowIDs1 = new uint[size1x];
     rowIDs2 = new uint[size2x];
 
-    gen.seed ((unsigned int) time (NULL));
-    // gen.seed(2);
+    // gen.seed ((unsigned int) time (NULL));
+    gen.seed(3);
 
     for (int i = 0; i < size1x ; i++){
-        rowIDs1[i] = i+1;
+        rowIDs1[i] = i;
     }
 
     for (int i = 0; i < size2x ; i++){
-        rowIDs2[i] = i+1;        
+        rowIDs2[i] = i;        
     }
 
     for (int i = 0 ; i < size1y ; i++){
@@ -270,6 +267,40 @@ int main(int argc , char* argv[]){
 
     TableSortOnKey(table1 , rowIDs1 , size1x , size1y , 0);
     TableSortOnKey(table2 , rowIDs2 , size2x , size2y , 0);
+
+
+
+    // for (int i = 0 ; i < size1y ; i++){
+    //     for (int j = 0 ; j < size1x ; j++){
+    //         cout << table1[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
+    
+    // cout << endl;
+
+    // for (int i = 0 ; i < size2y ; i++){
+    //     for (int j = 0 ; j < size2x ; j++){
+    //         cout << table2[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
+    
+    // cout << endl;
+
+    // for (int i = 0 ; i < size1x ; i++){
+    //     cout << rowIDs1[i] << " ";
+    // }
+    // cout << endl;
+    
+    // for (int i = 0 ; i < size2x ; i++){
+    //     cout << rowIDs2[i] << " ";
+    // }
+    // cout << endl;
+
+    // cout << "DONE" << endl;
+
+    // MergeTables(table1 , rowIDs1 , size1x , 0 , table2 , rowIDs2 , size2x , 0);
     
     for(int i = 0; i < size1y; ++i)
         delete[] table1[i];
