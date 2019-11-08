@@ -131,22 +131,20 @@ void SwitchElements(uint64_t** tableMain , int sizeY , int firstElem , int secon
 }
 
 
-void TableSortOnKey(uint64_t** tableMain ,uint* rowIDs , int sizeX , int sizeY , int key){
-
+void TableSortOnKey(uint64_t** tableMain, uint32_t* rowIDs, int sizeX, int sizeY, int key)
+{
     uint64_t* table1;
     uint64_t* table2;
 
-    int entriesQuicksort = 8192;
+    int entriesQSort = 8192;
 
     table1 = new uint64_t[sizeX];
     table2 = new uint64_t[sizeX];
 
-
-    for (int i = 0 ; i < sizeX ; i++){
+    for (int i = 0 ; i < sizeX ; i++)
         table1[i] = tableMain[key][i];
-    }
 
-    SimpleSortRec(table1 , table2 , sizeX , 0 , entriesQuicksort);
+    SimpleSortRec(table1, table2, sizeX, 0, entriesQSort);
 
     // for (int i = 0 ; i < sizeY ; i++){
     //     for (int j = 0 ; j < sizeX ; j++){
@@ -157,17 +155,18 @@ void TableSortOnKey(uint64_t** tableMain ,uint* rowIDs , int sizeX , int sizeY ,
     // cout << endl;
 
 
-    for (int i = 0 ; i < sizeX ; i++){
+    for (int i = 0 ; i < sizeX ; i++)
+    {
         int index = binarySearch(table2 , 0 , sizeX-1 , tableMain[key][i]);
-        if (index == -1){
+        if (index == -1) {
             cout << "ELEMENT NOT FOUND ERROR!" << endl;
             exit(1);
         }
         // cout << "FOUND " << i+1 << " " << tableMain[key][i] << endl;
-        if (index != i){
+        if (index != i) {
             SwitchElements(tableMain , sizeY , i , index);
-            uint tmp = rowIDs[i];
-            rowIDs[i] = rowIDs[index];
+            uint32_t tmp  = rowIDs[i];
+            rowIDs[i]     = rowIDs[index];
             rowIDs[index] = tmp;
         }
     }
@@ -210,19 +209,19 @@ void TableSortOnKey(uint64_t** tableMain ,uint* rowIDs , int sizeX , int sizeY ,
 
 }
 
-void MergeTables(uint64_t** table1 , uint* rowIDs1 , int size1 ,uint64_t** table2 , uint* rowIDs2 , int size2){
+void MergeTables(uint64_t** table1, uint32_t* rowIDs1, int size1, uint64_t** table2, uint32_t* rowIDs2, int size2) {
 
 }
 
-int main(int argc , char* argv[]){
-
-    int size1x = 50 , size1y = 4;
+int main(int argc , char* argv[])
+{
+    int size1x = 50, size1y = 4;
     int size2x = 3 , size2y = 2;
+
+    uint32_t*  rowIDs1;
+    uint32_t*  rowIDs2;
     uint64_t** table1;
     uint64_t** table2;
-    uint* rowIDs1;
-    uint* rowIDs2;
-
 
     default_random_engine gen;
     uniform_int_distribution<uint64_t> distribution(1,ULLONG_MAX);
@@ -235,38 +234,29 @@ int main(int argc , char* argv[]){
     for(int i = 0; i < size2y; i++)
         table2[i] = new uint64_t[size2x];
 
-    rowIDs1 = new uint[size1x];
-    rowIDs2 = new uint[size2x];
+    rowIDs1 = new uint32_t[size1x];
+    rowIDs2 = new uint32_t[size2x];
 
-    gen.seed ((unsigned int) time (NULL));
+    gen.seed((unsigned int) time(NULL));
     // gen.seed(2);
 
-    for (int i = 0; i < size1x ; i++){
+    for (int i = 0 ; i < size1x ; i++)
         rowIDs1[i] = i+1;
-    }
 
-    for (int i = 0; i < size2x ; i++){
+    for (int i = 0 ; i < size2x ; i++)
         rowIDs2[i] = i+1;
-    }
 
-    for (int i = 0 ; i < size1y ; i++){
-        for (int j = 0 ; j < size1x ; j++){
+    for (int i = 0 ; i < size1y ; i++) {
+        for (int j = 0 ; j < size1x ; j++) {
             table1[i][j] = distribution(gen);
-            // cout << table1[i][j] << " ";
         }
-        // cout << endl;
     }
-    // cout << endl;
 
-    for (int i = 0 ; i < size2y ; i++){
-        for (int j = 0 ; j < size2x ; j++){
+    for (int i = 0 ; i < size2y ; i++) {
+        for (int j = 0 ; j < size2x ; j++) {
             table2[i][j] = distribution(gen);
-            // cout << table2[i][j] << " ";
         }
-        // cout << endl;
     }
-
-
 
     TableSortOnKey(table1 , rowIDs1 , size1x , size1y , 0);
     TableSortOnKey(table2 , rowIDs2 , size2x , size2y , 0);
