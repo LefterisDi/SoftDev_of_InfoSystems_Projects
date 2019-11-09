@@ -6,8 +6,8 @@
 #include <iostream>
 #include "../templates/list.hpp"
 
-inline uint32_t BitConversion (uint64_t, int);
-void            SwitchElements(uint64_t **, int, int, int);
-void            MergeTables   (List<uint64_t> &, uint64_t **, uint32_t *, int, int, uint64_t **, uint32_t *, int, int);
+uint32_t BitConversion (uint64_t, uint32_t);
+void     SwitchElements(uint64_t **, uint32_t, uint32_t, uint32_t);
+void     MergeTables   (List<uint64_t> &, uint64_t **, uint32_t *, uint32_t, uint32_t, uint64_t **, uint32_t *, uint32_t, uint32_t);
 
 #endif // __UTILS_HEADER__
