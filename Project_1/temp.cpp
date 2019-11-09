@@ -18,5 +18,11 @@ int main(int argc , char* argv[])
 
     list.ListPrint();
 
+    uint64_t list_entry = 1;
+    list_entry <<= 32;
+    list_entry |= 2;
+
+    cout << list_entry << endl;
+
     // std::cout << bck.GetBucketSize() << '\n';
 }
