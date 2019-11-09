@@ -1,12 +1,12 @@
 
 #include <iostream>
-#include "list.hpp"
+#include "./templates/list.hpp"
 
 using namespace std;
 
 int main(int argc , char* argv[])
 {
-    List<int> list(24 , sizeof(int));
+    List<int> list(20 , sizeof(int));
 
     list.ListInsert(1);
     list.ListInsert(2);
