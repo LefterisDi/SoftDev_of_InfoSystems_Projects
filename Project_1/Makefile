@@ -1,12 +1,25 @@
 # OBJECT FILES
-MAIN_OBJS  = ./main.o
-UTILS_OBJS = ./sortingAlg/quicksort.o ./searchingAlg/binarySearch.o
-OBJECTS    = $(MAIN_OBJS) $(UTILS_OBJS)
+MAIN_OBJ   = ./main.o
+SORT_OBJS  = ./sortingAlg/quicksort.o ./sortingAlg/tablesort.o
+SEARCH_OBJ = ./searchingAlg/binarySearch.o
+UTILS_OBJ  = ./utils/utils.o
+TMPL_OBJ   = ./templates/list.o
+OBJECTS    = $(MAIN_OBJ) $(UTILS_OBJ) $(TMPL_OBJ) $(SORT_OBJS) $(SEARCH_OBJ)
 
 # SOURCES
-MAIN_SRCS  = ./main.cpp
-UTILS_SRCS = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp
-SOURCES    = $(MAIN_SRCS) $(UTILS_SRCS)
+MAIN_SRC   = ./main.cpp
+SORT_SRCS  = ./sortingAlg/quicksort.cpp ./sortingAlg/tablesort.cpp
+SEARCH_SRC = ./searchingAlg/binarySearch.cpp
+UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp
+TMPL_SRC   = ./templates/list.cpp
+SOURCES    = $(MAIN_SRCS) $(UTILS_SRC) $(TMPL_SRC) $(SORT_SRCS) $(SEARCH_SRC)
+
+# HEADERS
+SORT_HDRS  = ./sortingAlg/quicksort.cpp ./sortingAlg/tablesort.cpp
+SEARCH_HDR = ./searchingAlg/binarySearch.cpp
+UTILS_HDR  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp
+TMPL_HDR   = ./templates/list.hpp
+HEADERS    = $(SORT_HDRS) $(UTILS_HDR) $(TMPL_HDR) $(SEARCH_HDR)
 
 # EXECUTABLES
 MAIN_OUT   = main
@@ -23,18 +36,27 @@ all: $(OBJECTS) $(MAIN_OUT)
 # Creating Executables
 main : $(OBJECTS)
 	@echo "\n\033[1;33mCompiling executables\033[0m";
-	$(CC) $(DEBUG) -o $(MAIN_OUT) $^
+	$(CC) $(DEBUG) -o $(MAIN_OUT) $(OBJECTS)
 	@echo "";
 
 # ------------------------------------------------- #
 
 # Creating Object Files
-./main.o : ./main.cpp
+main.o : main.cpp
 	@echo "\n\033[1;33mCompiling objects\033[0m";
-	$(CC) $(DEBUG) -o ./main.o                      $(FLAGS) ./main.cpp
+	$(CC) $(DEBUG) -o main.o                        $(FLAGS) main.cpp
+
+./templates/list.o : ./templates/list.cpp
+	$(CC) $(DEBUG) -o ./templates/list.o            $(FLAGS) ./templates/list.cpp
+
+./utils/utils.o : ./utils/utils.cpp
+	$(CC) $(DEBUG) -o ./utils/utils.o               $(FLAGS) ./utils/utils.cpp
 
 ./sortingAlg/quicksort.o : ./sortingAlg/quicksort.cpp
 	$(CC) $(DEBUG) -o ./sortingAlg/quicksort.o      $(FLAGS) ./sortingAlg/quicksort.cpp
+
+./sortingAlg/tablesort.o : ./sortingAlg/tablesort.cpp
+	$(CC) $(DEBUG) -o ./sortingAlg/tablesort.o      $(FLAGS) ./sortingAlg/tablesort.cpp
 
 ./searchingAlg/binarySearch.o : ./searchingAlg/binarySearch.cpp
 	$(CC) $(DEBUG) -o ./searchingAlg/binarySearch.o $(FLAGS) ./searchingAlg/binarySearch.cpp
@@ -49,4 +71,4 @@ clean:
 
 # Counting Files
 count:
-	wc $(SOURCES)
+	wc $(SOURCES) $(HEADERS)
