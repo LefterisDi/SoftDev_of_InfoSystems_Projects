@@ -2,17 +2,21 @@
 #include <iostream>
 #include "list.hpp"
 
+using namespace std;
+
 int main(int argc , char* argv[])
 {
-    // Bucket bck;
-    int i = 2;
+    List<int> list(24 , sizeof(int));
 
-    int& j = i;
+    list.ListInsert(1);
+    list.ListInsert(2);
+    list.ListInsert(3);
+    list.ListInsert(4);
+    list.ListInsert(5);
+    list.ListInsert(6);
+    list.ListInsert(7);
 
-    std::cout << &i << std::endl;
-    std::cout << &j << std::endl;
-    std::cout << i << std::endl;
-    std::cout << j << std::endl;
+    list.ListPrint();
 
     // std::cout << bck.GetBucketSize() << '\n';
 }
