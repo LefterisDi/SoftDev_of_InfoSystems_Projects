@@ -3,20 +3,22 @@
 
 template <typename T>
 class Bucket {
-    T*        data;
-    uint32_t  slots;
-    uint32_t  remaining_slots;
-    uint32_t* next_bucket;
+    T*       data;
+    uint32_t slots;
+    uint32_t remaining_slots;
+    Bucket*  next_bucket;
 
     public:
         Bucket(const uint32_t& = 1);
         ~Bucket();
 
+        const Bucket&  GetNextBucket(void)       const;
         const uint32_t GetBucketSize(void)       const;
         const        T BucketSearch (const T&)   const;
         const       T& operator []  (int const&) const;
 
         bool   isFull(void);
+        void   LinkNextBucket(const Bucket<T>&);
         int8_t BucketInsert(const T&);
 };
 

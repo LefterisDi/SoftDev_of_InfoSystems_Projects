@@ -15,6 +15,12 @@ Bucket<T>::~Bucket()
 }
 
 template <typename T>
+const Bucket<T>& Bucket<T>::GetNextBucket(void) const
+{
+    return next_bucket;
+}
+
+template <typename T>
 const uint32_t Bucket<T>::GetBucketSize(void) const
 {
     return slots * sizeof(T);
@@ -33,12 +39,19 @@ bool Bucket<T>::isFull(void)
 }
 
 template <typename T>
+void Bucket<T>::LinkNextBucket(const Bucket<T>& new_bucket)
+{
+    next_bucket = &new_bucket;
+}
+
+template <typename T>
 int8_t Bucket<T>::BucketInsert(const T& item)
 {
     if (!remaining_slots)
         return -1;
 
     data[slots - remaining_slots] = item;
+    remaining_slots--;
 }
 
 /* ----------------------------------------------------------------------------------------- */
@@ -59,15 +72,26 @@ List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk
 template <typename T>
 List<T>::~List()
 {
-    delete head;
-    if (tail != head)
-        delete tail;
+    Bucket<T>* curr_bucket = head;
+
+    while (curr_bucket != NULL) {
+        head = head->GetNextBucket();
+        delete curr_bucket;
+        curr_bucket = head;
+    }
 }
 
 template <typename T>
 int8_t List<T>::ListInsert(const T& item)
 {
+    if (tail->isFull()) {
+        Bucket<T>* tmp = new Bucket<T>(bucket_size / data_size);
+        tail->LinkNextBucket(*tmp);
+        tail = tmp;
+    }
 
+    tail->BucketInsert(item);
+    return 0;
 }
 
 
