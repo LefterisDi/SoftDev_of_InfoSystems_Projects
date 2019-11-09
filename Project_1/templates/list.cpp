@@ -1,3 +1,5 @@
+/* File: list.cpp */
+
 #include <iostream>
 
 #include "list.hpp"
@@ -29,7 +31,7 @@ uint32_t Bucket<T>::GetBucketSize(void) const
 template <typename T>
 void Bucket<T>::BucketPrint (void) const
 {
-    for (int i = 0 ; i < slots - remaining_slots ; i++) {
+    for (uint32_t i = 0 ; i < slots - remaining_slots ; i++) {
         std::cout << "\t" << data[i] << std::endl;
     }
 }
@@ -119,7 +121,7 @@ void List<T>::ListPrint(void) const
 }
 
 // template class Bucket<int>;
-template class List<int>;
+template class List<uint64_t>;
 
 
 //

@@ -1,3 +1,7 @@
+/* File: list.hpp */
+
+#ifndef __LIST_TEMPLATE__
+#define __LIST_TEMPLATE__
 
 #include <iostream>
 
@@ -41,3 +45,5 @@ class List {
         // T ListSearch(const T&) const;
 
 };
+
+#endif // __LIST_TEMPLATE__
