@@ -19,7 +19,7 @@ void SwitchElements(uint64_t** tableMain , int sizeY , int firstElem , int secon
     }
 }
 
-void MergeTables(List<int>& list, uint64_t** table1, uint32_t* rowIDs1, int size1X, int key1, uint64_t** table2, uint32_t* rowIDs2, int size2X, int key2)
+void MergeTables(List<uint64_t>& list, uint64_t** table1, uint32_t* rowIDs1, int size1X, int key1, uint64_t** table2, uint32_t* rowIDs2, int size2X, int key2)
 {
     int tabelA_index = 0;
     int tableB_index = 0;
@@ -27,6 +27,11 @@ void MergeTables(List<int>& list, uint64_t** table1, uint32_t* rowIDs1, int size
     while (tabelA_index < size1X)
     {
         if (table1[key1][tabelA_index] == table2[key2][tableB_index]) {
+            uint64_t list_entry = rowIDs1[tabelA_index];
+            list_entry <<= 32;
+            list_entry |= rowIDs2[tableB_index];
+
+            list.ListInsert(list_entry);
 
             std::cout << rowIDs1[tabelA_index] <<  " " << rowIDs2[tableB_index] << std::endl;
             std::cout << table1[key1][tabelA_index] << " " << table2[key2][tableB_index] << std::endl;
