@@ -209,8 +209,41 @@ void TableSortOnKey(uint64_t** tableMain, uint32_t* rowIDs, int sizeX, int sizeY
 
 }
 
-void MergeTables(uint64_t** table1, uint32_t* rowIDs1, int size1, uint64_t** table2, uint32_t* rowIDs2, int size2) {
+void MergeTables(uint64_t** table1, uint32_t* rowIDs1, int size1X, int key1, uint64_t** table2, uint32_t* rowIDs2, int size2X, int key2)
+{
+    int i = 0;
+    int j = 0;
 
+    while (i < size1X)
+    {
+        if (table1[key1][i] == table2[key2][j]) {
+            cout << rowIDs1[i] <<  " " << rowIDs2[j] << endl;
+            cout << table1[key1][i] << " " << table2[key2][j] << endl;
+            cout << endl;
+
+            j++;
+            if (j == size2X) {
+                j = 0;
+                i++;
+            }
+
+        } else if (table1[key1][i] < table2[key2][j]) {
+            i++;
+            if (i == size1X){
+                break;
+            }
+            if (table1[key1][i-1] == table1[key1][i]){
+                j = 0;
+            }
+
+        } else if (table1[key1][i] > table2[key2][j]) {
+            j++;
+            if (j == size2X){
+                j = 0;
+                i++;
+            }
+        }
+    }
 }
 
 int main(int argc , char* argv[])
