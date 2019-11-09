@@ -12,13 +12,14 @@ class Bucket {
         Bucket(const uint32_t& = 1);
         ~Bucket();
 
-        const Bucket&  GetNextBucket(void)       const;
-        const uint32_t GetBucketSize(void)       const;
-        const        T BucketSearch (const T&)   const;
-        const       T& operator []  (int const&) const;
+        Bucket*  GetNextBucket(void)       const;
+        uint32_t GetBucketSize(void)       const;
+        void     BucketPrint  (void)       const;
+        T        BucketSearch (const T&)   const;
+        T&       operator []  (int const&) const;
 
         bool   isFull(void);
-        void   LinkNextBucket(const Bucket<T>&);
+        void   LinkNextBucket(Bucket<T>&);
         int8_t BucketInsert(const T&);
 };
 
@@ -35,7 +36,8 @@ class List {
         List(const uint32_t&, const uint32_t&);
         ~List();
 
-        int8_t ListInsert(const T&);
+        int8_t     ListInsert(const T&);
+        void ListPrint(void) const;
         // T ListSearch(const T&) const;
 
 };

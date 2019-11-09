@@ -15,19 +15,27 @@ Bucket<T>::~Bucket()
 }
 
 template <typename T>
-const Bucket<T>& Bucket<T>::GetNextBucket(void) const
+Bucket<T>* Bucket<T>::GetNextBucket(void) const
 {
     return next_bucket;
 }
 
 template <typename T>
-const uint32_t Bucket<T>::GetBucketSize(void) const
+uint32_t Bucket<T>::GetBucketSize(void) const
 {
     return slots * sizeof(T);
 }
 
 template <typename T>
-const T& Bucket<T>::operator [](int const& pos) const
+void Bucket<T>::BucketPrint (void) const
+{
+    for (int i = 0 ; i < slots - remaining_slots ; i++) {
+        std::cout << "\t" << data[i] << std::endl;
+    }
+}
+
+template <typename T>
+T& Bucket<T>::operator [](int const& pos) const
 {
     return data[pos];
 }
@@ -35,11 +43,11 @@ const T& Bucket<T>::operator [](int const& pos) const
 template <typename T>
 bool Bucket<T>::isFull(void)
 {
-    return (remaining_slots ? 1 : 0);
+    return (remaining_slots ? 0 : 1);
 }
 
 template <typename T>
-void Bucket<T>::LinkNextBucket(const Bucket<T>& new_bucket)
+void Bucket<T>::LinkNextBucket(Bucket<T>& new_bucket)
 {
     next_bucket = &new_bucket;
 }
@@ -52,6 +60,7 @@ int8_t Bucket<T>::BucketInsert(const T& item)
 
     data[slots - remaining_slots] = item;
     remaining_slots--;
+    return 0;
 }
 
 /* ----------------------------------------------------------------------------------------- */
@@ -94,6 +103,23 @@ int8_t List<T>::ListInsert(const T& item)
     return 0;
 }
 
+template <typename T>
+void List<T>::ListPrint(void) const
+{
+    Bucket<T>* tmp = head;
+
+    int i = 0;
+
+    while (tmp != NULL) {
+        std::cout << "Bucket " << i << std::endl;
+        tmp->BucketPrint();
+        tmp = tmp->GetNextBucket();
+        i++;
+    }
+}
+
+// template class Bucket<int>;
+template class List<int>;
 
 
 //
