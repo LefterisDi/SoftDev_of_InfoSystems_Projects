@@ -10,6 +10,7 @@
 
 #include "./sortingAlg/tablesort.hpp"
 #include "./templates/list.hpp"
+#include "./utils/utils.hpp"
 
 using namespace std;
 
@@ -22,7 +23,8 @@ int main(int argc , char* argv[])
     uint32_t* rowIDs1;
     uint32_t* rowIDs2;
 
-    List<int> list(1048576 , sizeof(int));
+    // 1048576 Bytes = 1 MB
+    List<uint64_t> list(1048576 , sizeof(uint64_t));
 
     default_random_engine gen;
     uniform_int_distribution<uint64_t> distribution(1,ULLONG_MAX);
@@ -103,7 +105,7 @@ int main(int argc , char* argv[])
 
     // cout << "DONE" << endl;
 
-    // MergeTables(table1 , rowIDs1 , size1x , 0 , table2 , rowIDs2 , size2x , 0);
+    MergeTables(list, table1 , rowIDs1 , size1x , 0 , table2 , rowIDs2 , size2x , 0);
 
     for(int i = 0; i < size1y; ++i)
         delete[] table1[i];
