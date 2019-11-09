@@ -1,13 +1,12 @@
 /* File: main.cpp */
 
+#include <bits/stdc++.h>
 #include <bitset>
 #include <climits>
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
 #include <random>
-
-#include <bits/stdc++.h>
 
 #include "./sortingAlg/quicksort.hpp"
 #include "./searchingAlg/binarySearch.hpp"
@@ -43,6 +42,8 @@ using namespace std;
 inline unsigned int BitConversion(uint64_t num, int key){//key must be between 0 and 7
     return ( ( (1 << 8) - 1) & (num >> ((7-key) * 8) ) );
 }
+
+
 
 void SimpleSortRec(uint64_t* table1 , uint64_t* table2 , int size , int key , int qsAfterNumOfEntries){
 
@@ -126,7 +127,7 @@ void SwitchElements(uint64_t** tableMain , int sizeY , int firstElem , int secon
 }
 
 
-void TableSortOnKey(uint64_t** tableMain ,uint32_t* rowIDs , int sizeX , int sizeY , int key){
+void TableSortOnKey(uint64_t** tableMain ,uint* rowIDs , int sizeX , int sizeY , int key){
 
     uint64_t* table1;
     uint64_t* table2;
@@ -166,10 +167,11 @@ void TableSortOnKey(uint64_t** tableMain ,uint32_t* rowIDs , int sizeX , int siz
 
         if (ElemInd != index){
             SwitchElements(tableMain , sizeY , ElemInd , index);
-            uint32_t tmp = rowIDs[ElemInd];
+            uint tmp = rowIDs[ElemInd];
             rowIDs[ElemInd] = rowIDs[index];
             rowIDs[index] = tmp;
         }
+
 
         // for (int i = 0 ; i < sizeY ; i++){
         //     for (int j = 0 ; j < sizeX ; j++){
@@ -209,17 +211,51 @@ void TableSortOnKey(uint64_t** tableMain ,uint32_t* rowIDs , int sizeX , int siz
 
 }
 
+void MergeTables(uint64_t** table1 , uint* rowIDs1 , int size1X , int key1 ,uint64_t** table2 , uint* rowIDs2 , int size2X , int key2){
 
-int main(int argc , char* argv[])
-{
+    int i = 0;
+    int j = 0;
+    while (i < size1X){
+        if (table1[key1][i] == table2[key2][j]){
+            //insert [rowIDs1[i] , rowIDs2[j]] in list
+            cout << rowIDs1[i] <<  " " << rowIDs2[j] << endl;
+            cout << table1[key1][i] << " " << table2[key2][j] << endl;
+
+            cout << endl;
+            j++;
+            if (j == size2X){
+                j = 0;
+                i++;
+            }
+        }
+        else if (table1[key1][i] < table2[key2][j]){
+            i++;
+            if (i == size1X){
+                break;
+            }
+            if (table1[key1][i-1] == table1[key1][i]){
+                j = 0;
+            }
+        }
+        else if (table1[key1][i] > table2[key2][j]){
+            j++;
+            if (j == size2X){
+                j = 0;
+                i++;
+            }
+        }
+    }
+}
+
+int main(int argc , char* argv[]){
+
     int size1x = 1000000 , size1y = 4;
-    int size2x = 10      , size2y = 2;
-
+    int size2x = 10 , size2y = 2;
     uint64_t** table1;
     uint64_t** table2;
+    uint* rowIDs1;
+    uint* rowIDs2;
 
-    uint32_t* rowIDs1;
-    uint32_t* rowIDs2;
 
     default_random_engine gen;
     uniform_int_distribution<uint64_t> distribution(1,ULLONG_MAX);
@@ -232,8 +268,8 @@ int main(int argc , char* argv[])
     for(int i = 0; i < size2y; i++)
         table2[i] = new uint64_t[size2x];
 
-    rowIDs1 = new uint32_t[size1x];
-    rowIDs2 = new uint32_t[size2x];
+    rowIDs1 = new uint[size1x];
+    rowIDs2 = new uint[size2x];
 
     // gen.seed ((unsigned int) time (NULL));
     gen.seed(3);
@@ -243,7 +279,6 @@ int main(int argc , char* argv[])
     }
 
     for (int i = 0; i < size2x ; i++){
-        // rowIDs2[i] = i+1;
         rowIDs2[i] = i;
     }
 
@@ -268,6 +303,40 @@ int main(int argc , char* argv[])
 
     TableSortOnKey(table1 , rowIDs1 , size1x , size1y , 0);
     TableSortOnKey(table2 , rowIDs2 , size2x , size2y , 0);
+
+
+
+    // for (int i = 0 ; i < size1y ; i++){
+    //     for (int j = 0 ; j < size1x ; j++){
+    //         cout << table1[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
+
+    // cout << endl;
+
+    // for (int i = 0 ; i < size2y ; i++){
+    //     for (int j = 0 ; j < size2x ; j++){
+    //         cout << table2[i][j] << " ";
+    //     }
+    //     cout << endl;
+    // }
+
+    // cout << endl;
+
+    // for (int i = 0 ; i < size1x ; i++){
+    //     cout << rowIDs1[i] << " ";
+    // }
+    // cout << endl;
+
+    // for (int i = 0 ; i < size2x ; i++){
+    //     cout << rowIDs2[i] << " ";
+    // }
+    // cout << endl;
+
+    // cout << "DONE" << endl;
+
+    // MergeTables(table1 , rowIDs1 , size1x , 0 , table2 , rowIDs2 , size2x , 0);
 
     for(int i = 0; i < size1y; ++i)
         delete[] table1[i];
