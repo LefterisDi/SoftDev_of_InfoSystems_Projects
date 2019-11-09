@@ -17,7 +17,7 @@ using namespace std;
 int main(int argc , char* argv[])
 {
     int size1x = 1000000 , size1y = 4;
-    int size2x = 10 , size2y = 2;
+    int size2x = 10      , size2y = 2;
     uint64_t** table1;
     uint64_t** table2;
     uint32_t* rowIDs1;
