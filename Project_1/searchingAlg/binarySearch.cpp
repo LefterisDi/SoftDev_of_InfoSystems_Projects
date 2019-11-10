@@ -10,7 +10,7 @@ int binarySearch(uint64_t arr[], bool* positionCTable, int l, int r, uint64_t x)
         int mid = l + (r - l) / 2;
 
         // If the element is present at the middle itself
-        if (arr[mid] == x && positionCTable[mid] == false)
+        if (arr[mid] == x && positionCTable[mid] == false)//checks if the element's position has been used before
             return mid;
 
         // If element is smaller than mid, then

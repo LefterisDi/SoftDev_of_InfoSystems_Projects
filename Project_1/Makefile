@@ -6,6 +6,7 @@ SEARCH_OBJ = ./searchingAlg/binarySearch.o
 UTILS_OBJ  = ./utils/utils.o
 TMPL_OBJ   = ./templates/list.o
 OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(UTILS_OBJ) $(TMPL_OBJ) $(SORT_OBJS) $(SEARCH_OBJ)
+OBJECTS2 = unit_testing.o $(PARSER_OBJ) $(UTILS_OBJ) $(TMPL_OBJ) $(SORT_OBJS) $(SEARCH_OBJ)
 
 # SOURCES
 MAIN_SRC   = main.cpp
@@ -34,12 +35,17 @@ DEBUG      = -g3
 
 # ------------------------------------------------- #
 
-all: $(OBJECTS) $(MAIN_OUT)
+all: $(OBJECTS) $(MAIN_OUT) unit_testing
 
 # Creating Executables
 main : $(OBJECTS)
 	@echo "\n\033[1;33mCompiling executables\033[0m";
 	$(CC) $(DEBUG) -o $(MAIN_OUT) $(OBJECTS)
+	@echo "";
+
+unit_testing : $(OBJECTS2)
+	@echo "\n\033[1;33mCompiling executables\033[0m";
+	$(CC) $(DEBUG) -o unit_testing $(OBJECTS2)
 	@echo "";
 
 # ------------------------------------------------- #
@@ -48,6 +54,10 @@ main : $(OBJECTS)
 main.o : main.cpp
 	@echo "\n\033[1;33mCompiling objects\033[0m";
 	$(CC) $(DEBUG) -o main.o                        $(FLAGS) main.cpp
+	
+unit_testing.o : unit_testing.cpp
+	@echo "\n\033[1;33mCompiling objects\033[0m";
+	$(CC) $(DEBUG) -o unit_testing.o                        $(FLAGS) unit_testing.cpp
 
 ./opts/getopts.o : ./opts/getopts.cpp
 	$(CC) $(DEBUG) -o ./opts/getopts.o              $(FLAGS) ./opts/getopts.cpp

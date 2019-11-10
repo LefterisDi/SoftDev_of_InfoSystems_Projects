@@ -31,9 +31,10 @@ void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X
 
     while (tableA_index < size1X)
     {
-        if (sortedTable1[tableA_index].key == sortedTable2[tableB_index].key) {
+        if (sortedTable1[tableA_index].key == sortedTable2[tableB_index].key) {//if the keys are the same then the pair is inserted in the list
             uint64_t list_entry = sortedTable1[tableA_index].rowID;
-            list_entry <<= 32;
+            list_entry <<= 32;//the pair is inside a 64 bit unsigned integer 
+            //32 bits are used for the first key and the 32 last bits are used for the second key 
             list_entry |= sortedTable2[tableB_index].rowID;
 
             list.ListInsert(list_entry);
@@ -44,7 +45,10 @@ void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X
 
             tableB_index++;
 
-            if (tableB_index == size2X){
+            if (tableB_index == size2X){//if the first array has two consecutive elements that are the same and 
+            //we reach the end of table 2 while searching pairs for the first of the two elements then we
+            //reset the pointer for the second table so that the remaining element of the first table gets to be compared with
+            //the second array's elements
                 tableB_index = tableB_pin;
                 tableA_index++;
             }
