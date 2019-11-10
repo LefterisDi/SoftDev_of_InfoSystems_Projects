@@ -140,7 +140,7 @@ int main(int argc , char* argv[])
     // cout << "DONE" << endl;
 
     // MergeTables(list, table1 , rowIDs1 , tbl1_cols , 0 , table2 , rowIDs2 , tbl2_cols , 0);
-    MergeTables(list, sortedTable1 , tbl1_cols , 0 , sortedTable2 , tbl2_cols , 0);
+    MergeTables(list, sortedTable1 , tbl1_cols , sortedTable2 , tbl2_cols);
 
     for(int i = 0; i < tbl1_rows; ++i)
         delete[] table1[i];
@@ -149,6 +149,9 @@ int main(int argc , char* argv[])
     for(int i = 0; i < tbl2_rows; ++i)
         delete[] table2[i];
     delete[] table2;
+
+    delete sortedTable1;
+    delete sortedTable2;
 
     // delete[] rowIDs1;
     // delete[] rowIDs2;

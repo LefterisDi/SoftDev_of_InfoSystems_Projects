@@ -72,20 +72,20 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key 
     }
 }
 
-MergeTuple* TableSortOnKey(uint64_t** tableMain, int sizeX, int sizeY, int key)
+MergeTuple* TableSortOnKey(uint64_t** tableMain, int columns, int rows, int key)
 {
     MergeTuple* table1;
     MergeTuple* table2;
-    // uint64_t* table3 =  new uint64_t[sizeX];
+    // uint64_t* table3 =  new uint64_t[columns];
 
-    // bool* correctionTable = new bool[sizeX];
+    // bool* correctionTable = new bool[columns];
 
     int entriesQuicksort = 8192;
 
-    table1 = new MergeTuple[sizeX];
-    table2 = new MergeTuple[sizeX];
+    table1 = new MergeTuple[columns];
+    table2 = new MergeTuple[columns];
 
-    for (int i = 0 ; i < sizeX ; i++) {
+    for (int i = 0 ; i < columns ; i++) {
         table1[i].key   = tableMain[key][i];
         table1[i].rowID = i;
         // correctionTable[i] = false;
@@ -93,30 +93,31 @@ MergeTuple* TableSortOnKey(uint64_t** tableMain, int sizeX, int sizeY, int key)
     }
 
     // std::cout << "BEFORE SIMPLE SORT" << std::endl;
-    // for (int j = 0; j < sizeX; j++) {
+    // for (int j = 0; j < columns; j++) {
     //     std::cout << table1[j].key << " , ";
     // }
     // std::cout << std::endl;
+    // std::sort(&table3[0] , &table3[columns]);
 
-    SimpleSortRec(table1 , table2 , sizeX , 0 , entriesQuicksort);
+    SimpleSortRec(table1 , table2 , columns , 0 , entriesQuicksort);
 
     // std::cout << "AFTER SIMPLE SORT" << std::endl;
-    // for (int j = 0; j < sizeX; j++) {
+    // for (int j = 0; j < columns; j++) {
     //     std::cout << table2[j].key << " , ";
     // }
     // std::cout << std::endl;
 
-    int sortedElems = 0;
-    int ElemInd     = 0;
+    // int sortedElems = 0;
+    // int ElemInd     = 0;
 
-    // while (sortedElems < sizeX)
+    // while (sortedElems < columns)
     // {
     //     if (correctionTable[ElemInd] == true) {
     //         ElemInd++;
     //         continue;
     //     }
     //
-    //     int index = binarySearch(table2 ,correctionTable , 0 , sizeX-1 , tableMain[key][ElemInd]);
+    //     int index = binarySearch(table2 ,correctionTable , 0 , columns-1 , tableMain[key][ElemInd]);
     //
     //     if (index == -1) {
     //         std::cout << "ELEMENT NOT FOUND ERROR!" << std::endl;
@@ -127,21 +128,21 @@ MergeTuple* TableSortOnKey(uint64_t** tableMain, int sizeX, int sizeY, int key)
     //     sortedElems++;
     //
     //     if (ElemInd != index) {
-    //         SwitchElements(tableMain , sizeY , ElemInd , index);
+    //         SwitchElements(tableMain , rows , ElemInd , index);
     //         uint32_t tmp    = rowIDs[ElemInd];
     //         rowIDs[ElemInd] = rowIDs[index];
     //         rowIDs[index]   = tmp;
     //     }
     //
     //
-    //     // for (int i = 0 ; i < sizeY ; i++){
-    //     //     for (int j = 0 ; j < sizeX ; j++){
+    //     // for (int i = 0 ; i < rows ; i++){
+    //     //     for (int j = 0 ; j < columns ; j++){
     //     //         std::cout << tableMain[i][j] << " ";
     //     //     }
     //     //     std::cout << std::endl;
     //     // }
     //
-    //     //  for (int i = 0 ; i < sizeX ; i++){
+    //     //  for (int i = 0 ; i < columns ; i++){
     //     //      std::cout << correctionTable[i] << " ";
     //     //  }
     //
@@ -149,10 +150,10 @@ MergeTuple* TableSortOnKey(uint64_t** tableMain, int sizeX, int sizeY, int key)
     //     //  std::cout << std::endl;
     // }
 
-    // std::sort(&table3[0] , &table3[sizeX]);
+    // std::sort(&table3[0] , &table3[columns]);
     //
     // bool error = false;
-    // for (int i = 0 ; i < sizeX ; i++){
+    // for (int i = 0 ; i < columns ; i++){
     //     // std::cout << table2[i] << " " << table1[i] << std::endl;
     //     if (table2[i] != table3[i]){
     //         error = true;

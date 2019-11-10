@@ -24,10 +24,11 @@ void SwitchElements(uint64_t** tableMain , uint32_t sizeY , uint32_t firstElem ,
 }
 
 // void MergeTables(List<uint64_t>& list, uint64_t** table1, uint32_t* rowIDs1, uint32_t size1X, uint32_t key1, uint64_t** table2, uint32_t* rowIDs2, uint32_t size2X, uint32_t key2)
-void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X, uint32_t key1, MergeTuple* sortedTable2, uint32_t size2X, uint32_t key2)
+void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X, MergeTuple* sortedTable2, uint32_t size2X)
 {
     uint32_t tabelA_index = 0;
     uint32_t tableB_index = 0;
+    uint32_t tableB_pin   = 0;
 
     while (tabelA_index < size1X)
     {
@@ -38,30 +39,37 @@ void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X
 
             list.ListInsert(list_entry);
 
-            std::cout << sortedTable1[tabelA_index].rowID <<  " " << sortedTable2[tableB_index].rowID << std::endl;
-            // std::cout << sortedTable1[tabelA_index].key << " " << sortedTable2[tableB_index].key << std::endl;
+            // std::cout << sortedTable1[tabelA_index].rowID <<  " " << sortedTable2[tableB_index].rowID << std::endl;
+            std::cout << sortedTable1[tabelA_index].key << " " << sortedTable2[tableB_index].key << std::endl;
             // std::cout << std::endl;
 
             tableB_index++;
 
             if (tableB_index == size2X){
-                tableB_index = 0;
-                tabelA_index++;
+                // tableB_index = 0;
+                // tabelA_index++;
+                break;
             }
 
         } else if (sortedTable1[tabelA_index].key < sortedTable2[tableB_index].key) {
+
+            // while (sortedTable1[tabelA_index].key < sortedTable2[tableB_index].key) {
+            // }
             tabelA_index++;
             if (tabelA_index == size1X)
                 break;
 
             if (sortedTable1[tabelA_index-1].key == sortedTable1[tabelA_index].key)
-                tableB_index = 0;
+                tableB_index = tableB_pin;
+            else
+                tableB_pin = tableB_index;
 
         } else if (sortedTable1[tabelA_index].key > sortedTable2[tableB_index].key) {
             tableB_index++;
             if (tableB_index == size2X){
-                tableB_index = 0;
-                tabelA_index++;
+                // tableB_index = 0;
+                // tabelA_index++;
+                break;
             }
         }
     }
