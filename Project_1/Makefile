@@ -32,7 +32,7 @@ MAIN_OUT   = main
 TEST_OUT   = unit_testing
 
 # FLAGS
-CC         = g++# -Wall#-Wno-unused-variable
+CC         = g++
 FLAGS      = -c
 DEBUG      = -g3
 
