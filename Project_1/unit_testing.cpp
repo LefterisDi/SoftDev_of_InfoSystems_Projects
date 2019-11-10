@@ -3,6 +3,7 @@
 #include <climits>
 #include <cstdlib>
 #include <ctime>
+#include <fstream>
 #include <iostream>
 #include <random>
 
@@ -24,7 +25,7 @@ int main()
     uint64_t*   table1;
     uint64_t*   table2;
     MergeTuple* sortedTable;
-
+    bool error = false;
 
     default_random_engine gen;
     uniform_int_distribution<uint64_t> distribution(1,ULLONG_MAX);
@@ -39,21 +40,40 @@ int main()
         table2[i] = table1[i];
     }
 
-    cout << "Testing sorting function..." << endl;
+    cout << "\n\033[1;33m-->\033[0m Testing sorting function ..." << endl;
 
     sort(&table1[0] , &table1[rows]);
 
     sortedTable = TableSortOnKey(&table2 , rows , 1 , 0 , 500);
 
-
     for (int i = 0; i < rows ; i++){
-        if (table1[i] != sortedTable[i].key){
-            cout << "Sorting failed because the elements are not the same" << endl;
-            exit(1);
+        if (table1[i] != sortedTable[i].key) {
+            error = true;
+            break;
         }
     }
 
-    cout << "Sorting test successful!" << endl;
+    ofstream sort_file;
+    sort_file.open("sort.txt");
+    for (int i = 0 ; i < rows ; i++) {
+        sort_file << table1[i] << endl;
+    }
+    sort_file.close();
+
+    ofstream testing_file;
+    testing_file.open("testing_sort.txt");
+    for (int i = 0 ; i < rows ; i++) {
+        testing_file << table1[i] << endl;;
+    }
+    testing_file.close();
+
+    if (error)
+        cout << "\nSorting test was \033[1;31mfailed\033[0m." << endl;
+    else {
+        cout << "\nSorting test was \033[1;32msuccessful\033[0m!" << endl << endl;
+        cout << "Results of           \033[1;33msort()\033[0m function are in \033[1;34msort.txt\033[0m" << endl;
+        cout << "Results of \033[1;33mTableSortOnKey()\033[0m function are in \033[1;34mtesting_sort.txt\033[0m" << endl << endl;
+    }
 
 
     /****************************************************************
@@ -88,36 +108,64 @@ int main()
         7 4
     */
 
-    cout << "Testing MergeTables function and list results ..." << endl;
+    cout << "\n\033[1;33m-->\033[0m Testing MergeTables function and list results ..." << endl;
 
-    cout << "RESULT MUST BE:\n \
-    0 0\n \
-    1 0\n \
-    3 2\n \
-    4 2\n \
-    5 2\n \
-    6 4\n \
-    7 4" << endl;
+    uint32_t correct_results[7][2] = {{0,0},{1,0},{3,2},{4,2},{5,2},{6,4},{7,4}};
+    uint32_t test_results[7][2]    = {};
 
+    cout << "\n\033[1;33m    Results must be:\033[0m" << endl;
+    cout << "    +-----------------+" << endl;
+    cout << "    | RowID1 | RowID2 |" << endl;
+    cout << "    +--------+--------+" << endl;
+    cout << "    | 0      | 0      |" << endl;
+    cout << "    | 1      | 0      |" << endl;
+    cout << "    | 3      | 2      |" << endl;
+    cout << "    | 4      | 2      |" << endl;
+    cout << "    | 5      | 2      |" << endl;
+    cout << "    | 6      | 4      |" << endl;
+    cout << "    | 7      | 4      |" << endl;
+    cout << "    +--------+--------+" << endl;
 
     MergeTables(list , sortedTable1 , 8 , sortedTable2 , 5);
 
-    cout << "MergeTables function and list results were correct, testing successful!" << endl;
+    cout << "\n\033[1;33m    Test Results:\033[0m" << endl;
 
-    cout << "List Results" << endl;
+    Bucket<uint64_t>* bucket = list.GetFirst();
 
-    Bucket<uint64_t> bucket = *list.GetFirst();
-
-    uint32_t mask32_left  = 0xFFFFFFFF;
+    uint64_t mask32_left  = 0xFFFFFFFF;
     uint32_t mask32_right = 0xFFFFFFFF;
 
     mask32_left <<= 32;
 
-    cout << "| RowID1 | RowID2 |" << endl;
-    for (int i = 0 ; i < list.GetTotalItems() ; i++) {
-        for (int j = 0 ; j < bucket.GetBucketItems() ; j++) {
-            cout << "| " << (bucket[j] & mask32_left) << "\t| " << (bucket[j] & mask32_right) << "\t|" << endl;
+    int i = 0;
+
+    cout << "    +-----------------+" << endl;
+    cout << "    | RowID1 | RowID2 |" << endl;
+    cout << "    +--------+--------+" << endl;
+    while (bucket != NULL) {
+        for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
+            cout << "    | " << (((*bucket)[j] & mask32_left) >> 32) << "      | " << ((*bucket)[j] & mask32_right) << "      |" << endl;
+            test_results[i][0] = ((*bucket)[j] & mask32_left) >> 32;
+            test_results[i][1] = (*bucket)[j] & mask32_right;
+            i++;
         }
-        bucket = *bucket.GetNextBucket();
+
+        bucket = bucket->GetNextBucket();
     }
+    cout << "    +--------+--------+" << endl;
+
+    error = false;
+    for (int i = 0; i < 7 && !error; i++) {
+        for (int j = 0; j < 2; j++) {
+            if (correct_results[i][j] != test_results[i][j]) {
+                error = true;
+                break;
+            }
+        }
+    }
+
+    if (error)
+        cout << "\nMergeTables function and list results were incorrect, testing \033[1;31mfailed\033[0m." << endl << endl;
+    else
+        cout << "\nMergeTables function and list results were correct, testing \033[1;32msuccessful\033[0m!" << endl << endl;
 }

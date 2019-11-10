@@ -33,7 +33,7 @@ void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X
     {
         // If the keys are the same then the pair is inserted in the list
         if (sortedTable1[tableA_index].key == sortedTable2[tableB_index].key) {
-            
+
             // We store the 2 uint32_t rowIDs into a single uint64_t integer for better performance.
             // We combine the two numbers into one by placing the rowID1 in the lift-most 32 bits
             // and the rowID2 in the right-most 32 bits.
@@ -43,7 +43,7 @@ void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X
 
             list.ListInsert(list_entry);
 
-            std::cout << sortedTable1[tableA_index].rowID << " " << sortedTable2[tableB_index].rowID << std::endl;
+            // std::cout << sortedTable1[tableA_index].rowID << " " << sortedTable2[tableB_index].rowID << std::endl;
             // std::cout << sortedTable1[tableA_index].key << " " << sortedTable2[tableB_index].key << std::endl;
             // std::cout << std::endl;
 
