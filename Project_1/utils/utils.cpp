@@ -38,7 +38,7 @@ void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X
 
             list.ListInsert(list_entry);
 
-            std::cout << sortedTable1[tableA_index].rowID <<  " " << sortedTable2[tableB_index].rowID << std::endl;
+            std::cout << sortedTable1[tableA_index].rowID << " " << sortedTable2[tableB_index].rowID << std::endl;
             // std::cout << sortedTable1[tableA_index].key << " " << sortedTable2[tableB_index].key << std::endl;
             // std::cout << std::endl;
 
