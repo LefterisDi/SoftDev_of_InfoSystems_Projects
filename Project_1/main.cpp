@@ -49,7 +49,7 @@ int main(int argc , char* argv[])
 
     uint64_t mask32_left  = 0xFFFFFFFF;
     uint32_t mask32_right = 0xFFFFFFFF;
-
+ 
     mask32_left <<= 32;
 
     int i = 0;
