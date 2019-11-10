@@ -58,11 +58,40 @@ int main(){
 
 
      /************************************************************************************
-     * MERGING TESTING
+     * MERGING AND LIST TESTING
      * ***********************************************************************************/
+    
+    
+    List<uint64_t> list(1048576 , sizeof(uint64_t));
 
-     /************************************************************************************
-     * LIST TESTING
-     * ***********************************************************************************/
+    MergeTuple sortedTable1[8] = {  {1 , 0} ,
+                                    {1 , 1} ,
+                                    {5 , 2} ,
+                                    {8 , 3} ,
+                                    {8 , 4} ,
+                                    {8 , 5} ,
+                                    {12 , 6} ,
+                                    {12 , 7} };
 
+    MergeTuple sortedTable2[5] = {  {1 , 0} ,
+                                    {3 , 1} ,
+                                    {8 , 2} ,
+                                    {10 , 3} ,
+                                    {12 , 4} };
+
+    /*RESULT MUST BE 
+        0 0
+        1 0
+        3 2
+        4 2
+        5 2
+        6 4
+        7 4
+    */
+
+    cout << "Testing MergeTables function and list results..." << endl;
+
+    MergeTables(list , sortedTable1 , 8 , sortedTable2 , 5);
+
+    cout << "MergeTables function and list results were correct, testing successful !" << endl;
 }
