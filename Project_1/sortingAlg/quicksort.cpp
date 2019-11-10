@@ -5,9 +5,9 @@
 #include "../utils/utils.hpp"
 // #include <cstdlib>
 
-void swap(uint64_t* a, uint64_t* b)
+void swap(MergeTuple* a, MergeTuple* b)
 {
-    uint64_t t = *a;
+    MergeTuple t = *a;
     *a = *b;
     *b = t;
 }
@@ -29,10 +29,10 @@ int partition(MergeTuple* arr, int low, int high)
         // If current element is smaller than the pivot
         if (arr[j].key < pivot) {
             i++; // increment index of smaller element
-            swap(&arr[i].key, &arr[j].key);
+            swap(&arr[i], &arr[j]);
         }
     }
-    swap(&arr[i + 1].key, &arr[high].key);
+    swap(&arr[i + 1], &arr[high]);
     return (i + 1);
 }
 
