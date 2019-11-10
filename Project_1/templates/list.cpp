@@ -29,6 +29,12 @@ uint32_t Bucket<T>::GetBucketSize(void) const
 }
 
 template <typename T>
+uint32_t Bucket<T>::GetBucketItems(void) const
+{
+    return slots - remaining_slots;
+}
+
+template <typename T>
 void Bucket<T>::BucketPrint (void) const
 {
     for (uint32_t i = 0 ; i < slots - remaining_slots ; i++) {
@@ -102,6 +108,7 @@ int8_t List<T>::ListInsert(const T& item)
     }
 
     tail->BucketInsert(item);
+    total_items++;
     return 0;
 }
 
@@ -120,4 +127,17 @@ void List<T>::ListPrint(void) const
     }
 }
 
+template <typename T>
+Bucket<T>* List<T>::GetFirst(void) const
+{
+    return head;
+}
+
+template <typename T>
+const uint32_t List<T>::GetTotalItems(void) const
+{
+    return total_items;
+}
+
+template class Bucket<uint64_t>;
 template class List<uint64_t>;

@@ -13,16 +13,16 @@
 
 using namespace std;
 
-int main(){
-
-    /************************************************************************************
-     * SORTING TESTING
-     * ***********************************************************************************/
+int main()
+{
+    /****************************************************************
+    *                        SORTING TESTING                        *
+    ****************************************************************/
 
     uint32_t rows = 300000;
 
-    uint64_t* table1;
-    uint64_t* table2;
+    uint64_t*   table1;
+    uint64_t*   table2;
     MergeTuple* sortedTable;
 
 
@@ -56,11 +56,9 @@ int main(){
     cout << "Sorting test successful!" << endl;
 
 
-
-     /************************************************************************************
-     * MERGING AND LIST TESTING
-     * ***********************************************************************************/
-
+    /****************************************************************
+    *                   MERGING AND LIST TESTING                    *
+    ****************************************************************/
 
     List<uint64_t> list(1048576 , sizeof(uint64_t));
 
@@ -79,7 +77,8 @@ int main(){
                                     {10 , 3} ,
                                     {12 , 4} };
 
-    /*RESULT MUST BE
+    /*
+     RESULT MUST BE
         0 0
         1 0
         3 2
@@ -89,9 +88,26 @@ int main(){
         7 4
     */
 
-    cout << "Testing MergeTables function and list results..." << endl;
+    cout << "Testing MergeTables function and list results ..." << endl;
 
     MergeTables(list , sortedTable1 , 8 , sortedTable2 , 5);
 
-    cout << "MergeTables function and list results were correct, testing successful !" << endl;
+    cout << "MergeTables function and list results were correct, testing successful!" << endl;
+
+    cout << "List Results" << endl;
+
+    Bucket<uint64_t> bucket = *list.GetFirst();
+
+    uint32_t mask32_left  = 0xFFFFFFFF;
+    uint32_t mask32_right = 0xFFFFFFFF;
+
+    mask32_left <<= 32;
+
+    cout << "| RowID1 | RowID2 |" << endl;
+    for (int i = 0 ; i < list.GetTotalItems() ; i++) {
+        for (int j = 0 ; j < bucket.GetBucketItems() ; j++) {
+            cout << "| " << (bucket[j] & mask32_left) << "\t| " << (bucket[j] & mask32_right) << "\t|" << endl;
+        }
+        bucket = *bucket.GetNextBucket();
+    }
 }

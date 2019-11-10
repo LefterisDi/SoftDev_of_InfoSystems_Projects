@@ -16,10 +16,11 @@ class Bucket {
         Bucket(const uint32_t& = 1);
         ~Bucket();
 
-        Bucket*  GetNextBucket(void)       const;
-        uint32_t GetBucketSize(void)       const;
-        void     BucketPrint  (void)       const;
-        T&       operator []  (int const&) const;
+        Bucket*  GetNextBucket (void)       const;
+        uint32_t GetBucketSize (void)       const;
+        uint32_t GetBucketItems(void)       const;
+        void     BucketPrint   (void)       const;
+        T&       operator []   (int const&) const;
 
         bool   isFull(void);
         void   LinkNextBucket(Bucket<T>&);
@@ -35,12 +36,16 @@ class List {
     uint32_t   bucket_size;
     uint32_t   bucket_items;
 
+    uint32_t   total_items;
+
     public:
         List(const uint32_t&, const uint32_t&);
         ~List();
 
-        int8_t ListInsert(const T&);
-        void   ListPrint (void) const;
+        int8_t         ListInsert   (const T&);
+        void           ListPrint    (void) const;
+        Bucket<T>*     GetFirst     (void) const;
+        const uint32_t GetTotalItems(void) const;
 };
 
 #endif // __LIST_TEMPLATE__
