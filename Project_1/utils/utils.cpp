@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "../templates/list.hpp"
+#include "utils.hpp"
 
 uint32_t BitConversion(uint64_t num, uint32_t key)
 {//key must be between 0 and 7
@@ -22,14 +23,15 @@ void SwitchElements(uint64_t** tableMain , uint32_t sizeY , uint32_t firstElem ,
     }
 }
 
-void MergeTables(List<uint64_t>& list, uint64_t** table1, uint32_t* rowIDs1, uint32_t size1X, uint32_t key1, uint64_t** table2, uint32_t* rowIDs2, uint32_t size2X, uint32_t key2)
+// void MergeTables(List<uint64_t>& list, uint64_t** table1, uint32_t* rowIDs1, uint32_t size1X, uint32_t key1, uint64_t** table2, uint32_t* rowIDs2, uint32_t size2X, uint32_t key2)
+void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X, uint32_t key1, MergeTuple* sortedTable2, uint32_t size2X, uint32_t key2)
 {
     uint32_t tabelA_index = 0;
     uint32_t tableB_index = 0;
 
     while (tabelA_index < size1X)
     {
-        if (table1[key1][tabelA_index] == table2[key2][tableB_index]) {
+        if (sortedTable1[key1][tabelA_index] == sortedTable2[key2][tableB_index]) {
             uint64_t list_entry = rowIDs1[tabelA_index];
             list_entry <<= 32;
             list_entry |= rowIDs2[tableB_index];
@@ -37,8 +39,8 @@ void MergeTables(List<uint64_t>& list, uint64_t** table1, uint32_t* rowIDs1, uin
             list.ListInsert(list_entry);
 
             std::cout << rowIDs1[tabelA_index] <<  " " << rowIDs2[tableB_index] << std::endl;
-            std::cout << table1[key1][tabelA_index] << " " << table2[key2][tableB_index] << std::endl;
-            std::cout << std::endl;
+            // std::cout << sortedTable1[key1][tabelA_index] << " " << sortedTable2[key2][tableB_index] << std::endl;
+            // std::cout << std::endl;
 
             tableB_index++;
 
@@ -47,15 +49,15 @@ void MergeTables(List<uint64_t>& list, uint64_t** table1, uint32_t* rowIDs1, uin
                 tabelA_index++;
             }
 
-        } else if (table1[key1][tabelA_index] < table2[key2][tableB_index]) {
+        } else if (sortedTable1[key1][tabelA_index] < sortedTable2[key2][tableB_index]) {
             tabelA_index++;
             if (tabelA_index == size1X)
                 break;
 
-            if (table1[key1][tabelA_index-1] == table1[key1][tabelA_index])
+            if (sortedTable1[key1][tabelA_index-1] == sortedTable1[key1][tabelA_index])
                 tableB_index = 0;
 
-        } else if (table1[key1][tabelA_index] > table2[key2][tableB_index]) {
+        } else if (sortedTable1[key1][tabelA_index] > sortedTable2[key2][tableB_index]) {
             tableB_index++;
             if (tableB_index == size2X){
                 tableB_index = 0;

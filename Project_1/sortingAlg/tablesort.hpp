@@ -5,6 +5,8 @@
 
 #include <iostream>
 
-void TableSortOnKey(uint64_t **, uint32_t *, int, int, int);
+#include "../utils/utils.hpp"
+
+MergeTuple* TableSortOnKey(uint64_t **, int, int, int);
 
 #endif // __TABLE_SORT__

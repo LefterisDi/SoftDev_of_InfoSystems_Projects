@@ -26,11 +26,11 @@ int main(int argc , char* argv[])
      * | args[1].optType.cp = <query file>  |
      * +------------------------------------+
      */
-    if (!getopts(argc,argv,"ra:p,rb:p",args))
+    if (!getopts(argc,argv,"da:p,db:p",args))
         return -1;
 
-    cout << args[0].optType.cp << endl;
-    cout << args[1].optType.cp << endl;
+    // cout << args[0].optType.cp << endl;
+    // cout << args[1].optType.cp << endl;
 
     // int tbl1_cols = 1000000 , tbl1_rows = 4;
     // int tbl2_cols = 10      , tbl2_rows = 2;
@@ -52,8 +52,8 @@ int main(int argc , char* argv[])
     // return 0;
     // uint64_t** table2;
 
-    uint32_t*  rowIDs1;
-    uint32_t*  rowIDs2;
+    // uint32_t*  rowIDs1;
+    // uint32_t*  rowIDs2;
 
     // 1048576 Bytes = 1 MB
     List<uint64_t> list(1048576 , sizeof(uint64_t));
@@ -69,19 +69,19 @@ int main(int argc , char* argv[])
     // for(int i = 0; i < tbl2_rows; i++)
     //     table2[i] = new uint64_t[tbl2_cols];
 
-    rowIDs1 = new uint32_t[tbl1_cols];
-    rowIDs2 = new uint32_t[tbl2_cols];
+    // rowIDs1 = new uint32_t[tbl1_cols];
+    // rowIDs2 = new uint32_t[tbl2_cols];
 
     // gen.seed ((unsigned int) time (NULL));
     // gen.seed(3);
 
-    for (int i = 0; i < tbl1_cols ; i++){
-        rowIDs1[i] = i;
-    }
-
-    for (int i = 0; i < tbl2_cols ; i++){
-        rowIDs2[i] = i;
-    }
+    // for (int i = 0; i < tbl1_cols ; i++){
+    //     rowIDs1[i] = i;
+    // }
+    //
+    // for (int i = 0; i < tbl2_cols ; i++){
+    //     rowIDs2[i] = i;
+    // }
 
     // for (int i = 0 ; i < tbl1_rows ; i++){
     //     for (int j = 0 ; j < tbl1_cols ; j++){
@@ -102,8 +102,10 @@ int main(int argc , char* argv[])
 
 
 
-    TableSortOnKey(table1 , rowIDs1 , tbl1_cols , tbl1_rows , 0);
-    TableSortOnKey(table2 , rowIDs2 , tbl2_cols , tbl2_rows , 0);
+    // TableSortOnKey(table1 , rowIDs1 , tbl1_cols , tbl1_rows , 0);
+    // TableSortOnKey(table2 , rowIDs2 , tbl2_cols , tbl2_rows , 0);
+    MergeTuple* sortedTable1 = TableSortOnKey(table1 , tbl1_cols , tbl1_rows , 0);
+    MergeTuple* sortedTable2 = TableSortOnKey(table2 , tbl2_cols , tbl2_rows , 0);
 
 
 
@@ -137,7 +139,8 @@ int main(int argc , char* argv[])
 
     // cout << "DONE" << endl;
 
-    MergeTables(list, table1 , rowIDs1 , tbl1_cols , 0 , table2 , rowIDs2 , tbl2_cols , 0);
+    // MergeTables(list, table1 , rowIDs1 , tbl1_cols , 0 , table2 , rowIDs2 , tbl2_cols , 0);
+    MergeTables(list, sortedTable1 , tbl1_cols , 0 , sortedTable2 , tbl2_cols , 0);
 
     for(int i = 0; i < tbl1_rows; ++i)
         delete[] table1[i];

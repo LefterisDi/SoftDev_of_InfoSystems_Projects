@@ -12,7 +12,7 @@
 #include "../sortingAlg/quicksort.hpp"
 #include "../utils/utils.hpp"
 
-void SimpleSortRec(uint64_t* table1 , uint64_t* table2 , int size , int key , int qsAfterNumOfEntries)
+void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key , int qsAfterNumOfEntries)
 {
     uint32_t hist[UCHAR_MAX+1] = {};
 
@@ -29,7 +29,7 @@ void SimpleSortRec(uint64_t* table1 , uint64_t* table2 , int size , int key , in
     }
 
     for (int i = 0 ; i < size ; i++)
-        hist[BitConversion(table1[i] , key)]++;
+        hist[BitConversion(table1[i].key , key)]++;
 
     int psumCount = 0;
 
@@ -54,7 +54,7 @@ void SimpleSortRec(uint64_t* table1 , uint64_t* table2 , int size , int key , in
     int table2Ind = 0;
     for(int i = 0 ; i < psumCount ; i++) {
         for (int j = 0 ; j < size ; j++) {
-            if (psum[i][0] == BitConversion(table1[j] , key)) {
+            if (psum[i][0] == BitConversion(table1[j].key , key)) {
                 table2[table2Ind] = table1[j];
                 table2Ind++;
             }
@@ -72,69 +72,82 @@ void SimpleSortRec(uint64_t* table1 , uint64_t* table2 , int size , int key , in
     }
 }
 
-void TableSortOnKey(uint64_t** tableMain, uint32_t* rowIDs, int sizeX, int sizeY, int key)
+MergeTuple* TableSortOnKey(uint64_t** tableMain, int sizeX, int sizeY, int key)
 {
-    uint64_t* table1;
-    uint64_t* table2;
+    MergeTuple* table1;
+    MergeTuple* table2;
     // uint64_t* table3 =  new uint64_t[sizeX];
 
-    bool* correctionTable = new bool[sizeX];
+    // bool* correctionTable = new bool[sizeX];
 
     int entriesQuicksort = 8192;
 
-    table1 = new uint64_t[sizeX];
-    table2 = new uint64_t[sizeX];
+    table1 = new MergeTuple[sizeX];
+    table2 = new MergeTuple[sizeX];
 
     for (int i = 0 ; i < sizeX ; i++) {
-        table1[i]          = tableMain[key][i];
-        correctionTable[i] = false;
+        table1[i].key   = tableMain[key][i];
+        table1[i].rowID = i;
+        // correctionTable[i] = false;
         // table3[i]          = tableMain[key][i];
     }
 
+    std::cout << "BEFORE SIMPLE SORT" << std::endl;
+    for (int j = 0; j < sizeX; j++) {
+        std::cout << table1[j].key << " , ";
+    }
+    std::cout << std::endl;
+
     SimpleSortRec(table1 , table2 , sizeX , 0 , entriesQuicksort);
+
+    std::cout << "AFTER SIMPLE SORT" << std::endl;
+    for (int j = 0; j < sizeX; j++) {
+        std::cout << table2[j].key << " , ";
+    }
+    std::cout << std::endl;
 
     int sortedElems = 0;
     int ElemInd     = 0;
 
-    while (sortedElems < sizeX)
-    {
-        if (correctionTable[ElemInd] == true) {
-            ElemInd++;
-            continue;
-        }
-
-        int index = binarySearch(table2 ,correctionTable , 0 , sizeX-1 , tableMain[key][ElemInd]);
-
-        if (index == -1) {
-            std::cout << "ELEMENT NOT FOUND ERROR!" << std::endl;
-            exit(1);
-        }
-
-        correctionTable[index] = true;
-        sortedElems++;
-
-        if (ElemInd != index) {
-            SwitchElements(tableMain , sizeY , ElemInd , index);
-            uint32_t tmp    = rowIDs[ElemInd];
-            rowIDs[ElemInd] = rowIDs[index];
-            rowIDs[index]   = tmp;
-        }
-
-
-        // for (int i = 0 ; i < sizeY ; i++){
-        //     for (int j = 0 ; j < sizeX ; j++){
-        //         std::cout << tableMain[i][j] << " ";
-        //     }
-        //     std::cout << std::endl;
-        // }
-
-        //  for (int i = 0 ; i < sizeX ; i++){
-        //      std::cout << correctionTable[i] << " ";
-        //  }
-
-        //  std::cout << std::endl;
-        //  std::cout << std::endl;
-    }
+    // while (sortedElems < sizeX)
+    // {
+    //     if (correctionTable[ElemInd] == true) {
+    //         ElemInd++;
+    //         continue;
+    //     }
+    //
+    //     int index = binarySearch(table2 ,correctionTable , 0 , sizeX-1 , tableMain[key][ElemInd]);
+    //
+    //     if (index == -1) {
+    //         std::cout << "ELEMENT NOT FOUND ERROR!" << std::endl;
+    //         exit(1);
+    //     }
+    //
+    //     correctionTable[index] = true;
+    //     sortedElems++;
+    //
+    //     if (ElemInd != index) {
+    //         SwitchElements(tableMain , sizeY , ElemInd , index);
+    //         uint32_t tmp    = rowIDs[ElemInd];
+    //         rowIDs[ElemInd] = rowIDs[index];
+    //         rowIDs[index]   = tmp;
+    //     }
+    //
+    //
+    //     // for (int i = 0 ; i < sizeY ; i++){
+    //     //     for (int j = 0 ; j < sizeX ; j++){
+    //     //         std::cout << tableMain[i][j] << " ";
+    //     //     }
+    //     //     std::cout << std::endl;
+    //     // }
+    //
+    //     //  for (int i = 0 ; i < sizeX ; i++){
+    //     //      std::cout << correctionTable[i] << " ";
+    //     //  }
+    //
+    //     //  std::cout << std::endl;
+    //     //  std::cout << std::endl;
+    // }
 
     // std::sort(&table3[0] , &table3[sizeX]);
     //
@@ -152,7 +165,8 @@ void TableSortOnKey(uint64_t** tableMain, uint32_t* rowIDs, int sizeX, int sizeY
     // std::cout << error << std::endl;
 
     delete[] table1;
-    delete[] table2;
+    // delete[] table2;
     // delete[] table3;
-    delete[] correctionTable;
+    // delete[] correctionTable;
+    return table2;
 }
