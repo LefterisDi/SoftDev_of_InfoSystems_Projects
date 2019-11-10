@@ -31,7 +31,7 @@ int main(){
 
     table1 = new uint64_t[rows];
     table2 = new uint64_t[rows];
-   
+
     gen.seed(1);
 
     for (int i = 0 ; i < rows ; i++){
@@ -60,8 +60,8 @@ int main(){
      /************************************************************************************
      * MERGING AND LIST TESTING
      * ***********************************************************************************/
-    
-    
+
+
     List<uint64_t> list(1048576 , sizeof(uint64_t));
 
     MergeTuple sortedTable1[8] = {  {1 , 0} ,
@@ -79,7 +79,7 @@ int main(){
                                     {10 , 3} ,
                                     {12 , 4} };
 
-    /*RESULT MUST BE 
+    /*RESULT MUST BE
         0 0
         1 0
         3 2
