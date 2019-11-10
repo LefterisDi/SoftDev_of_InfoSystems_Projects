@@ -26,49 +26,49 @@ void SwitchElements(uint64_t** tableMain , uint32_t sizeY , uint32_t firstElem ,
 // void MergeTables(List<uint64_t>& list, uint64_t** table1, uint32_t* rowIDs1, uint32_t size1X, uint32_t key1, uint64_t** table2, uint32_t* rowIDs2, uint32_t size2X, uint32_t key2)
 void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X, MergeTuple* sortedTable2, uint32_t size2X)
 {
-    uint32_t tabelA_index = 0;
+    uint32_t tableA_index = 0;
     uint32_t tableB_index = 0;
     uint32_t tableB_pin   = 0;
 
-    while (tabelA_index < size1X)
+    while (tableA_index < size1X)
     {
-        if (sortedTable1[tabelA_index].key == sortedTable2[tableB_index].key) {
-            uint64_t list_entry = sortedTable1[tabelA_index].rowID;
+        if (sortedTable1[tableA_index].key == sortedTable2[tableB_index].key) {
+            uint64_t list_entry = sortedTable1[tableA_index].rowID;
             list_entry <<= 32;
             list_entry |= sortedTable2[tableB_index].rowID;
 
             list.ListInsert(list_entry);
 
-            // std::cout << sortedTable1[tabelA_index].rowID <<  " " << sortedTable2[tableB_index].rowID << std::endl;
-            std::cout << sortedTable1[tabelA_index].key << " " << sortedTable2[tableB_index].key << std::endl;
+            std::cout << sortedTable1[tableA_index].rowID <<  " " << sortedTable2[tableB_index].rowID << std::endl;
+            // std::cout << sortedTable1[tableA_index].key << " " << sortedTable2[tableB_index].key << std::endl;
             // std::cout << std::endl;
 
             tableB_index++;
 
             if (tableB_index == size2X){
-                // tableB_index = 0;
-                // tabelA_index++;
-                break;
+                tableB_index = tableB_pin;
+                tableA_index++;
+                // break;
             }
 
-        } else if (sortedTable1[tabelA_index].key < sortedTable2[tableB_index].key) {
+        } else if (sortedTable1[tableA_index].key < sortedTable2[tableB_index].key) {
 
-            // while (sortedTable1[tabelA_index].key < sortedTable2[tableB_index].key) {
+            // while (sortedTable1[tableA_index].key < sortedTable2[tableB_index].key) {
             // }
-            tabelA_index++;
-            if (tabelA_index == size1X)
+            tableA_index++;
+            if (tableA_index == size1X)
                 break;
 
-            if (sortedTable1[tabelA_index-1].key == sortedTable1[tabelA_index].key)
+            if (sortedTable1[tableA_index-1].key == sortedTable1[tableA_index].key)
                 tableB_index = tableB_pin;
             else
                 tableB_pin = tableB_index;
 
-        } else if (sortedTable1[tabelA_index].key > sortedTable2[tableB_index].key) {
+        } else if (sortedTable1[tableA_index].key > sortedTable2[tableB_index].key) {
             tableB_index++;
             if (tableB_index == size2X){
                 // tableB_index = 0;
-                // tabelA_index++;
+                // tableA_index++;
                 break;
             }
         }
@@ -110,7 +110,7 @@ uint64_t** ReadFile(const char* inp_data, uint32_t& table_rows, uint32_t& table_
     // --------------------------------------------------------------- //
 
     fl_data = new uint64_t*[cols];
-    for(int i = 0 ; i < cols ; i++)
+    for(uint32_t i = 0 ; i < cols ; i++)
         fl_data[i] = new uint64_t[rows];
 
     // std::cout << "!!!!!!!!!!! CHECKPOINT 7" << std::endl;

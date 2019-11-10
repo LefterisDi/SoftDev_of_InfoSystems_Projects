@@ -142,11 +142,11 @@ int main(int argc , char* argv[])
     // MergeTables(list, table1 , rowIDs1 , tbl1_cols , 0 , table2 , rowIDs2 , tbl2_cols , 0);
     MergeTables(list, sortedTable1 , tbl1_cols , sortedTable2 , tbl2_cols);
 
-    for(int i = 0; i < tbl1_rows; ++i)
+    for(uint32_t i = 0; i < tbl1_rows; ++i)
         delete[] table1[i];
     delete[] table1;
 
-    for(int i = 0; i < tbl2_rows; ++i)
+    for(uint32_t i = 0; i < tbl2_rows; ++i)
         delete[] table2[i];
     delete[] table2;
 
