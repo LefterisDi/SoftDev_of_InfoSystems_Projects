@@ -1,21 +1,23 @@
 # OBJECT FILES
 MAIN_OBJ   = main.o
+UNIT_OBJ   = unit_testing.o
 PARSER_OBJ = ./opts/getopts.o
 SORT_OBJS  = ./sortingAlg/quicksort.o ./sortingAlg/tablesort.o
 SEARCH_OBJ = ./searchingAlg/binarySearch.o
 UTILS_OBJ  = ./utils/utils.o
 TMPL_OBJ   = ./templates/list.o
 OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(UTILS_OBJ) $(TMPL_OBJ) $(SORT_OBJS) $(SEARCH_OBJ)
-OBJECTS2 = unit_testing.o $(PARSER_OBJ) $(UTILS_OBJ) $(TMPL_OBJ) $(SORT_OBJS) $(SEARCH_OBJ)
+TEST_OBJS  = $(UNIT_OBJ) $(PARSER_OBJ) $(UTILS_OBJ) $(TMPL_OBJ) $(SORT_OBJS) $(SEARCH_OBJ)
 
 # SOURCES
 MAIN_SRC   = main.cpp
+UNIT_SRC   = unit_testing.cpp
 PARSER_SRC = ./opts/getopts.cpp
 SORT_SRCS  = ./sortingAlg/quicksort.cpp ./sortingAlg/tablesort.cpp
 SEARCH_SRC = ./searchingAlg/binarySearch.cpp
 UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp
 TMPL_SRC   = ./templates/list.cpp
-SOURCES    = $(MAIN_SRCS) $(PARSER_SRC) $(UTILS_SRC) $(TMPL_SRC) $(SORT_SRCS) $(SEARCH_SRC)
+SOURCES    = $(UNIT_SRC) $(MAIN_SRCS) $(PARSER_SRC) $(UTILS_SRC) $(TMPL_SRC) $(SORT_SRCS) $(SEARCH_SRC)
 
 # HEADERS
 PARSER_HDR = ./opts/getopts.hpp
@@ -27,6 +29,7 @@ HEADERS    = $(PARSER_HDR) $(SORT_HDRS) $(UTILS_HDR) $(TMPL_HDR) $(SEARCH_HDR)
 
 # EXECUTABLES
 MAIN_OUT   = main
+TEST_OUT   = unit_testing
 
 # FLAGS
 CC         = g++# -Wall#-Wno-unused-variable
@@ -35,17 +38,16 @@ DEBUG      = -g3
 
 # ------------------------------------------------- #
 
-all: $(OBJECTS) $(MAIN_OUT) unit_testing
+all: $(OBJECTS) $(TEST_OBJS) $(MAIN_OUT) $(TEST_OUT)
 
 # Creating Executables
 main : $(OBJECTS)
 	@echo "\n\033[1;33mCompiling executables\033[0m";
 	$(CC) $(DEBUG) -o $(MAIN_OUT) $(OBJECTS)
-	@echo "";
 
-unit_testing : $(OBJECTS2)
-	@echo "\n\033[1;33mCompiling executables\033[0m";
-	$(CC) $(DEBUG) -o unit_testing $(OBJECTS2)
+unit_testing : $(TEST_OBJS)
+	@echo "\n\033[1;33mCompiling testing executables\033[0m";
+	$(CC) $(DEBUG) -o $(TEST_OUT) $(TEST_OBJS)
 	@echo "";
 
 # ------------------------------------------------- #
@@ -54,10 +56,10 @@ unit_testing : $(OBJECTS2)
 main.o : main.cpp
 	@echo "\n\033[1;33mCompiling objects\033[0m";
 	$(CC) $(DEBUG) -o main.o                        $(FLAGS) main.cpp
-	
+
 unit_testing.o : unit_testing.cpp
-	@echo "\n\033[1;33mCompiling objects\033[0m";
-	$(CC) $(DEBUG) -o unit_testing.o                        $(FLAGS) unit_testing.cpp
+	@echo "\n\033[1;33mCompiling test objects\033[0m";
+	$(CC) $(DEBUG) -o unit_testing.o                $(FLAGS) unit_testing.cpp
 
 ./opts/getopts.o : ./opts/getopts.cpp
 	$(CC) $(DEBUG) -o ./opts/getopts.o              $(FLAGS) ./opts/getopts.cpp
@@ -81,7 +83,7 @@ unit_testing.o : unit_testing.cpp
 
 # Cleaning Files
 clean:
-	rm -f $(MAIN_OUT) $(OBJECTS)
+	rm -f $(MAIN_OUT) $(TEST_OUT) $(OBJECTS) $(TEST_OBJS)
 
 # ------------------------------------------------- #
 
