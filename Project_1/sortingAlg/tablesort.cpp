@@ -19,7 +19,7 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key 
     if (size < 2 || key == 8)
         return;
 
-    if (size <= qsAfterNumOfEntries/*64KB or 8192 entries*/) {
+    if (size <= qsAfterNumOfEntries/*64KB or 8192 entries*/) {//checks if the quicksort conditions are met
         quickSort(table1 , 0 , size - 1);
 
         for (int i = 0 ; i < size ; i++) {
@@ -28,7 +28,7 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key 
         return;
     }
 
-    for (int i = 0 ; i < size ; i++)
+    for (int i = 0 ; i < size ; i++)//makes histogram
         hist[BitConversion(table1[i].key , key)]++;
 
     int psumCount = 0;
@@ -42,7 +42,7 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key 
     int ind     = 0;
     int itCount = 0;
 
-    for (int i = 0 ; i <= UCHAR_MAX ; i++) {
+    for (int i = 0 ; i <= UCHAR_MAX ; i++) {//creates psum table
         if (hist[i] != 0) {
             psum[ind][0] = i;
             psum[ind][1] = itCount;
@@ -52,7 +52,7 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key 
     }
 
     int table2Ind = 0;
-    for(int i = 0 ; i < psumCount ; i++) {
+    for(int i = 0 ; i < psumCount ; i++) {//sorting the second array using 8 bits dependent on the key given
         for (int j = 0 ; j < size ; j++) {
             if (psum[i][0] == BitConversion(table1[j].key , key)) {
                 table2[table2Ind] = table1[j];
@@ -61,7 +61,7 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key 
         }
     }
 
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {//rights the results on the first array since the second array is now sorted
         table1[i] = table2[i];
     }
 
