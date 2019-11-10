@@ -14,6 +14,6 @@ typedef struct tuple {
 uint64_t** ReadFile      (const char *, uint32_t &, uint32_t &);
 uint32_t   BitConversion (uint64_t, uint32_t);
 void       SwitchElements(uint64_t **, uint32_t, uint32_t, uint32_t);
-void       MergeTables   (List<uint64_t> &, uint64_t **, uint32_t, uint32_t, uint64_t **, uint32_t, uint32_t);
+void       MergeTables   (List<uint64_t> &, MergeTuple*, uint32_t, uint32_t, MergeTuple*, uint32_t, uint32_t);
 
 #endif // __UTILS_HEADER__
