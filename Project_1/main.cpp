@@ -42,6 +42,28 @@ int main(int argc , char* argv[])
 
     MergeTables(list, sortedTable1 , tbl1_cols , sortedTable2 , tbl2_cols);
 
+    Bucket<uint64_t>* bucket = list.GetFirst();
+
+    ofstream results;
+    results.open("results.txt");
+
+    uint64_t mask32_left  = 0xFFFFFFFF;
+    uint32_t mask32_right = 0xFFFFFFFF;
+
+    mask32_left <<= 32;
+
+    int i = 0;
+
+    while (bucket != NULL) {
+        for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
+            results << (((*bucket)[j] & mask32_left) >> 32) << " , " << ((*bucket)[j] & mask32_right) << endl;
+            i++;
+        }
+
+        bucket = bucket->GetNextBucket();
+    }
+    results.close();
+
     for(uint32_t i = 0; i < tbl1_rows; ++i)
         delete[] table1[i];
     delete[] table1;
