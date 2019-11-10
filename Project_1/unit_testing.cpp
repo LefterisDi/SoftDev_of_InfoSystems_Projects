@@ -19,7 +19,7 @@ int main()
     *                        SORTING TESTING                        *
     ****************************************************************/
 
-    uint32_t rows = 300000;
+    uint32_t rows = 30000;
 
     uint64_t*   table1;
     uint64_t*   table2;
@@ -89,6 +89,16 @@ int main()
     */
 
     cout << "Testing MergeTables function and list results ..." << endl;
+
+    cout << "RESULT MUST BE:\n \
+    0 0\n \
+    1 0\n \
+    3 2\n \
+    4 2\n \
+    5 2\n \
+    6 4\n \
+    7 4" << endl;
+
 
     MergeTables(list , sortedTable1 , 8 , sortedTable2 , 5);
 
