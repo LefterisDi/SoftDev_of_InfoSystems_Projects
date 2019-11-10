@@ -72,6 +72,6 @@ int main(int argc , char* argv[])
         delete[] table2[i];
     delete[] table2;
 
-    delete sortedTable1;
-    delete sortedTable2;
+    delete[] sortedTable1;
+    delete[] sortedTable2;
 }
