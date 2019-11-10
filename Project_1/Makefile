@@ -5,7 +5,7 @@ SORT_OBJS  = ./sortingAlg/quicksort.o ./sortingAlg/tablesort.o
 SEARCH_OBJ = ./searchingAlg/binarySearch.o
 UTILS_OBJ  = ./utils/utils.o
 TMPL_OBJ   = ./templates/list.o
-OBJECTS    = $(PARSER_OBJ) $(UTILS_OBJ) $(TMPL_OBJ) $(SORT_OBJS) $(SEARCH_OBJ) $(MAIN_OBJ)
+OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(UTILS_OBJ) $(TMPL_OBJ) $(SORT_OBJS) $(SEARCH_OBJ)
 
 # SOURCES
 MAIN_SRC   = main.cpp
@@ -14,7 +14,7 @@ SORT_SRCS  = ./sortingAlg/quicksort.cpp ./sortingAlg/tablesort.cpp
 SEARCH_SRC = ./searchingAlg/binarySearch.cpp
 UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp
 TMPL_SRC   = ./templates/list.cpp
-SOURCES    = $(PARSER_SRC) $(UTILS_SRC) $(TMPL_SRC) $(SORT_SRCS) $(SEARCH_SRC) $(MAIN_SRCS)
+SOURCES    = $(MAIN_SRCS) $(PARSER_SRC) $(UTILS_SRC) $(TMPL_SRC) $(SORT_SRCS) $(SEARCH_SRC)
 
 # HEADERS
 PARSER_HDR = ./opts/getopts.hpp
@@ -45,8 +45,11 @@ main : $(OBJECTS)
 # ------------------------------------------------- #
 
 # Creating Object Files
-./opts/getopts.o : ./opts/getopts.cpp
+main.o : main.cpp
 	@echo "\n\033[1;33mCompiling objects\033[0m";
+	$(CC) $(DEBUG) -o main.o                        $(FLAGS) main.cpp
+
+./opts/getopts.o : ./opts/getopts.cpp
 	$(CC) $(DEBUG) -o ./opts/getopts.o              $(FLAGS) ./opts/getopts.cpp
 
 ./templates/list.o : ./templates/list.cpp
@@ -63,9 +66,6 @@ main : $(OBJECTS)
 
 ./searchingAlg/binarySearch.o : ./searchingAlg/binarySearch.cpp
 	$(CC) $(DEBUG) -o ./searchingAlg/binarySearch.o $(FLAGS) ./searchingAlg/binarySearch.cpp
-
-main.o : main.cpp
-	$(CC) $(DEBUG) -o main.o                        $(FLAGS) main.cpp
 
 # ------------------------------------------------- #
 

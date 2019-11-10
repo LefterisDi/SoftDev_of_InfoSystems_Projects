@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "../utils/utils.hpp"
-// #include <cstdlib>
 
 void swap(MergeTuple* a, MergeTuple* b)
 {
@@ -22,7 +21,7 @@ void swap(MergeTuple* a, MergeTuple* b)
 int partition(MergeTuple* arr, int low, int high)
 {
     uint64_t pivot = arr[high].key; // pivot
-    int i = (low - 1);          // Index of smaller element
+    int i = (low - 1);              // Index of smaller element
 
     for (int j = low ; j <= high - 1 ; j++)
     {

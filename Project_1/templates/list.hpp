@@ -19,7 +19,6 @@ class Bucket {
         Bucket*  GetNextBucket(void)       const;
         uint32_t GetBucketSize(void)       const;
         void     BucketPrint  (void)       const;
-        T        BucketSearch (const T&)   const;
         T&       operator []  (int const&) const;
 
         bool   isFull(void);
@@ -40,10 +39,8 @@ class List {
         List(const uint32_t&, const uint32_t&);
         ~List();
 
-        int8_t     ListInsert(const T&);
-        void ListPrint(void) const;
-        // T ListSearch(const T&) const;
-
+        int8_t ListInsert(const T&);
+        void   ListPrint (void) const;
 };
 
 #endif // __LIST_TEMPLATE__
