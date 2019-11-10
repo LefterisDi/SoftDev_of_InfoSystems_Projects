@@ -28,7 +28,7 @@ HEADERS    = $(PARSER_HDR) $(SORT_HDRS) $(UTILS_HDR) $(TMPL_HDR) $(SEARCH_HDR)
 MAIN_OUT   = main
 
 # FLAGS
-CC         = g++ -Wall#-Wno-unused-variable
+CC         = g++# -Wall#-Wno-unused-variable
 FLAGS      = -c
 DEBUG      = -g3
 

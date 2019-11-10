@@ -19,14 +19,14 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key 
     if (size < 2 || key == 8)
         return;
 
-    // if (size <= qsAfterNumOfEntries/*64KB or 8192 entries*/) {
-    //     quickSort(table1 , 0 , size - 1);
-    //
-    //     for (int i = 0 ; i < size ; i++) {
-    //         table2[i] = table1[i];
-    //     }
-    //     return;
-    // }
+    if (size <= qsAfterNumOfEntries/*64KB or 8192 entries*/) {
+        quickSort(table1 , 0 , size - 1);
+
+        for (int i = 0 ; i < size ; i++) {
+            table2[i] = table1[i];
+        }
+        return;
+    }
 
     for (int i = 0 ; i < size ; i++)
         hist[BitConversion(table1[i].key , key)]++;
