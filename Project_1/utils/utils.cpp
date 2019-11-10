@@ -31,15 +31,15 @@ void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X
 
     while (tabelA_index < size1X)
     {
-        if (sortedTable1[key1][tabelA_index] == sortedTable2[key2][tableB_index]) {
-            uint64_t list_entry = rowIDs1[tabelA_index];
+        if (sortedTable1[tabelA_index].key == sortedTable2[tableB_index].key) {
+            uint64_t list_entry = sortedTable1[tabelA_index].rowID;
             list_entry <<= 32;
-            list_entry |= rowIDs2[tableB_index];
+            list_entry |= sortedTable2[tableB_index].rowID;
 
             list.ListInsert(list_entry);
 
-            std::cout << rowIDs1[tabelA_index] <<  " " << rowIDs2[tableB_index] << std::endl;
-            // std::cout << sortedTable1[key1][tabelA_index] << " " << sortedTable2[key2][tableB_index] << std::endl;
+            std::cout << sortedTable1[tabelA_index].rowID <<  " " << sortedTable2[tableB_index].rowID << std::endl;
+            // std::cout << sortedTable1[tabelA_index].key << " " << sortedTable2[tableB_index].key << std::endl;
             // std::cout << std::endl;
 
             tableB_index++;
@@ -49,15 +49,15 @@ void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X
                 tabelA_index++;
             }
 
-        } else if (sortedTable1[key1][tabelA_index] < sortedTable2[key2][tableB_index]) {
+        } else if (sortedTable1[tabelA_index].key < sortedTable2[tableB_index].key) {
             tabelA_index++;
             if (tabelA_index == size1X)
                 break;
 
-            if (sortedTable1[key1][tabelA_index-1] == sortedTable1[key1][tabelA_index])
+            if (sortedTable1[tabelA_index-1].key == sortedTable1[tabelA_index].key)
                 tableB_index = 0;
 
-        } else if (sortedTable1[key1][tabelA_index] > sortedTable2[key2][tableB_index]) {
+        } else if (sortedTable1[tabelA_index].key > sortedTable2[tableB_index].key) {
             tableB_index++;
             if (tableB_index == size2X){
                 tableB_index = 0;
