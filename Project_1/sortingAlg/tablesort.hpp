@@ -7,6 +7,6 @@
 
 #include "../utils/utils.hpp"
 
-MergeTuple* TableSortOnKey(uint64_t **, int, int, int);
+MergeTuple* TableSortOnKey(uint64_t **, int, int, int , int);
 
 #endif // __TABLE_SORT__

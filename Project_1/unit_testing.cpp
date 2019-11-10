@@ -43,7 +43,7 @@ int main(){
 
     sort(&table1[0] , &table1[rows]);
 
-    sortedTable = TableSortOnKey(&table2 , rows , 1 , 0);
+    sortedTable = TableSortOnKey(&table2 , rows , 1 , 0 , 500);
 
 
     for (int i = 0; i < rows ; i++){

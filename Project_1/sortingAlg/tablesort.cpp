@@ -76,12 +76,10 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key 
     }
 }
 
-MergeTuple* TableSortOnKey(uint64_t** tableMain, int columns, int rows, int key)
+MergeTuple* TableSortOnKey(uint64_t** tableMain, int columns, int rows, int key , int entriesQuicksort)
 {
     MergeTuple* table1;
     MergeTuple* table2;
-
-    int entriesQuicksort = 8192;
 
     table1 = new MergeTuple[columns];
     table2 = new MergeTuple[columns];

@@ -37,8 +37,8 @@ int main(int argc , char* argv[])
 
     List<uint64_t> list(1048576 , sizeof(uint64_t));
 
-    MergeTuple* sortedTable1 = TableSortOnKey(table1 , tbl1_cols , tbl1_rows , 0);
-    MergeTuple* sortedTable2 = TableSortOnKey(table2 , tbl2_cols , tbl2_rows , 0);
+    MergeTuple* sortedTable1 = TableSortOnKey(table1 , tbl1_cols , tbl1_rows , 0 , 8192);
+    MergeTuple* sortedTable2 = TableSortOnKey(table2 , tbl2_cols , tbl2_rows , 0 , 8192);
 
     MergeTables(list, sortedTable1 , tbl1_cols , sortedTable2 , tbl2_cols);
 
