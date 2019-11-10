@@ -5,6 +5,8 @@
 
 #include <iostream>
 
-void quickSort(uint64_t [], int, int);
+#include "../utils/utils.hpp"
+
+void quickSort(MergeTuple *, int, int);
 
 #endif // __QUICKSORT_HPP__

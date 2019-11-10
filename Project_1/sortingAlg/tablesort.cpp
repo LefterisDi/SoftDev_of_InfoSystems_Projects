@@ -92,19 +92,19 @@ MergeTuple* TableSortOnKey(uint64_t** tableMain, int sizeX, int sizeY, int key)
         // table3[i]          = tableMain[key][i];
     }
 
-    std::cout << "BEFORE SIMPLE SORT" << std::endl;
-    for (int j = 0; j < sizeX; j++) {
-        std::cout << table1[j].key << " , ";
-    }
-    std::cout << std::endl;
+    // std::cout << "BEFORE SIMPLE SORT" << std::endl;
+    // for (int j = 0; j < sizeX; j++) {
+    //     std::cout << table1[j].key << " , ";
+    // }
+    // std::cout << std::endl;
 
     SimpleSortRec(table1 , table2 , sizeX , 0 , entriesQuicksort);
 
-    std::cout << "AFTER SIMPLE SORT" << std::endl;
-    for (int j = 0; j < sizeX; j++) {
-        std::cout << table2[j].key << " , ";
-    }
-    std::cout << std::endl;
+    // std::cout << "AFTER SIMPLE SORT" << std::endl;
+    // for (int j = 0; j < sizeX; j++) {
+    //     std::cout << table2[j].key << " , ";
+    // }
+    // std::cout << std::endl;
 
     int sortedElems = 0;
     int ElemInd     = 0;

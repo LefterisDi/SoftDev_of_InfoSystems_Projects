@@ -1,6 +1,8 @@
 /* File: binarySearch.cpp */
 
 #include <iostream>
+
+#include "../utils/utils.hpp"
 // #include <cstdlib>
 
 void swap(uint64_t* a, uint64_t* b)
@@ -17,20 +19,20 @@ void swap(uint64_t* a, uint64_t* b)
 * to left of pivot and all greater elements to right  *
 * of pivot                                            *
 ******************************************************/
-int partition(uint64_t arr[], int low, int high)
+int partition(MergeTuple* arr, int low, int high)
 {
-    uint64_t pivot = arr[high]; // pivot
+    uint64_t pivot = arr[high].key; // pivot
     int i = (low - 1);          // Index of smaller element
 
     for (int j = low ; j <= high - 1 ; j++)
     {
         // If current element is smaller than the pivot
-        if (arr[j] < pivot) {
+        if (arr[j].key < pivot) {
             i++; // increment index of smaller element
-            swap(&arr[i], &arr[j]);
+            swap(&arr[i].key, &arr[j].key);
         }
     }
-    swap(&arr[i + 1], &arr[high]);
+    swap(&arr[i + 1].key, &arr[high].key);
     return (i + 1);
 }
 
@@ -40,7 +42,7 @@ int partition(uint64_t arr[], int low, int high)
 * low   --> Starting index,                   *
 * high  --> Ending index                      *
 **********************************************/
-void quickSort(uint64_t arr[], int low, int high)
+void quickSort(MergeTuple* arr, int low, int high)
 {
     if (low < high)
     {

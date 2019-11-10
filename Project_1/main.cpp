@@ -150,6 +150,6 @@ int main(int argc , char* argv[])
         delete[] table2[i];
     delete[] table2;
 
-    delete[] rowIDs1;
-    delete[] rowIDs2;
+    // delete[] rowIDs1;
+    // delete[] rowIDs2;
 }
