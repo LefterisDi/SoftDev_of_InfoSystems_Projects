@@ -1,6 +1,8 @@
 /* File: utils.cpp */
 
 #include <iostream>
+#include <fstream>
+#include <string.h>
 
 #include "../templates/list.hpp"
 
@@ -61,4 +63,81 @@ void MergeTables(List<uint64_t>& list, uint64_t** table1, uint32_t* rowIDs1, uin
             }
         }
     }
+}
+
+uint64_t** ReadFile(const char* inp_data, uint32_t& table_rows, uint32_t& table_cols)
+{
+    uint64_t** fl_data;
+    // std::cout << "!!!!!!!!!!! CHECKPOINT 1" << std::endl;
+
+    FILE* fp;
+
+    fp = fopen(inp_data,"r");
+    // std::cout << "!!!!!!!!!!! CHECKPOINT 2" << std::endl;
+
+    char*  line = NULL;
+    size_t len  = 0;
+
+    uint32_t rows = 0;
+    uint32_t cols = 0;
+
+    while (getline(&line, &len, fp) != -1)
+        rows++;
+    // std::cout << "!!!!!!!!!!! CHECKPOINT 3" << std::endl;
+
+    char* columns = NULL;
+    while ((columns = strtok((columns == NULL) ? line : NULL, ",")) != NULL)
+        cols++;
+    // std::cout << "!!!!!!!!!!! CHECKPOINT 4" << std::endl;
+
+    free(line);
+    // std::cout << "!!!!!!!!!!! CHECKPOINT 5" << std::endl;
+
+    // std::cout << "ROWS = " << cols << std::endl;
+    // std::cout << "COLS = " << rows << std::endl;
+
+    // std::cout << "!!!!!!!!!!! CHECKPOINT 6" << std::endl;
+    // --------------------------------------------------------------- //
+
+    fl_data = new uint64_t*[cols];
+    for(int i = 0 ; i < cols ; i++)
+        fl_data[i] = new uint64_t[rows];
+
+    // std::cout << "!!!!!!!!!!! CHECKPOINT 7" << std::endl;
+    // --------------------------------------------------------------- //
+
+    fseek(fp, 0, SEEK_SET);
+    // std::cout << "!!!!!!!!!!! CHECKPOINT 8" << std::endl;
+
+    line = NULL;
+    len  = 0;
+
+    int col_i = 0;
+    while (getline(&line, &len, fp) != -1) {
+        // std::cout << "!!!!!!!!!!! CHECKPOINT 9" << std::endl;
+        char* tmp_col = NULL;
+
+        int row_i = 0;
+        // std::cout << "!!!!!!!!!!! CHECKPOINT 10" << std::endl;
+        while ((tmp_col = strtok((tmp_col == NULL) ? line : NULL, ",\n")) != NULL) {
+            // std::cout << "!!!!!!!!!!! CHECKPOINT 11" << std::endl;
+            // std::cout << "DATA     = " << tmp_col << std::endl;
+            fl_data[row_i][col_i] = strtoul(tmp_col, NULL, 0);
+            // std::cout << "NEW DATA = " << fl_data[row_i][col_i] << std::endl;
+            // std::cout << "NEW DATA = " << tmp_col << std::endl;
+            row_i++;
+        }
+        // std::cout << "!!!!!!!!!!! CHECKPOINT 12" << std::endl;
+        col_i++;
+    }
+    // std::cout << "!!!!!!!!!!! CHECKPOINT 13" << std::endl;
+
+    free(line);
+    fclose(fp);
+    // std::cout << "!!!!!!!!!!! CHECKPOINT 14" << std::endl;
+
+    table_rows = cols;
+    table_cols = rows;
+
+    return fl_data;
 }
