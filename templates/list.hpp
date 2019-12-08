@@ -19,7 +19,7 @@ class Bucket {
         Bucket*  GetNextBucket (void)       const;
         uint32_t GetBucketSize (void)       const;
         uint32_t GetBucketItems(void)       const;
-        void     BucketPrint   (void)       const;
+        // void     BucketPrint   (void)       const;
         T&       operator []   (int const&) const;
 
         bool   isFull(void);
@@ -43,9 +43,10 @@ class List {
         ~List();
 
         int8_t         ListInsert   (const T&);
-        void           ListPrint    (void) const;
+        // void           ListPrint    (void) const;
         Bucket<T>*     GetFirst     (void) const;
         const uint32_t GetTotalItems(void) const;
 };
+
 
 #endif // __LIST_TEMPLATE__

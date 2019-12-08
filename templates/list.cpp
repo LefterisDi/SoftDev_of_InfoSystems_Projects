@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "list.hpp"
+#include "../relationStructs.h"
 
 template <typename T>
 Bucket<T>::Bucket(const uint32_t& items) : slots(items), remaining_slots(items), next_bucket(NULL)
@@ -34,13 +35,14 @@ uint32_t Bucket<T>::GetBucketItems(void) const
     return slots - remaining_slots;
 }
 
-template <typename T>
-void Bucket<T>::BucketPrint (void) const
-{
-    for (uint32_t i = 0 ; i < slots - remaining_slots ; i++) {
-        std::cout << "\t" << data[i] << std::endl;
-    }
-}
+// template <typename T>
+// void Bucket<T>::BucketPrint (void) const
+// {
+//     for (uint32_t i = 0 ; i < slots - remaining_slots ; i++) {
+//         std::cout << "\t" << data[i] << std::endl;
+//     }
+// }
+
 
 template <typename T>
 T& Bucket<T>::operator [](int const& pos) const
@@ -112,20 +114,20 @@ int8_t List<T>::ListInsert(const T& item)
     return 0;
 }
 
-template <typename T>
-void List<T>::ListPrint(void) const
-{
-    Bucket<T>* tmp = head;
+// template <typename T>
+// void List<T>::ListPrint(void) const
+// {
+//     Bucket<T>* tmp = head;
 
-    int i = 0;
+//     int i = 0;
 
-    while (tmp != NULL) {
-        std::cout << "Bucket " << i << std::endl;
-        tmp->BucketPrint();
-        tmp = tmp->GetNextBucket();
-        i++;
-    }
-}
+//     while (tmp != NULL) {
+//         std::cout << "Bucket " << i << std::endl;
+//         tmp->BucketPrint();
+//         tmp = tmp->GetNextBucket();
+//         i++;
+//     }
+// }
 
 template <typename T>
 Bucket<T>* List<T>::GetFirst(void) const
@@ -141,3 +143,10 @@ const uint32_t List<T>::GetTotalItems(void) const
 
 template class Bucket<uint64_t>;
 template class List<uint64_t>;
+template class List<ResStruct>;
+template class Bucket<ResStruct>;
+template class List<JoinPred>;
+template class Bucket<JoinPred>;
+template class List<CompPred>;
+template class Bucket<CompPred>;
+

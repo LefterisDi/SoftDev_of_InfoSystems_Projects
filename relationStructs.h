@@ -27,15 +27,9 @@ typedef struct CompPred{
     char comp;
 }CompPred;
 
-typedef struct CompRes{
-    List<uint64_t> resList;
+typedef struct ResStruct{
     uint64_t tableID;
-}CompRes;
-
-typedef struct JoinRes{
-    List<uint64_t> resList;
-    uint64_t tableID1;
-    uint64_t tableID2;
-}JoinRes;
+    List<uint64_t>* rowIDlist;
+}ResStruct;
 
 #endif
