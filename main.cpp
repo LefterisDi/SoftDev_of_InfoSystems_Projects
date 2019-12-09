@@ -20,18 +20,85 @@
 
 using namespace std;
 
-List<uint64_t>* JoinPredicate(RelationTable* relTable , JoinPred& cpred){
+ResStruct* FindInResList(List<ResStruct>& resList , uint64_t elemID){
+
+    Bucket<ResStruct>* bucket = resList.GetFirst();
+    ResStruct* found = NULL;
+
+    while (bucket != NULL) {
+        for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
+            if (elemID == (*bucket)[j].tableID){
+                found = &(*bucket)[j];
+                return found;
+            }
+        }
+
+        bucket = bucket->GetNextBucket();
+    }
+
+    return found;
+}
+
+List<uint64_t>* JoinPredicate(RelationTable* relTable , JoinPred& cpred , List<ResStruct>& resList){
 
     List<uint64_t>* doubleKeyList = new List<uint64_t>(1048576 , sizeof(uint64_t));
+    uint64_t** table1;
+    uint64_t** table2;
+    if (FindInResList(resList , cpred.rel1)->rowIDlist->GetTotalItems() != NULL){
+        table1 = new uint64_t*[relTable[cpred.rel1].cols];
+        uint32_t totalItems = FindInResList(resList , cpred.rel1)->rowIDlist->GetTotalItems();
+        for(int i = 0; i < relTable[cpred.rel1].cols; i++)
+            table1[i] = new uint64_t[totalItems];
+    }
+    else {
+        table1 = relTable[cpred.rel1].table;
+    }
 
-    MergeTuple* sortedTable1 = TableSortOnKey(relTable[cpred.rel1].table , relTable[cpred.rel1].rows , cpred.colRel1 , 8192);
-    MergeTuple* sortedTable2 = TableSortOnKey(relTable[cpred.rel2].table , relTable[cpred.rel2].rows , cpred.colRel2 , 8192);
+    if (FindInResList(resList , cpred.rel2)->rowIDlist->GetTotalItems() != NULL){
+        uint64_t** table2 = new uint64_t*[relTable[cpred.rel2].cols];
+        uint32_t totalItems = FindInResList(resList , cpred.rel2)->rowIDlist->GetTotalItems();
+        for(int i = 0; i < relTable[cpred.rel2].cols; i++)
+            table2[i] = new uint64_t[totalItems];
+    }
+    else {
+        table2 = relTable[cpred.rel2].table;
+    }
+
+    MergeTuple* sortedTable1 = TableSortOnKey(table1 , FindInResList(resList , cpred.rel1)->rowIDlist->GetTotalItems() , cpred.colRel1 , 8192);
+    MergeTuple* sortedTable2 = TableSortOnKey(table2 , FindInResList(resList , cpred.rel2)->rowIDlist->GetTotalItems() , cpred.colRel2 , 8192);
 
     // for (int i = 0 ; i < relTable[cpred.rel1].rows ; i++){
     //     cout << sortedTable1[i].key << endl;
     // }
 
     MergeTables(*doubleKeyList, sortedTable1 , relTable[cpred.rel1].rows , sortedTable2 , relTable[cpred.rel2].rows);
+
+    ResStruct* tmp = FindInResList(resList , cpred.rel1);
+    
+    Bucket<uint64_t>* bucketDK = doubleKeyList->GetFirst();
+    Bucket<uint64_t>* bucketRL = tmp->rowIDlist->GetFirst();
+
+    uint32_t i = 0;
+    while (bucketDK != NULL) {
+        for (int j = 0 ; j < bucketDK->GetBucketItems() ; j++) {
+            if ( (*bucketDK)[j] != (*bucketRL)[0] ){
+                // Bucket<uint64_t>* bucketTMP = bucketRL;
+                bucketRL = bucketRL->GetNextBucket();
+                //remove element assuming that each element has its own bucket
+                i--;
+                j--;
+            }
+            else {
+                bucketRL = bucketRL->GetNextBucket();
+            }
+            i++;
+        }
+
+        bucketDK = bucketDK->GetNextBucket();
+        if (bucketDK == NULL && bucketRL != NULL){
+            //while not error delete the element in the i th place
+        }
+    }
 
     return doubleKeyList;
 }
@@ -109,24 +176,7 @@ int FindInList(List<uint64_t>* rowIDlist , uint64_t elemID , int numOfElems = 1)
 
 }
 
-ResStruct* FindInResList(List<ResStruct>& resList , uint64_t elemID){
 
-    Bucket<ResStruct>* bucket = resList.GetFirst();
-    ResStruct* found = NULL;
-
-    while (bucket != NULL) {
-        for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
-            if (elemID == (*bucket)[j].tableID){
-                found = &(*bucket)[j];
-                return found;
-            }
-        }
-
-        bucket = bucket->GetNextBucket();
-    }
-
-    return found;
-}
 
 // List<uint64_t>* FindInList(List<ResStruct>* rowIDlist , uint64_t elemID){
 
