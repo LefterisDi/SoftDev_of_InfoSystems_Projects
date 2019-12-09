@@ -85,10 +85,10 @@ List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk
     }
 
     head = new Bucket<T>(bucket_size / data_size);
-    bucket_num++;
-    tail    = head;
-    current = head;
-    currentPos = 0;
+    total_buckets++;
+    tail      = head;
+    last_used = head;
+    last_used_pos = 0;
 }
 
 template <typename T>
@@ -108,7 +108,7 @@ int8_t List<T>::ListInsert(const T& item)
 {
     if (tail->isFull()) {
         Bucket<T>* tmp = new Bucket<T>(bucket_size / data_size);
-        bucket_num++;
+        total_buckets++;
         tail->LinkNextBucket(*tmp);
         tail = tmp;
     }
@@ -116,6 +116,66 @@ int8_t List<T>::ListInsert(const T& item)
     tail->BucketInsert(item);
     total_items++;
     return 0;
+}
+
+template <typename T>
+int8_t List<T>::DeleteBucket(int const& pos)
+{
+    Bucket<T>* last_used_backup     = last_used;
+    uint32_t   last_used_pos_backup = last_used_pos;
+
+    Bucket<T>* prev_bckt = (*this)[pos-1];
+
+    // We keep these values in case the "last_used" bucket will be deleted.
+    // We save time by holding this information instead of searching the
+    // list from the beginning after the deletion, because we just did it.
+    Bucket<T>* last_used_new     = last_used;
+    uint32_t   last_used_pos_new = last_used_pos;
+
+    Bucket<T>* del_bckt  = (*this)[pos];
+
+    if (!pos)
+        prev_bckt = head;
+
+    if (total_buckets > 1) {
+        if (!pos)
+            head = head->GetNextBucket();
+
+        else if (del_bckt == tail)
+            tail = prev_bckt;
+
+        del_bckt->LinkNextBucket( *(del_bckt->GetNextBucket()->GetNextBucket()) );
+        total_buckets--;
+
+    } else {
+        head->LinkNextBucket(*del_bckt->GetNextBucket());
+    }
+
+    total_items -= del_bckt->GetBucketItems();
+
+    delete del_bckt;
+
+    // If "last_used" bucket is about to be deleted,
+    // we have to update the pointers
+    if (last_used == del_bckt) {
+        // We update "last_used" pointer to point to the new head
+        if (!pos) {
+            last_used     = head;
+            last_used_pos = 0;
+
+        // We set previous bucket as "last_used"
+        } else {
+            last_used     = last_used_new;
+            last_used_pos = last_used_pos_new;
+        }
+
+    // Otherwise, we reset the values to their previous values
+    } else {
+        last_used     = last_used_backup;
+        last_used_pos = last_used_pos_backup;
+    }
+
+    return 1;
 }
 
 // template <typename T>
@@ -140,52 +200,54 @@ Bucket<T>* List<T>::GetFirst(void) const
 }
 
 template <typename T>
+Bucket<T>* List<T>::GetLast(void) const
+{
+    return tail;
+}
+
+template <typename T>
 const uint32_t List<T>::GetTotalItems(void) const
 {
     return total_items;
 }
 
 template <typename T>
-const uint32_t List<T>::GetBucketNum(void) const
+const uint32_t List<T>::GetTotalBuckets(void) const
 {
-    return bucket_num;
+    return total_buckets;
 }
 
-template <typename T>
-void List<T>::ResetCurrent (void)
-{
-    current    = head;
-    currentPos = 0;
-}
+// template <typename T>
+// void List<T>::ResetCurrent (void)
+// {
+//     last_used     = head;
+//     last_used_pos = 0;
+// }
 
 template <typename T>
 Bucket<T>* List<T>::operator [](int const& pos)
 {
-    if (pos < 0 || pos > bucket_num)
+    if (pos < 0 || pos > total_buckets)
         return NULL;
 
-    if (currentPos == pos)
-        return current;
-    else if (currentPos < pos) {
-        while (currentPos < pos) {
-            current = current->GetNextBucket();
-            currentPos++;
-        }
+    if (last_used_pos == pos)
+        return last_used;
 
-    } else {
-        current    = head;
-        currentPos = 0;
+    if (last_used_pos > pos) {
+        last_used     = head;
+        last_used_pos = 0;
         // this->ResetCurrent();
 
-        if (current == NULL)
+        if (last_used == NULL)
             return NULL;
-
-        while (currentPos < pos) {
-            current = current->GetNextBucket();
-            currentPos++;
-        }
     }
-    return current;
+
+    while (last_used_pos < pos) {
+        last_used = last_used->GetNextBucket();
+        last_used_pos++;
+    }
+
+    return last_used;
 }
 
 template class Bucket<CompPred>;
