@@ -27,6 +27,10 @@ typedef struct CompPred{
     char comp;
 }CompPred;
 
+typedef struct FullResList{
+    List<ResStruct>* tableList;
+}FullResList;
+
 typedef struct ResStruct{
     uint64_t tableID;
     List<uint64_t>* rowIDlist;

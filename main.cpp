@@ -1,5 +1,3 @@
-/* File: main.cpp */
-
 #include <bits/stdc++.h>
 #include <bitset>
 #include <climits>
@@ -8,17 +6,19 @@
 #include <iostream>
 #include <random>
 
-#include <list> 
-#include <iterator>
-
+// #include <list> 
+// #include <iterator>
 
 #include "./relationStructs.h"
 #include "./sortingAlg/tablesort.hpp"
+#include "./sortingAlg/quicksort.hpp"
 #include "./templates/list.hpp"
 #include "./opts/getopts.hpp"
 #include "./utils/utils.hpp"
 
+
 using namespace std;
+
 
 ResStruct* FindInResList(List<ResStruct>& resList , uint64_t elemID){
 
@@ -39,196 +39,70 @@ ResStruct* FindInResList(List<ResStruct>& resList , uint64_t elemID){
     return found;
 }
 
-List<uint64_t>* JoinPredicate(RelationTable* relTable , JoinPred& cpred , List<ResStruct>& resList){
+List<uint64_t>* ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<FullResList>& resList){
+    
+    Bucket<FullResList>* bucketFL = resList.GetFirst();
+    ResStruct* existingRel = NULL;
 
-    List<uint64_t>* doubleKeyList = new List<uint64_t>(1048576 , sizeof(uint64_t));
-    uint64_t** table1;
-    uint64_t** table2;
-    if (FindInResList(resList , cpred.rel1)->rowIDlist->GetTotalItems() != NULL){
-        table1 = new uint64_t*[relTable[cpred.rel1].cols];
-        uint32_t totalItems = FindInResList(resList , cpred.rel1)->rowIDlist->GetTotalItems();
-        for(int i = 0; i < relTable[cpred.rel1].cols; i++)
-            table1[i] = new uint64_t[totalItems];
-    }
-    else {
-        table1 = relTable[cpred.rel1].table;
-    }
+    while (bucketFL != NULL) {
+        for (int j = 0 ; j < bucketFL->GetBucketItems() ; j++) {
+            existingRel = FindInResList( *( (*bucketFL)[j].tableList ) , cpred.rel1);
+            if (existingRel != NULL){
+                break;
+            }
+        }
 
-    if (FindInResList(resList , cpred.rel2)->rowIDlist->GetTotalItems() != NULL){
-        uint64_t** table2 = new uint64_t*[relTable[cpred.rel2].cols];
-        uint32_t totalItems = FindInResList(resList , cpred.rel2)->rowIDlist->GetTotalItems();
-        for(int i = 0; i < relTable[cpred.rel2].cols; i++)
-            table2[i] = new uint64_t[totalItems];
-    }
-    else {
-        table2 = relTable[cpred.rel2].table;
+        bucketFL = bucketFL->GetNextBucket();
     }
 
-    MergeTuple* sortedTable1 = TableSortOnKey(table1 , FindInResList(resList , cpred.rel1)->rowIDlist->GetTotalItems() , cpred.colRel1 , 8192);
-    MergeTuple* sortedTable2 = TableSortOnKey(table2 , FindInResList(resList , cpred.rel2)->rowIDlist->GetTotalItems() , cpred.colRel2 , 8192);
+    if (existingRel == NULL){
 
-    // for (int i = 0 ; i < relTable[cpred.rel1].rows ; i++){
-    //     cout << sortedTable1[i].key << endl;
+    }
+
+
+    // ResStruct* tableStruct = FindInResList(resList , cpred.rel1);
+    // if (tableStruct == NULL){
+    //     ResStruct* tableRes = new ResStruct;
+    //     tableRes->tableID = cpred.rel1;
+    //     for (uint64_t i = 0 ; i < relTable[cpred.rel1].rows ; i++){
+    //         tableRes->rowIDlist->ListInsert(i);
+    //     }
+    //     resList.ListInsert(*tableRes);
+    // }
+    // switch (cpred.comp)
+    // {
+    // case '>':
+    //     for (int i = 0; i < relTable[cpred.rel1].rows;i++){
+    //         cout << relTable[cpred.rel1].table[cpred.colRel1][i] << endl;
+    //         if (relTable[cpred.rel1].table[cpred.colRel1][i] > cpred.num){
+    //             keyList->ListInsert((uint64_t)i);
+    //         }
+    //     }    
+    //     break;
+    
+    // case '<':
+    //     for (int i = 0; i < relTable[cpred.rel1].rows;i++){
+    //         if (relTable[cpred.rel1].table[cpred.colRel1][i] < cpred.num){
+    //             keyList->ListInsert((uint64_t)i);
+
+    //         }
+    //     }
+
+    //     break;
+    
+    // case '=':
+    //     for (int i = 0; i < relTable[cpred.rel1].rows;i++){
+    //         if (relTable[cpred.rel1].table[cpred.colRel1][i] == cpred.num){
+    //             keyList->ListInsert((uint64_t)i);
+
+    //         }
+    //     }
+
+    //     break;
     // }
 
-    MergeTables(*doubleKeyList, sortedTable1 , relTable[cpred.rel1].rows , sortedTable2 , relTable[cpred.rel2].rows);
-
-    ResStruct* tmp = FindInResList(resList , cpred.rel1);
-    
-    Bucket<uint64_t>* bucketDK = doubleKeyList->GetFirst();
-    Bucket<uint64_t>* bucketRL = tmp->rowIDlist->GetFirst();
-
-    uint32_t i = 0;
-    while (bucketDK != NULL) {
-        for (int j = 0 ; j < bucketDK->GetBucketItems() ; j++) {
-            if ( (*bucketDK)[j] != (*bucketRL)[0] ){
-                // Bucket<uint64_t>* bucketTMP = bucketRL;
-                bucketRL = bucketRL->GetNextBucket();
-                //remove element assuming that each element has its own bucket
-                i--;
-                j--;
-            }
-            else {
-                bucketRL = bucketRL->GetNextBucket();
-            }
-            i++;
-        }
-
-        bucketDK = bucketDK->GetNextBucket();
-        if (bucketDK == NULL && bucketRL != NULL){
-            //while not error delete the element in the i th place
-        }
-    }
-
-    return doubleKeyList;
+    // return keyList;
 }
-
-
-List<uint64_t>* ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<ResStruct>& resList){
-    
-    ResStruct* tableStruct = FindInResList(resList , cpred.rel1);
-    switch (cpred.comp)
-    {
-    case '>':
-        for (int i = 0; i < relTable[cpred.rel1].rows;i++){
-            cout << relTable[cpred.rel1].table[cpred.colRel1][i] << endl;
-            if (relTable[cpred.rel1].table[cpred.colRel1][i] > cpred.num){
-                keyList->ListInsert((uint64_t)i);
-            }
-        }    
-        break;
-    
-    case '<':
-        for (int i = 0; i < relTable[cpred.rel1].rows;i++){
-            if (relTable[cpred.rel1].table[cpred.colRel1][i] < cpred.num){
-                keyList->ListInsert((uint64_t)i);
-
-            }
-        }
-
-        break;
-    
-    case '=':
-        for (int i = 0; i < relTable[cpred.rel1].rows;i++){
-            if (relTable[cpred.rel1].table[cpred.colRel1][i] == cpred.num){
-                keyList->ListInsert((uint64_t)i);
-
-            }
-        }
-
-        break;
-    }
-
-    return keyList;
-}
-
-int FindInList(List<uint64_t>* rowIDlist , uint64_t elemID , int numOfElems = 1){
-
-    if (rowIDlist == NULL || numOfElems > 2 || numOfElems < 1){
-        return -1;
-    }
-
-    Bucket<uint64_t>* bucket = rowIDlist->GetFirst();
-
-    uint64_t mask32_left  = 0xFFFFFFFF;
-    uint32_t mask32_right = 0xFFFFFFFF;
-    mask32_left <<= 32;
-
-    while (bucket != NULL) {
-        for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
-            if (numOfElems == 2){
-                if ( ( ( (*bucket)[j] & mask32_left ) >> 32 ) == elemID){
-                    return 1;
-                }
-                else if ( ( (*bucket)[j] & mask32_right ) == elemID){
-                    return 1;
-                } 
-            }
-            else if ( (*bucket)[j] == elemID ){
-                return 1;
-            }
-        }
-
-        bucket = bucket->GetNextBucket();
-    }
-
-    return 0;
-
-}
-
-
-
-// List<uint64_t>* FindInList(List<ResStruct>* rowIDlist , uint64_t elemID){
-
-//     if (rowIDlist == NULL){
-//         return NULL;
-//     }
-
-//     Bucket<ResStruct>* bucket = rowIDlist->GetFirst();
-
-//     while (bucket != NULL) {
-//         for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
-//             if ( (*bucket)[j].type == 0 ){
-//                 if ((*bucket)[j].tableID1 == elemID || (*bucket)[j].tableID2 == elemID ){
-//                     return (*bucket)[j].resList;
-//                 }
-//             }
-//             else if ((*bucket)[j].tableID1 == elemID){
-//                 return (*bucket)[j].resList;
-//             }
-//         }
-
-//         bucket = bucket->GetNextBucket();
-//     }
-
-//     return NULL;
-// }
-
-
-// List<ResStruct>* DoAllCompPred(List<CompPred>& compList , RelationTable* relTable){
-
-//     List<ResStruct>* resList = new List<ResStruct>(10*sizeof(ResStruct) , sizeof(ResStruct));
-//     Bucket<CompPred>* bucket = compList.GetFirst();
-    
-//     while (bucket != NULL) {
-//         for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
-//             // if (FindInList(resList , (*bucket)[j].rel1)){
-
-//             // }
-//             ResStruct* res = new ResStruct;
-//             res->resList = ComparisonPredicate(relTable , (*bucket)[j]);
-//             res->type = 1;
-//             res->tableID1 = (*bucket)[j].rel1;
-//             res->tableID2 = ULLONG_MAX;
-//             resList->ListInsert(*res);
-//             free(res);
-
-//         }
-//         bucket = bucket->GetNextBucket();
-//     }
-// }
-
-
 
 int main(int argc , char* argv[])
 {
@@ -320,18 +194,12 @@ int main(int argc , char* argv[])
 
     
     List<uint64_t>* rowIDlist;
-    List<ResStruct>* resList = new List<ResStruct>(sizeof(ResStruct) , sizeof(ResStruct));
+    List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
 
     for (itcp = compList.begin(); itcp != compList.end(); itcp++){
         //do every comp
-        rowIDlist = ComparisonPredicate(relTable , *itcp);
-        ResStruct* strc = new ResStruct;
-        strc->type = 1;
-        strc->resList = rowIDlist;
-        strc->tableID1 = itcp->rel1;
-        strc->tableID2 = -1;
-        resList->ListInsert(*strc);
-        cout << FindInList(resList , itcp->rel1) << endl;
+        rowIDlist = ComparisonPredicate(relTable , *itcp , *resList);
+       
         Bucket<uint64_t>* bucket = rowIDlist->GetFirst();
 
         while (bucket != NULL) {
@@ -343,31 +211,27 @@ int main(int argc , char* argv[])
         }
     }
 
-    List<uint64_t>* rowIDlistJoin;
-    list<uint64_t>::iterator itj;
+    // List<uint64_t>* rowIDlistJoin;
+    // list<uint64_t>::iterator itj;
 
-    for (itjp = joinList.begin(); itjp != joinList.end() ; itjp++){
-        //do joins
-        rowIDlistJoin = JoinPredicate(relTable , *itjp);
+    // for (itjp = joinList.begin(); itjp != joinList.end() ; itjp++){
+    //     //do joins
+    //     rowIDlistJoin = JoinPredicate(relTable , *itjp);
 
-        Bucket<uint64_t>* bucket = rowIDlistJoin->GetFirst();
+    //     Bucket<uint64_t>* bucket = rowIDlistJoin->GetFirst();
 
-        uint64_t mask32_left  = 0xFFFFFFFF;
-        uint32_t mask32_right = 0xFFFFFFFF;
-        mask32_left <<= 32;
+    //     uint64_t mask32_left  = 0xFFFFFFFF;
+    //     uint32_t mask32_right = 0xFFFFFFFF;
+    //     mask32_left <<= 32;
 
-        while (bucket != NULL) {
-            for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
-                cout << (((*bucket)[j] & mask32_left) >> 32) << " , " << ((*bucket)[j] & mask32_right) << endl;
-            }
+    //     while (bucket != NULL) {
+    //         for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
+    //             cout << (((*bucket)[j] & mask32_left) >> 32) << " , " << ((*bucket)[j] & mask32_right) << endl;
+    //         }
 
-            bucket = bucket->GetNextBucket();
-        }
-
-        // for (itj = rowIDlistJoin.begin() ; itj != rowIDlistJoin.end() ; itj++){
-        //     cout << *itj << endl;
-        // }
-    }
+    //         bucket = bucket->GetNextBucket();
+    //     }
+    // }
 
 
 
@@ -377,6 +241,5 @@ int main(int argc , char* argv[])
         delete[] relTable[l].table;
     }
     
-    // delete[] rowIDs1;
-    // delete[] rowIDs2;
 }
+ 
