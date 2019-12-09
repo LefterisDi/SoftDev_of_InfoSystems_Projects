@@ -32,7 +32,7 @@ uint32_t Bucket<T>::GetBucketSize(void) const
 template <typename T>
 uint32_t Bucket<T>::GetBucketItems(void) const
 {
-    return slots - remaining_slots;
+    return (slots - remaining_slots);
 }
 
 // template <typename T>
@@ -86,7 +86,7 @@ List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk
 
     head = new Bucket<T>(bucket_size / data_size);
     bucket_num++;
-    tail = head;
+    tail    = head;
     current = head;
     currentPos = 0;
 }
@@ -146,7 +146,7 @@ const uint32_t List<T>::GetTotalItems(void) const
 }
 
 template <typename T>
-const uint32_t List<T>::GetBucketNum (void) const
+const uint32_t List<T>::GetBucketNum(void) const
 {
     return bucket_num;
 }
@@ -154,49 +154,47 @@ const uint32_t List<T>::GetBucketNum (void) const
 template <typename T>
 void List<T>::ResetCurrent (void)
 {
-    current = head;
+    current    = head;
     currentPos = 0;
 }
 
 template <typename T>
 Bucket<T>* List<T>::operator [](int const& pos)
 {
-
-    if (pos < 0 || pos > bucket_num){
+    if (pos < 0 || pos > bucket_num)
         return NULL;
-    }
 
-    if (currentPos == pos){
+    if (currentPos == pos)
         return current;
-    }
-    else if (currentPos < pos){
-        while (currentPos < pos){
+    else if (currentPos < pos) {
+        while (currentPos < pos) {
             current = current->GetNextBucket();
             currentPos++;
         }
-    }
-    else {
-        this->ResetCurrent();
-        if (current == NULL){
-            return NULL;
-        }
-        while (currentPos < pos){
-            current = current->GetNextBucket();
-            currentPos++;
-        }
-    }
 
+    } else {
+        current    = head;
+        currentPos = 0;
+        // this->ResetCurrent();
+
+        if (current == NULL)
+            return NULL;
+
+        while (currentPos < pos) {
+            current = current->GetNextBucket();
+            currentPos++;
+        }
+    }
     return current;
 }
 
-template class Bucket<uint64_t>;
-template class List<uint64_t>;
-template class List<ResStruct>;
-template class Bucket<ResStruct>;
-template class List<JoinPred>;
-template class Bucket<JoinPred>;
-template class List<CompPred>;
 template class Bucket<CompPred>;
-template class List<FullResList>;
 template class Bucket<FullResList>;
-
+template class Bucket<JoinPred>;
+template class Bucket<ResStruct>;
+template class Bucket<uint64_t>;
+template class List<CompPred>;
+template class List<FullResList>;
+template class List<JoinPred>;
+template class List<ResStruct>;
+template class List<uint64_t>;
