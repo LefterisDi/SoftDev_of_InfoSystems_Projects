@@ -87,6 +87,8 @@ List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk
     head = new Bucket<T>(bucket_size / data_size);
     bucket_num++;
     tail = head;
+    current = head;
+    currentPos = 0;
 }
 
 template <typename T>
@@ -150,20 +152,42 @@ const uint32_t List<T>::GetBucketNum (void) const
 }
 
 template <typename T>
+void List<T>::ResetCurrent (void) const
+{
+    this->current = this->GetFirst();
+    currentPos = 0;
+}
+
+template <typename T>
 Bucket<T>* List<T>::operator [](int const& pos) const
 {
-    Bucket<T>* bucket = this->GetFirst();
 
-    if (bucket == NULL){
+    if (pos < 0 || pos > this->bucket_num){
         return NULL;
     }
 
-    for (int i = 0 ; i < pos ; i++){
-        bucket = bucket->GetNextBucket();
-        if (bucket == NULL){
-            return NULL;
+    if (currentPos == pos){
+        return current;
+    }
+    else if (currentPos < pos){
+        while (currentPos < pos){
+            current = current->GetNextBucket();
+            currentPos++;
         }
     }
+    else {
+        this->ResetCurrect();
+        if (this->current == NULL){
+            return NULL;
+        }
+        while (currentPos < pos){
+            current = current->GetNextBucket();
+            currentPos++;
+        }
+    }
+
+
+
 
     return bucket;
 }

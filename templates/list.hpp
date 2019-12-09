@@ -31,7 +31,9 @@ template <typename T>
 class List {
     Bucket<T>* head;
     Bucket<T>* tail;
-
+    Bucket<T>* current;
+    uint32_t currentPos;
+    
     uint32_t   data_size;
     uint32_t   bucket_size;
 
@@ -48,6 +50,7 @@ class List {
         Bucket<T>*     GetFirst     (void) const;
         const uint32_t GetTotalItems(void) const;
         const uint32_t GetBucketNum (void) const;
+        void           ResetCurrent (void) const;
         Bucket<T>*     operator []  (int const&) const;
 };
 
