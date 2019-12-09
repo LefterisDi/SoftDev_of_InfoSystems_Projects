@@ -85,6 +85,7 @@ List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk
     }
 
     head = new Bucket<T>(bucket_size / data_size);
+    bucket_num++;
     tail = head;
 }
 
@@ -105,6 +106,7 @@ int8_t List<T>::ListInsert(const T& item)
 {
     if (tail->isFull()) {
         Bucket<T>* tmp = new Bucket<T>(bucket_size / data_size);
+        bucket_num++;
         tail->LinkNextBucket(*tmp);
         tail = tmp;
     }
@@ -139,6 +141,31 @@ template <typename T>
 const uint32_t List<T>::GetTotalItems(void) const
 {
     return total_items;
+}
+
+template <typename T>
+const uint32_t List<T>::GetBucketNum (void) const
+{
+    return bucket_num;
+}
+
+template <typename T>
+Bucket<T>* List<T>::operator [](int const& pos) const
+{
+    Bucket<T>* bucket = this->GetFirst();
+
+    if (bucket == NULL){
+        return NULL;
+    }
+
+    for (int i = 0 ; i < pos ; i++){
+        bucket = bucket->GetNextBucket();
+        if (bucket == NULL){
+            return NULL;
+        }
+    }
+
+    return bucket;
 }
 
 template class Bucket<uint64_t>;

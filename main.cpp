@@ -56,7 +56,7 @@ List<uint64_t>* ComparisonPredicate(RelationTable* relTable , CompPred& cpred , 
     }
 
     if (existingRel == NULL){
-
+        
     }
 
 

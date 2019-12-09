@@ -34,7 +34,8 @@ class List {
 
     uint32_t   data_size;
     uint32_t   bucket_size;
-    uint32_t   bucket_items;
+
+    uint32_t   bucket_num;
 
     uint32_t   total_items;
 
@@ -46,6 +47,8 @@ class List {
         // void           ListPrint    (void) const;
         Bucket<T>*     GetFirst     (void) const;
         const uint32_t GetTotalItems(void) const;
+        const uint32_t GetBucketNum (void) const;
+        Bucket<T>*     operator []  (int const&) const;
 };
 
 
