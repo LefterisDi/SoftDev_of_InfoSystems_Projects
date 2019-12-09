@@ -50,8 +50,8 @@ class List {
         Bucket<T>*     GetFirst     (void) const;
         const uint32_t GetTotalItems(void) const;
         const uint32_t GetBucketNum (void) const;
-        void           ResetCurrent (void) const;
-        Bucket<T>*     operator []  (int const&) const;
+        void           ResetCurrent (void);
+        Bucket<T>*     operator []  (int const&);
 };
 
 

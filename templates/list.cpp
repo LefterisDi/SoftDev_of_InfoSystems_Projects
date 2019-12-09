@@ -152,14 +152,14 @@ const uint32_t List<T>::GetBucketNum (void) const
 }
 
 template <typename T>
-void List<T>::ResetCurrent (void) const
+void List<T>::ResetCurrent (void)
 {
     current = head;
     currentPos = 0;
 }
 
 template <typename T>
-Bucket<T>* List<T>::operator [](int const& pos) const
+Bucket<T>* List<T>::operator [](int const& pos)
 {
 
     if (pos < 0 || pos > bucket_num){
@@ -176,7 +176,7 @@ Bucket<T>* List<T>::operator [](int const& pos) const
         }
     }
     else {
-        this->ResetCurrect();
+        this->ResetCurrent();
         if (current == NULL){
             return NULL;
         }
@@ -197,4 +197,6 @@ template class List<JoinPred>;
 template class Bucket<JoinPred>;
 template class List<CompPred>;
 template class Bucket<CompPred>;
+template class List<FullResList>;
+template class Bucket<FullResList>;
 
