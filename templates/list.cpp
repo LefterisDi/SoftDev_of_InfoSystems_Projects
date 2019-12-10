@@ -1,5 +1,6 @@
 /* File: list.cpp */
 
+#include <cstring>
 #include <iostream>
 
 #include "list.hpp"
@@ -8,7 +9,7 @@
 template <typename T>
 Bucket<T>::Bucket(const uint32_t& items) : slots(items), remaining_slots(items), next_bucket(NULL)
 {
-    data = new T[items];
+    data = new T[items]();
 }
 
 template <typename T>
@@ -45,7 +46,7 @@ uint32_t Bucket<T>::GetBucketItems(void) const
 
 
 template <typename T>
-T& Bucket<T>::operator [](int const& pos) const
+T& Bucket<T>::operator[](int const& pos) const
 {
     return data[pos];
 }
@@ -71,6 +72,12 @@ int8_t Bucket<T>::BucketInsert(const T& item)
     data[slots - remaining_slots] = item;
     remaining_slots--;
     return 0;
+}
+
+template <typename T>
+int8_t Bucket<T>::ClearBucket(void)
+{
+    memset(data, 0, slots);
 }
 
 /* ----------------------------------------------------------------------------------------- */
@@ -134,6 +141,8 @@ int8_t List<T>::DeleteBucket(int const& pos)
 
     Bucket<T>* del_bckt  = (*this)[pos];
 
+    total_items -= del_bckt->GetBucketItems();
+
     if (!pos)
         prev_bckt = head;
 
@@ -144,16 +153,14 @@ int8_t List<T>::DeleteBucket(int const& pos)
         else if (del_bckt == tail)
             tail = prev_bckt;
 
-        prev_bckt->LinkNextBucket( *(del_bckt->GetNextBucket()) );
+        prev_bckt->LinkNextBucket(*del_bckt->GetNextBucket());
         total_buckets--;
 
+        delete del_bckt;
+
     } else {
-        head->LinkNextBucket(*del_bckt->GetNextBucket());
+        head->ClearBucket();
     }
-
-    total_items -= del_bckt->GetBucketItems();
-
-    delete del_bckt;
 
     // If "last_used" bucket is about to be deleted,
     // we have to update the pointers
@@ -225,7 +232,7 @@ const uint32_t List<T>::GetTotalBuckets(void) const
 // }
 
 template <typename T>
-Bucket<T>* List<T>::operator [](int const& pos)
+Bucket<T>* List<T>::operator[](int const& pos)
 {
     if (pos < 0 || pos > total_buckets)
         return NULL;
