@@ -241,11 +241,24 @@ int main(int argc , char* argv[])
     //     delete[] relTable[l].table;
     // }
 
-    List<uint64_t>l(10*sizeof(uint64_t) , sizeof(uint64_t));
+    List<uint64_t>l(sizeof(uint64_t) , sizeof(uint64_t));
 
-    for (int i = 0 ; i < 100 ; i++){
-        l.ListInsert(distribution(gen));
+    for (int i = 0 ; i < 10 ; i++){
+        uint64_t t = distribution(gen);
+        l.ListInsert(t);
+        cout << t << " ";
+        if ((i+1)%1==0){
+            cout << endl;
+        }
     }
+    cout << endl << endl;
+
+    cout << (*l[5])[0] << endl;
+    l.DeleteBucket(5);
+    cout << (*l[6])[0] << endl;
+    cout << (*l[7])[0] << endl;
+    cout << (*l[7])[0] << endl;
+    cout << (*l[1])[0] << endl;
     
 }
  

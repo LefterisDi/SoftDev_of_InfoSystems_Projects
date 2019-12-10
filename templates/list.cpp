@@ -85,7 +85,7 @@ List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk
     }
 
     head = new Bucket<T>(bucket_size / data_size);
-    total_buckets++;
+    total_buckets = 1;
     tail      = head;
     last_used = head;
     last_used_pos = 0;
@@ -227,7 +227,7 @@ const uint32_t List<T>::GetTotalBuckets(void) const
 template <typename T>
 Bucket<T>* List<T>::operator [](int const& pos)
 {
-    if (pos < 0 || pos > total_buckets)
+    if (pos < 0 || pos > total_buckets - 1)
         return NULL;
 
     if (last_used_pos == pos)
