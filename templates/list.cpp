@@ -144,7 +144,7 @@ int8_t List<T>::DeleteBucket(int const& pos)
         else if (del_bckt == tail)
             tail = prev_bckt;
 
-        del_bckt->LinkNextBucket( *(del_bckt->GetNextBucket()->GetNextBucket()) );
+        prev_bckt->LinkNextBucket( *(del_bckt->GetNextBucket()) );
         total_buckets--;
 
     } else {
