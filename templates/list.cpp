@@ -58,9 +58,9 @@ bool Bucket<T>::isFull(void)
 }
 
 template <typename T>
-void Bucket<T>::LinkNextBucket(Bucket<T>& new_bucket)
+void Bucket<T>::LinkNextBucket(Bucket<T>* new_bucket)
 {
-    next_bucket = &new_bucket;
+    next_bucket = new_bucket;
 }
 
 template <typename T>
@@ -116,7 +116,7 @@ int8_t List<T>::ListInsert(const T& item)
     if (tail->isFull()) {
         Bucket<T>* tmp = new Bucket<T>(bucket_size / data_size);
         total_buckets++;
-        tail->LinkNextBucket(*tmp);
+        tail->LinkNextBucket(tmp);
         tail = tmp;
     }
 
@@ -153,7 +153,7 @@ int8_t List<T>::DeleteBucket(int const& pos)
         else if (del_bckt == tail)
             tail = prev_bckt;
 
-        prev_bckt->LinkNextBucket(*del_bckt->GetNextBucket());
+        prev_bckt->LinkNextBucket(del_bckt->GetNextBucket());
         total_buckets--;
 
         delete del_bckt;

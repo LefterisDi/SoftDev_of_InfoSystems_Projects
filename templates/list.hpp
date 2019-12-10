@@ -23,7 +23,7 @@ class Bucket {
         // void     BucketPrint   (void)       const;
 
         bool   isFull(void);
-        void   LinkNextBucket(Bucket<T> &);
+        void   LinkNextBucket(Bucket<T> *);
         int8_t BucketInsert  (const T &);
         // int8_t DeleteEntry   (int const &);
         int8_t ClearBucket   (void);
