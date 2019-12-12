@@ -297,16 +297,16 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
 
     }
     else {
-        // table1 = relTable[jpred.rel1].table;
-        table1 = new uint64_t*[relTable[jpred.rel1].cols];
+        table1 = relTable[jpred.rel1].table;
+        // table1 = new uint64_t*[relTable[jpred.rel1].cols];
         rowNum1 = (uint32_t)relTable[jpred.rel1].rows;
-        for(int i = 0; i < relTable[jpred.rel1].cols; i++)
-            table1[i] = new uint64_t[rowNum1];
-        for (int j =  0 ; j < rowNum1 ; j++){
-            for (int i = 0 ; i < relTable[jpred.rel1].cols ; i++){
-                table1[i][j] = relTable[jpred.rel1].table[i][j];
-            }
-        }
+        // for(int i = 0; i < relTable[jpred.rel1].cols; i++)
+        //     table1[i] = new uint64_t[rowNum1];
+        // for (int j =  0 ; j < rowNum1 ; j++){
+        //     for (int i = 0 ; i < relTable[jpred.rel1].cols ; i++){
+        //         table1[i][j] = relTable[jpred.rel1].table[i][j];
+        //     }
+        // }
     }
 
     if (exists2 == true){
@@ -326,17 +326,17 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
 
     }
     else {
-        // table2 = relTable[jpred.rel2].table;
-        table2 = new uint64_t*[relTable[jpred.rel2].cols];
+        table2 = relTable[jpred.rel2].table;
+        // table2 = new uint64_t*[relTable[jpred.rel2].cols];
         rowNum2 = (uint32_t)relTable[jpred.rel2].rows;
-        for(int i = 0; i < relTable[jpred.rel2].cols; i++)
-            table2[i] = new uint64_t[rowNum2];
-                for (int j =  0 ; j < rowNum2 ; j++){
-            for (int i = 0 ; i < relTable[jpred.rel2].cols ; i++){
-                uint64_t rowID = (*(*existingRel2->rowIDlist)[j])[0];
-                table2[i][j] = relTable[jpred.rel2].table[i][j];
-            }
-        }
+        // for(int i = 0; i < relTable[jpred.rel2].cols; i++)
+        //     table2[i] = new uint64_t[rowNum2];
+        //         for (int j =  0 ; j < rowNum2 ; j++){
+        //     for (int i = 0 ; i < relTable[jpred.rel2].cols ; i++){
+        //         uint64_t rowID = (*(*existingRel2->rowIDlist)[j])[0];
+        //         table2[i][j] = relTable[jpred.rel2].table[i][j];
+        //     }
+        // }
     }
 
     for (uint32_t i = 0 ; i < rowNum1 ; i++){
@@ -395,14 +395,7 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
     else{
 
     }
-
-    for(int i = 0; i < relTable[jpred.rel1].cols; i++)
-        delete[] table1[i];
-    delete[] table1;
-
-    for(int i = 0; i < relTable[jpred.rel2].cols; i++)
-        delete[] table2[i];
-    delete[] table2;
+   
 
     delete doubleKeyList;
 
@@ -411,9 +404,21 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
 
     if (exists1 == false){
         delete existingRel1;
+        
     }
+    else {
+        for(int i = 0; i < relTable[jpred.rel1].cols; i++)
+            delete[] table1[i];
+        delete[] table1;
+    }
+
     if (exists2 == false){
         delete existingRel2;
+    }
+    else {
+        for(int i = 0; i < relTable[jpred.rel2].cols; i++)
+            delete[] table2[i];
+        delete[] table2;
     }
 
     if (exists1 == false && exists2 == false){
