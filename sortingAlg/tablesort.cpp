@@ -14,7 +14,7 @@
 
 using namespace std;
 
-void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key , int qsAfterNumOfEntries)
+void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , uint32_t size , int key , int qsAfterNumOfEntries)
 {
     uint32_t hist[UCHAR_MAX+1] = {};
 
@@ -83,7 +83,7 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , int size , int key 
     }
 }
 
-MergeTuple* TableSortOnKey(uint64_t** tableMain, int rows , int key , int entriesQuicksort)
+MergeTuple* TableSortOnKey(uint64_t** tableMain, uint32_t rows , int key , int entriesQuicksort)
 {
     MergeTuple* table1;
     MergeTuple* table2;
@@ -91,7 +91,7 @@ MergeTuple* TableSortOnKey(uint64_t** tableMain, int rows , int key , int entrie
     table1 = new MergeTuple[rows];
     table2 = new MergeTuple[rows];
 
-    for (int i = 0 ; i < rows ; i++) {
+    for (uint32_t i = 0 ; i < rows ; i++) {
         table1[i].key   = tableMain[key][i];
         table1[i].rowID = i;
     }

@@ -78,13 +78,16 @@ template <typename T>
 int8_t Bucket<T>::ClearBucket(void)
 {
     memset(data, 0, slots);
+    this->remaining_slots = this->slots;
+
+    return 1;
 }
 
 /* ----------------------------------------------------------------------------------------- */
 
 // We save space by allocating the exact amount of elements
 template <typename T>
-List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk_size), data_size(dt_size)
+List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk_size), data_size(dt_size) , total_buckets(1) , total_items(0)
 {
     if (data_size > bk_size) {
         std::cout << "Error: Data size is larger than bucket size" << std::endl;
@@ -92,7 +95,6 @@ List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk
     }
 
     head = new Bucket<T>(bucket_size / data_size);
-    total_buckets = 1;
     tail      = head;
     last_used = head;
     last_used_pos = 0;
