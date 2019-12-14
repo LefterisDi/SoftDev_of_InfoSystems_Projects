@@ -36,6 +36,12 @@ uint32_t Bucket<T>::GetBucketItems(void) const
     return (slots - remaining_slots);
 }
 
+template <typename T>
+uint32_t Bucket<T>::GetRemainingSlots(void) const
+{
+    return remaining_slots;
+}
+
 // template <typename T>
 // void Bucket<T>::BucketPrint (void) const
 // {
@@ -64,7 +70,7 @@ void Bucket<T>::LinkNextBucket(Bucket<T>* new_bucket)
 }
 
 template <typename T>
-int8_t Bucket<T>::BucketInsert(const T& item)
+int8_t Bucket<T>::BucketInsertEntry(const T& item)
 {
     if (!remaining_slots)
         return -1;
@@ -75,10 +81,28 @@ int8_t Bucket<T>::BucketInsert(const T& item)
 }
 
 template <typename T>
+int8_t Bucket<T>::BucketDeleteEntry(const uint32_t& index)
+{
+    if (index < 0 || index >= slots)
+        return -1;
+
+    memset(&data[index], 0, sizeof(T));
+    data[index] = data[slots - remaining_slots - 1];
+
+    remaining_slots++;
+
+    // Indicates that the bucket is empty
+    if (remaining_slots == slots)
+        return 1;
+
+    return 0;
+}
+
+template <typename T>
 int8_t Bucket<T>::ClearBucket(void)
 {
-    memset(data, 0, slots);
-    this->remaining_slots = this->slots;
+    memset(data, 0, sizeof(data));
+    remaining_slots = slots;
 
     return 1;
 }
@@ -94,9 +118,9 @@ List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk
         return;
     }
 
-    head = new Bucket<T>(bucket_size / data_size);
-    tail      = head;
-    last_used = head;
+    head          = new Bucket<T>(bucket_size / data_size);
+    tail          = head;
+    last_used     = head;
     last_used_pos = 0;
 }
 
@@ -122,7 +146,7 @@ int8_t List<T>::ListInsert(const T& item)
         tail = tmp;
     }
 
-    tail->BucketInsert(item);
+    tail->BucketInsertEntry(item);
     total_items++;
     return 0;
 }
@@ -185,6 +209,12 @@ int8_t List<T>::DeleteBucket(int const& pos)
     }
 
     return 1;
+}
+
+template <typename T>
+int8_t List<T>::DeleteLastBucket(void)
+{
+    this->DeleteBucket(total_buckets-1);
 }
 
 // template <typename T>
@@ -257,6 +287,49 @@ Bucket<T>* List<T>::operator[](int const& pos)
     }
 
     return last_used;
+}
+
+template <typename T>
+List<T>*  List<T>::operator+(List<T>& old_lst)
+{
+    uint32_t rem_curr_tail_slots            = this->tail->GetRemainingSlots();
+    uint32_t old_tail_total_items = old_lst.tail->GetBucketItems() - 1;
+
+    // If that condition evaluates to true, means that
+    // the list which will be concatenated is emtpy
+    if (old_tail_total_items == -1)
+        return this;
+
+    for (int i = 0; i < rem_curr_tail_slots; i++) {
+        this->tail->BucketInsertEntry( (*old_lst.tail)[old_tail_total_items] );
+        int8_t res = old_lst.tail->BucketDeleteEntry(old_tail_total_items);
+
+        old_tail_total_items--;
+
+        if (res == 2) {
+            old_lst.DeleteLastBucket();
+            old_tail_total_items = old_lst.tail->GetBucketItems() - 1;
+            old_lst.total_buckets--;
+
+            // This means that we have already transfer all items from
+            // the list that will be concatenated to the original list
+            if (old_tail_total_items == -1) {
+                total_items += old_lst.total_items;
+                return this;
+            }
+        }
+    }
+
+    this->tail->LinkNextBucket(old_lst.head);
+
+    total_items   += old_lst.total_items;
+    total_buckets += old_lst.total_buckets;
+
+    tail = old_lst.tail;
+
+    old_lst.head = old_lst.tail = NULL;
+
+    return this;
 }
 
 template class Bucket<CompPred>;
