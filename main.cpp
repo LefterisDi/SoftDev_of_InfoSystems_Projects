@@ -6,7 +6,7 @@
 #include <iostream>
 #include <random>
 
-// #include <list> 
+// #include <list>
 // #include <iterator>
 
 #include "./relationStructs.h"
@@ -40,7 +40,7 @@ ResStruct* FindInResList(List<ResStruct>& resList , uint64_t elemID){
 }
 
 List<uint64_t>* ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<FullResList>& resList){
-    
+
     Bucket<FullResList>* bucketFL = resList.GetFirst();
     ResStruct* existingRel = NULL;
 
@@ -56,7 +56,7 @@ List<uint64_t>* ComparisonPredicate(RelationTable* relTable , CompPred& cpred , 
     }
 
     if (existingRel == NULL){
-        
+
     }
 
 
@@ -77,9 +77,9 @@ List<uint64_t>* ComparisonPredicate(RelationTable* relTable , CompPred& cpred , 
     //         if (relTable[cpred.rel1].table[cpred.colRel1][i] > cpred.num){
     //             keyList->ListInsert((uint64_t)i);
     //         }
-    //     }    
+    //     }
     //     break;
-    
+
     // case '<':
     //     for (int i = 0; i < relTable[cpred.rel1].rows;i++){
     //         if (relTable[cpred.rel1].table[cpred.colRel1][i] < cpred.num){
@@ -89,7 +89,7 @@ List<uint64_t>* ComparisonPredicate(RelationTable* relTable , CompPred& cpred , 
     //     }
 
     //     break;
-    
+
     // case '=':
     //     for (int i = 0; i < relTable[cpred.rel1].rows;i++){
     //         if (relTable[cpred.rel1].table[cpred.colRel1][i] == cpred.num){
@@ -170,7 +170,7 @@ int main(int argc , char* argv[])
     //     cout << endl;
     // }
 
-    
+
 
     // JoinPred jp;
     // CompPred cp;
@@ -192,14 +192,14 @@ int main(int argc , char* argv[])
     // cp.num = (uint64_t)3536385184864502858;
     // compList.push_back(cp);
 
-    
+
     // List<uint64_t>* rowIDlist;
     // List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
 
     // for (itcp = compList.begin(); itcp != compList.end(); itcp++){
     //     //do every comp
     //     rowIDlist = ComparisonPredicate(relTable , *itcp , *resList);
-       
+
     //     Bucket<uint64_t>* bucket = rowIDlist->GetFirst();
 
     //     while (bucket != NULL) {
@@ -253,12 +253,12 @@ int main(int argc , char* argv[])
     }
     cout << endl << endl;
 
+    l.DeleteBucket(0);
+    cout << (*l[0])[0] << endl;
     cout << (*l[5])[0] << endl;
     l.DeleteBucket(5);
+    cout << (*l[5])[0] << endl;
+    l.DeleteBucket(7);
     cout << (*l[6])[0] << endl;
-    cout << (*l[7])[0] << endl;
-    cout << (*l[7])[0] << endl;
     cout << (*l[1])[0] << endl;
-    
 }
- 
