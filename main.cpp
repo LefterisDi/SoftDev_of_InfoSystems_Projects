@@ -20,9 +20,13 @@
 using namespace std;
 
 
-ResStruct* FindInResList(List<ResStruct>& resList , uint64_t elemID){
+ResStruct* FindInResList(List<ResStruct>* resList , uint64_t elemID){
 
-    Bucket<ResStruct>* bucket = resList.GetFirst();
+    if (resList == NULL){
+        return NULL;
+    }
+
+    Bucket<ResStruct>* bucket = resList->GetFirst();
     ResStruct* found = NULL;
 
     while (bucket != NULL) {
@@ -39,101 +43,421 @@ ResStruct* FindInResList(List<ResStruct>& resList , uint64_t elemID){
     return found;
 }
 
-List<uint64_t>* ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<FullResList>& resList){
+int ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<FullResList>* resList){
 
-    Bucket<FullResList>* bucketFL = resList.GetFirst();
     ResStruct* existingRel = NULL;
+    FullResList* frl = NULL;
+    bool exists = true;
 
-    while (bucketFL != NULL) {
-        for (int j = 0 ; j < bucketFL->GetBucketItems() ; j++) {
-            existingRel = FindInResList( *( (*bucketFL)[j].tableList ) , cpred.rel1);
-            if (existingRel != NULL){
-                break;
-            }
+    for (uint32_t i = 0 ; i < resList->GetTotalBuckets() ; i++){
+        existingRel = FindInResList( (* (*resList)[i])[0].tableList , cpred.rel1);
+        if (existingRel != NULL){
+            break;
         }
-
-        bucketFL = bucketFL->GetNextBucket();
     }
 
     if (existingRel == NULL){
 
+        exists = false;
+        frl = new FullResList;
+        frl->tableList = new List<ResStruct>(sizeof(ResStruct) , sizeof(ResStruct));
+
+        existingRel = new ResStruct;
+        existingRel->tableID = cpred.rel1;
+        existingRel->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        for (uint64_t i = 0 ; i < relTable[cpred.rel1].rows ; i++){
+            existingRel->rowIDlist->ListInsert(i);
+        }
+
+        // frl->tableList->ListInsert(*existingRel);
+        // resList.ListInsert(*frl);
+    }
+
+    uint32_t totalBuckets = existingRel->rowIDlist->GetTotalItems();
+
+    switch (cpred.comp)
+    {
+    case '>':
+        for (uint64_t i = 0; i < totalBuckets ;i++){
+            uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+            // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
+            if ( (relTable[cpred.rel1].table[cpred.colRel1][rowID] > cpred.num) == false ){
+                existingRel->rowIDlist->DeleteBucket(i);
+                i--;
+                totalBuckets--;
+            }
+        }
+        break;
+
+    case '<':
+        for (uint64_t i = 0; i < totalBuckets ;i++){
+            uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+            // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
+            if ( (relTable[cpred.rel1].table[cpred.colRel1][rowID] < cpred.num) == false ){
+                existingRel->rowIDlist->DeleteBucket(i);
+                i--;
+                totalBuckets--;
+            }
+        }
+
+        break;
+
+    case '=':
+        for (uint64_t i = 0; i < totalBuckets ;i++){
+            uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+            // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
+            if ( (relTable[cpred.rel1].table[cpred.colRel1][rowID] == cpred.num) == false ){
+                existingRel->rowIDlist->DeleteBucket(i);
+                i--;
+                totalBuckets--;
+            }
+        }
+        break;
+    }
+
+    if (exists == false){
+        frl->tableList->ListInsert(*existingRel);
+        resList->ListInsert(*frl);
+    }
+
+    for (uint64_t i = 0; i < existingRel->rowIDlist->GetTotalItems() ;i++){
+        uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+        cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
+    }
+    cout << endl;
+
+    return 1;
+}
+
+int DeleteTargetedSL(ResStruct* resStr , int mask , List<uint64_t>* doubleKeyList){
+
+    uint64_t mask32_left  = 0xFFFFFFFF;
+    uint32_t mask32_right = 0xFFFFFFFF;
+    mask32_left <<= 32;
+
+    List<uint64_t>* newList = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+
+    for (uint32_t i = 0 ; i < doubleKeyList->GetTotalBuckets() ; i++){
+        for (uint32_t j = 0 ; j < (*doubleKeyList)[i]->GetBucketItems() ; j++){
+            uint32_t newRowID = 0;
+            switch (mask)
+            {
+            case 0:
+                newRowID = ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32);
+                break;
+
+            case 1:
+                newRowID = ( (*(*doubleKeyList)[i])[j]  & mask32_right );
+                break;
+            }
+            newList->ListInsert( (*(*resStr->rowIDlist)[newRowID])[0] );
+        }
+    }
+
+    delete resStr->rowIDlist;
+    resStr->rowIDlist = NULL;
+    resStr->rowIDlist = newList;
+
+    return 1;
+}
+
+
+int DeleteTargeted( FullResList* listOfArrays , int mask , List<uint64_t>* doubleKeyList){
+
+    uint64_t mask32_left  = 0xFFFFFFFF;
+    uint32_t mask32_right = 0xFFFFFFFF;
+    mask32_left <<= 32;
+
+    for (uint32_t l = 0; l < listOfArrays->tableList->GetTotalItems() ; l++){
+        ResStruct* res = &( (*(*(listOfArrays->tableList))[l])[0] );
+
+        switch (mask)
+        {
+        case 0:
+            DeleteTargetedSL(res , 0 ,doubleKeyList);
+            break;
+
+        case 1:
+            DeleteTargetedSL(res , 1 , doubleKeyList);
+            break;
+        }
+    }
+
+    return 1;
+}
+
+int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* resList){
+
+
+    ResStruct* existingRel1 = NULL;
+    ResStruct* existingRel2 = NULL;
+
+    FullResList* frl1 = NULL;
+    FullResList* frl2 = NULL;
+
+
+    bool exists1 = true;
+    bool exists2 = true;
+
+
+
+    for (uint32_t i = 0 ; i < resList->GetTotalItems() ; i++){
+        existingRel1 = FindInResList( (* (*resList)[i])[0].tableList , jpred.rel1);
+        frl1 = &( (*(*resList)[i])[0] );
+        if (existingRel1 != NULL){
+            break;
+        }
+    }
+
+    for (uint32_t i = 0 ; i < resList->GetTotalItems() ; i++){
+        existingRel2 = FindInResList( (* (*resList)[i])[0].tableList , jpred.rel2);
+        frl2 = &( (*(*resList)[i])[0] );
+        if (existingRel2 != NULL){
+            break;
+        }
+    }
+
+    if (existingRel1 == NULL && existingRel2 == NULL){
+
+        exists1 = false;
+        exists2 = false;
+
+        frl1 = new FullResList;
+        frl1->tableList = new List<ResStruct>(sizeof(ResStruct) , sizeof(ResStruct));
+
+        existingRel1 = new ResStruct;
+        existingRel1->tableID = jpred.rel1;
+        existingRel1->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        for (uint64_t i = 0 ; i < relTable[jpred.rel1].rows ; i++){
+            existingRel1->rowIDlist->ListInsert(i);
+        }
+
+        existingRel2 = new ResStruct;
+        existingRel2->tableID = jpred.rel2;
+        existingRel2->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        for (uint64_t i = 0 ; i < relTable[jpred.rel2].rows ; i++){
+            existingRel2->rowIDlist->ListInsert(i);
+        }
+
+        // frl1->tableList->ListInsert(*existingRel1);
+        // frl1->tableList->ListInsert(*existingRel2);
+        // resList.ListInsert(*frl);
+    }
+    else if (existingRel1 != NULL && existingRel2 != NULL){
+        // frl1->tableList->GetLast()
+        //fuse the two
+    }
+    else if (existingRel1 != NULL && existingRel2 == NULL){
+        exists1 = true;
+        exists2 = false;
+
+        existingRel2 = new ResStruct;
+        existingRel2->tableID = jpred.rel2;
+        existingRel2->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        for (uint64_t i = 0 ; i < relTable[jpred.rel2].rows ; i++){
+            existingRel2->rowIDlist->ListInsert(i);
+        }
+
+        // frl1->tableList->ListInsert(*existingRel2);
+    }
+    else {
+        exists1 = false;
+        exists2 = true;
+
+        existingRel1 = new ResStruct;
+        existingRel1->tableID = jpred.rel1;
+        existingRel1->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        for (uint64_t i = 0 ; i < relTable[jpred.rel1].rows ; i++){
+            existingRel1->rowIDlist->ListInsert(i);
+        }
+
+        // frl2->tableList->ListInsert(*existingRel1);
+    }
+
+    List<uint64_t>* doubleKeyList = new List<uint64_t>(1048576 , sizeof(uint64_t));
+    uint64_t** table1;
+    uint64_t** table2;
+    uint32_t rowNum1 = 0;
+    uint32_t rowNum2 = 0;
+
+    if (exists1 == true){
+
+        table1 = new uint64_t*[relTable[jpred.rel1].cols];
+        rowNum1 = existingRel1->rowIDlist->GetTotalItems();
+        for(int i = 0; i < relTable[jpred.rel1].cols; i++)
+            table1[i] = new uint64_t[rowNum1];
+
+        //columns change with the first parameter and rowIDs with the second
+        for (int j =  0 ; j < rowNum1 ; j++){
+            for (int i = 0 ; i < relTable[jpred.rel1].cols ; i++){
+                uint64_t rowID = (*(*existingRel1->rowIDlist)[j])[0];
+                table1[i][j] = relTable[jpred.rel1].table[i][rowID];
+            }
+        }
+
+    }
+    else {
+        table1 = relTable[jpred.rel1].table;
+        // table1 = new uint64_t*[relTable[jpred.rel1].cols];
+        rowNum1 = (uint32_t)relTable[jpred.rel1].rows;
+        // for(int i = 0; i < relTable[jpred.rel1].cols; i++)
+        //     table1[i] = new uint64_t[rowNum1];
+        // for (int j =  0 ; j < rowNum1 ; j++){
+        //     for (int i = 0 ; i < relTable[jpred.rel1].cols ; i++){
+        //         table1[i][j] = relTable[jpred.rel1].table[i][j];
+        //     }
+        // }
+    }
+
+    if (exists2 == true){
+
+        table2 = new uint64_t*[relTable[jpred.rel2].cols];
+        rowNum2 = existingRel2->rowIDlist->GetTotalItems();
+        for(int i = 0; i < relTable[jpred.rel2].cols; i++)
+            table2[i] = new uint64_t[rowNum2];
+
+        //columns change with the first parameter and rowIDs with the second
+        for (int j =  0 ; j < rowNum2 ; j++){
+            for (int i = 0 ; i < relTable[jpred.rel2].cols ; i++){
+                uint64_t rowID = (*(*existingRel2->rowIDlist)[j])[0];
+                table2[i][j] = relTable[jpred.rel2].table[i][rowID];
+            }
+        }
+
+    }
+    else {
+        table2 = relTable[jpred.rel2].table;
+        // table2 = new uint64_t*[relTable[jpred.rel2].cols];
+        rowNum2 = (uint32_t)relTable[jpred.rel2].rows;
+        // for(int i = 0; i < relTable[jpred.rel2].cols; i++)
+        //     table2[i] = new uint64_t[rowNum2];
+        //         for (int j =  0 ; j < rowNum2 ; j++){
+        //     for (int i = 0 ; i < relTable[jpred.rel2].cols ; i++){
+        //         uint64_t rowID = (*(*existingRel2->rowIDlist)[j])[0];
+        //         table2[i][j] = relTable[jpred.rel2].table[i][j];
+        //     }
+        // }
+    }
+
+    for (uint32_t i = 0 ; i < rowNum1 ; i++){
+        for (uint32_t j = 0 ; j < relTable[jpred.rel1].cols ; j++){
+            cout << table1[j][i] << " ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+
+    MergeTuple* sortedTable1 = TableSortOnKey(table1 , rowNum1 , jpred.colRel1 , 8192);
+    MergeTuple* sortedTable2 = TableSortOnKey(table2 , rowNum2 , jpred.colRel2 , 8192);
+
+    // for (int i = 0 ; i < rowNum1 ; i++){
+    //     cout << sortedTable1[i].rowID << endl;
+    // }
+
+    MergeTables(*doubleKeyList, sortedTable1 , rowNum1 , sortedTable2 , rowNum2);
+
+    uint64_t mask32_left  = 0xFFFFFFFF;
+    uint32_t mask32_right = 0xFFFFFFFF;
+    mask32_left <<= 32;
+
+    for (int i = 0 ; i < doubleKeyList->GetTotalBuckets() ; i++){
+        for (int j = 0 ; j < (*doubleKeyList)[i]->GetBucketItems() ; j++){
+            cout << ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[j]  & mask32_right );
+            cout << endl;
+        }
+        cout << endl;
+    }
+
+    if (exists1 == false && exists2 == false){
+        DeleteTargetedSL(existingRel1 , 0 , doubleKeyList);
+        DeleteTargetedSL(existingRel2 , 1 , doubleKeyList);
+
+        for (uint32_t i = 0 ; i < existingRel1->rowIDlist->GetTotalItems() ; i++){
+            cout << (*(*existingRel1->rowIDlist)[i])[0] << endl;
+        }
+        cout << endl;
+
+        for (uint32_t i = 0 ; i < existingRel2->rowIDlist->GetTotalItems() ; i++){
+            cout << (*(*existingRel2->rowIDlist)[i])[0] << endl;
+        }
+
+        frl1->tableList->ListInsert(*existingRel1);
+        frl1->tableList->ListInsert(*existingRel2);
+        resList->ListInsert(*frl1);
+
+    }
+    else if (exists1 == true && exists2 == true){
+
+    }
+    else if (exists1 == true && exists2 == false){
+
+    }
+    else{
+
     }
 
 
-    // ResStruct* tableStruct = FindInResList(resList , cpred.rel1);
-    // if (tableStruct == NULL){
-    //     ResStruct* tableRes = new ResStruct;
-    //     tableRes->tableID = cpred.rel1;
-    //     for (uint64_t i = 0 ; i < relTable[cpred.rel1].rows ; i++){
-    //         tableRes->rowIDlist->ListInsert(i);
-    //     }
-    //     resList.ListInsert(*tableRes);
-    // }
-    // switch (cpred.comp)
-    // {
-    // case '>':
-    //     for (int i = 0; i < relTable[cpred.rel1].rows;i++){
-    //         cout << relTable[cpred.rel1].table[cpred.colRel1][i] << endl;
-    //         if (relTable[cpred.rel1].table[cpred.colRel1][i] > cpred.num){
-    //             keyList->ListInsert((uint64_t)i);
-    //         }
-    //     }
-    //     break;
+    delete doubleKeyList;
 
-    // case '<':
-    //     for (int i = 0; i < relTable[cpred.rel1].rows;i++){
-    //         if (relTable[cpred.rel1].table[cpred.colRel1][i] < cpred.num){
-    //             keyList->ListInsert((uint64_t)i);
+    delete[] sortedTable1;
+    delete[] sortedTable2;
 
-    //         }
-    //     }
+    if (exists1 == false){
+        delete existingRel1;
 
-    //     break;
+    }
+    else {
+        for(int i = 0; i < relTable[jpred.rel1].cols; i++)
+            delete[] table1[i];
+        delete[] table1;
+    }
 
-    // case '=':
-    //     for (int i = 0; i < relTable[cpred.rel1].rows;i++){
-    //         if (relTable[cpred.rel1].table[cpred.colRel1][i] == cpred.num){
-    //             keyList->ListInsert((uint64_t)i);
+    if (exists2 == false){
+        delete existingRel2;
+    }
+    else {
+        for(int i = 0; i < relTable[jpred.rel2].cols; i++)
+            delete[] table2[i];
+        delete[] table2;
+    }
 
-    //         }
-    //     }
+    if (exists1 == false && exists2 == false){
+        delete frl1;
+    }
 
-    //     break;
-    // }
-
-    // return keyList;
+    return 1;
 }
 
 int main(int argc , char* argv[])
 {
-    // list<JoinPred> joinList;
-    // list<JoinPred>::iterator itjp;
-    // list<CompPred> compList;
-    // list<CompPred>::iterator itcp;
+    list<JoinPred> joinList;
+    list<JoinPred>::iterator itjp;
+    list<CompPred> compList;
+    list<CompPred>::iterator itcp;
 
 
-    // // uint32_t*  rowIDs1;
-    // // uint32_t*  rowIDs2;
+    // uint32_t*  rowIDs1;
+    // uint32_t*  rowIDs2;
 
-    // int relations = 3;
-    // RelationTable* relTable = new RelationTable[relations];
-    // relTable[0].rows = 4;
-    // relTable[0].cols = 5;
-    // relTable[0].table = new uint64_t*[relTable[0].cols];
-    // for(int i = 0; i < relTable[0].cols; i++)
-    //     relTable[0].table[i] = new uint64_t[relTable[0].rows];
+    int relations = 3;
+    RelationTable* relTable = new RelationTable[relations];
+    relTable[0].rows = 4;
+    relTable[0].cols = 5;
+    relTable[0].table = new uint64_t*[relTable[0].cols];
+    for(int i = 0; i < relTable[0].cols; i++)
+        relTable[0].table[i] = new uint64_t[relTable[0].rows];
 
-    // relTable[1].rows = 6;
-    // relTable[1].cols = 3;
-    // relTable[1].table = new uint64_t*[relTable[1].cols];
-    // for(int i = 0; i < relTable[1].cols; i++)
-    //     relTable[1].table[i] = new uint64_t[relTable[1].rows];
+    relTable[1].rows = 6;
+    relTable[1].cols = 3;
+    relTable[1].table = new uint64_t*[relTable[1].cols];
+    for(int i = 0; i < relTable[1].cols; i++)
+        relTable[1].table[i] = new uint64_t[relTable[1].rows];
 
-    // relTable[2].rows = 6;
-    // relTable[2].cols = 4;
-    // relTable[2].table = new uint64_t*[relTable[2].cols];
-    // for(int i = 0; i < relTable[2].cols; i++)
-    //     relTable[2].table[i] = new uint64_t[relTable[2].rows];
+    relTable[2].rows = 6;
+    relTable[2].cols = 4;
+    relTable[2].table = new uint64_t*[relTable[2].cols];
+    for(int i = 0; i < relTable[2].cols; i++)
+        relTable[2].table[i] = new uint64_t[relTable[2].rows];
 
 
 
@@ -141,97 +465,91 @@ int main(int argc , char* argv[])
     uniform_int_distribution<uint64_t> distribution(1,5);
     // uniform_int_distribution<uint64_t> distribution(1,ULLONG_MAX);
 
-    // // rowIDs1 = new uint32_t[size1x];
-    // // rowIDs2 = new uint32_t[size2x];
+    // rowIDs1 = new uint32_t[size1x];
+    // rowIDs2 = new uint32_t[size2x];
 
     // gen.seed((unsigned int) time(NULL));
     gen.seed(2);
 
-    // // for (int i = 0 ; i < size1x ; i++)
-    // //     rowIDs1[i] = i;
+    // for (int i = 0 ; i < size1x ; i++)
+    //     rowIDs1[i] = i;
 
-    // // for (int i = 0 ; i < size2x ; i++)
-    // //     rowIDs2[i] = i;
-    // for (int l = 0 ; l < relations ; l++){
-    //     for (int i = 0 ; i < relTable[l].cols ; i++) {
-    //         for (int j = 0 ; j < relTable[l].rows ; j++) {
-    //             relTable[l].table[i][j] = distribution(gen);
-    //         }
-    //     }
-    // }
+    // for (int i = 0 ; i < size2x ; i++)
+    //     rowIDs2[i] = i;
+    for (int l = 0 ; l < relations ; l++){
+        for (int i = 0 ; i < relTable[l].cols ; i++) {
+            for (int j = 0 ; j < relTable[l].rows ; j++) {
+                relTable[l].table[i][j] = distribution(gen);
+            }
+        }
+    }
 
-    // for (int l = 0 ; l < relations ; l++){
-    //     for (int i = 0 ; i < relTable[l].rows ; i++) {
-    //         for (int j = 0 ; j < relTable[l].cols ; j++) {
-    //             cout << relTable[l].table[j][i] << " ";
-    //         }
-    //         cout << endl;
-    //     }
-    //     cout << endl;
-    // }
+    for (int l = 0 ; l < relations ; l++){
+        for (int i = 0 ; i < relTable[l].rows ; i++) {
+            for (int j = 0 ; j < relTable[l].cols ; j++) {
+                cout << relTable[l].table[j][i] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+    }
 
 
 
-    // JoinPred jp;
-    // CompPred cp;
-    // jp.type = 0;
-    // jp.rel1 = 0;
-    // jp.rel2 = 1;
-    // jp.colRel1 = 1;
-    // jp.colRel2 = 2;
-    // joinList.push_back(jp);
+    JoinPred jp;
+    CompPred cp;
+    jp.type = 0;
+    jp.rel1 = 0;
+    jp.rel2 = 1;
+    jp.colRel1 = 1;
+    jp.colRel2 = 2;
+    joinList.push_back(jp);
+
     // jp.rel1 = 1;
     // jp.rel2 = 2;
     // jp.colRel1 = 0;
     // jp.colRel2 = 1;
     // joinList.push_back(jp);
+
+    // cp.type = 1;
+    // cp.rel1 = 0;
+    // cp.colRel1 = 2;
+    // cp.comp = '>';
+    // cp.num = (uint64_t)1;
+    // compList.push_back(cp);
+
     // cp.type = 1;
     // cp.rel1 = 0;
     // cp.colRel1 = 1;
-    // cp.comp = '<';
-    // cp.num = (uint64_t)3536385184864502858;
+    // cp.comp = '>';
+    // cp.num = (uint64_t)2;
     // compList.push_back(cp);
 
+    // cp.type = 1;
+    // cp.rel1 = 1;
+    // cp.colRel1 = 1;
+    // cp.comp = '>';
+    // cp.num = (uint64_t)9726819158084351267;
+    // compList.push_back(cp);
 
-    // List<uint64_t>* rowIDlist;
-    // List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
+    List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
 
-    // for (itcp = compList.begin(); itcp != compList.end(); itcp++){
-    //     //do every comp
-    //     rowIDlist = ComparisonPredicate(relTable , *itcp , *resList);
+    cout << "ONE\n" << endl;
 
-    //     Bucket<uint64_t>* bucket = rowIDlist->GetFirst();
+    for (itcp = compList.begin(); itcp != compList.end(); itcp++){
+        //do every comp
+        ComparisonPredicate(relTable , *itcp , resList);
 
-    //     while (bucket != NULL) {
-    //         for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
-    //             cout << (*bucket)[j] << endl;
-    //         }
+    }
 
-    //         bucket = bucket->GetNextBucket();
-    //     }
-    // }
+    list<uint64_t>::iterator itj;
 
-    // // List<uint64_t>* rowIDlistJoin;
-    // // list<uint64_t>::iterator itj;
+    cout << "TWO\n" << endl;
 
-    // // for (itjp = joinList.begin(); itjp != joinList.end() ; itjp++){
-    // //     //do joins
-    // //     rowIDlistJoin = JoinPredicate(relTable , *itjp);
-
-    // //     Bucket<uint64_t>* bucket = rowIDlistJoin->GetFirst();
-
-    // //     uint64_t mask32_left  = 0xFFFFFFFF;
-    // //     uint32_t mask32_right = 0xFFFFFFFF;
-    // //     mask32_left <<= 32;
-
-    // //     while (bucket != NULL) {
-    // //         for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
-    // //             cout << (((*bucket)[j] & mask32_left) >> 32) << " , " << ((*bucket)[j] & mask32_right) << endl;
-    // //         }
-
-    // //         bucket = bucket->GetNextBucket();
-    // //     }
-    // // }
+    for (itjp = joinList.begin(); itjp != joinList.end() ; itjp++){
+        //do joins
+        JoinPredicate(relTable , *itjp , resList);
+    }
 
 
 
@@ -241,24 +559,42 @@ int main(int argc , char* argv[])
     //     delete[] relTable[l].table;
     // }
 
-    List<uint64_t>l(sizeof(uint64_t) , sizeof(uint64_t));
+    // List<uint64_t>l(sizeof(uint64_t) , sizeof(uint64_t));
 
-    for (int i = 0 ; i < 10 ; i++){
-        uint64_t t = distribution(gen);
-        l.ListInsert(t);
-        cout << t << " ";
-        if ((i+1)%1==0){
-            cout << endl;
+    // for (int i = 0 ; i < 10 ; i++){
+    //     uint64_t t = distribution(gen);
+    //     l.ListInsert(t);
+    //     cout << t << " ";
+    //     if ((i+1)%1==0){
+    //         cout << endl;
+    //     }
+    // }
+    // cout << endl << endl;
+
+    // l.DeleteBucket(0);
+    // cout << (*l[0])[0] << endl;
+    // cout << (*l[5])[0] << endl;
+    // l.DeleteBucket(5);
+    // cout << (*l[5])[0] << endl;
+    // l.DeleteBucket(7);
+    // cout << (*l[4])[0] << endl;
+    // cout << (*l[5])[0] << endl;
+    // cout << (*l[6])[0] << endl;
+
+    for (uint32_t i = 0 ; i < resList->GetTotalItems() ; i++){
+        List<ResStruct>* tableList = (*(*resList)[i])[0].tableList;
+        for (uint32_t j = 0 ; j < tableList->GetTotalItems() ; j++){
+            delete (*(*tableList)[j])[0].rowIDlist;
         }
+        delete tableList;
     }
-    cout << endl << endl;
+    delete resList;
 
-    l.DeleteBucket(0);
-    cout << (*l[0])[0] << endl;
-    cout << (*l[5])[0] << endl;
-    l.DeleteBucket(5);
-    cout << (*l[5])[0] << endl;
-    l.DeleteBucket(7);
-    cout << (*l[6])[0] << endl;
-    cout << (*l[1])[0] << endl;
+    for (int j = 0; j < relations ; j++){
+        for(int i = 0; i < relTable[j].cols; i++)
+            delete[] relTable[j].table[i];
+        delete[] relTable[j].table;
+    }
+    delete[] relTable;
+
 }
