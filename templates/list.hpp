@@ -62,7 +62,8 @@ class List {
         const uint32_t GetTotalBuckets (void) const;
         // void           ResetCurrent    (void);
         Bucket<T>*     operator []     (int const &);
-        List<T>*       operator +      (List<T> &);
+        List<T>&       operator +      (List<T> &);
+        List<T>&       operator +=     (List<T> &);
 };
 
 

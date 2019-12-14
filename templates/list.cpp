@@ -290,7 +290,7 @@ Bucket<T>* List<T>::operator[](int const& pos)
 }
 
 template <typename T>
-List<T>*  List<T>::operator+(List<T>& old_lst)
+List<T>&  List<T>::operator+(List<T>& old_lst)
 {
     uint32_t rem_curr_tail_slots            = this->tail->GetRemainingSlots();
     uint32_t old_tail_total_items = old_lst.tail->GetBucketItems() - 1;
@@ -298,7 +298,7 @@ List<T>*  List<T>::operator+(List<T>& old_lst)
     // If that condition evaluates to true, means that
     // the list which will be concatenated is emtpy
     if (old_tail_total_items == -1)
-        return this;
+        return *this;
 
     for (int i = 0; i < rem_curr_tail_slots; i++) {
         this->tail->BucketInsertEntry( (*old_lst.tail)[old_tail_total_items] );
@@ -315,7 +315,7 @@ List<T>*  List<T>::operator+(List<T>& old_lst)
             // the list that will be concatenated to the original list
             if (old_tail_total_items == -1) {
                 total_items += old_lst.total_items;
-                return this;
+                return *this;
             }
         }
     }
@@ -329,7 +329,13 @@ List<T>*  List<T>::operator+(List<T>& old_lst)
 
     old_lst.head = old_lst.tail = NULL;
 
-    return this;
+    return *this;
+}
+
+template <typename T>
+List<T>&  List<T>::operator+=(List<T>& old_lst)
+{
+    return (*this + old_lst);
 }
 
 template class Bucket<CompPred>;
