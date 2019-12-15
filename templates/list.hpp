@@ -36,7 +36,7 @@ class Bucket {
 
 template <typename T>
 class List {
-    Bucket<T>* head;
+    Bucket<T>* head; 
     Bucket<T>* tail;
     Bucket<T>* last_used;
 
