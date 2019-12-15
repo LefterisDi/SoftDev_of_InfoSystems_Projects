@@ -190,7 +190,7 @@ int DeleteTargeted( FullResList* listOfArrays , int mask , List<uint64_t>* doubl
 
 
 int JoinSelf(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* resList){
-    
+
     ResStruct* existingRel = NULL;
     FullResList* frl = NULL;
     bool exists = true;
@@ -203,18 +203,18 @@ int JoinSelf(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* res
     }
 
     if (existingRel == NULL){
-        
+
         exists = false;
         frl = new FullResList;
         frl->tableList = new List<ResStruct>(sizeof(ResStruct) , sizeof(ResStruct));
-        
+
         existingRel = new ResStruct;
         existingRel->tableID = jpred.rel1;
         existingRel->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
         for (uint64_t i = 0 ; i < relTable[jpred.rel1].rows ; i++){
             existingRel->rowIDlist->ListInsert(i);
         }
-        
+
         // frl->tableList->ListInsert(*existingRel);
         // resList.ListInsert(*frl);
     }
@@ -235,7 +235,7 @@ int JoinSelf(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* res
 
     for (uint64_t i = 0; i < existingRel->rowIDlist->GetTotalItems() ;i++){
         uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
-        cout << relTable[jpred.rel1].table[jpred.colRel1][rowID] << endl;    
+        cout << relTable[jpred.rel1].table[jpred.colRel1][rowID] << endl;
     }
     cout << endl;
 
@@ -545,7 +545,7 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
 int DoAllCompPreds(RelationTable* relTable , List<CompPred>* compList , List<FullResList>* resList , bool* relExistsInRL){
 
     for (uint32_t i = 0 ; i < compList->GetTotalItems() ; i++){
-        
+
         CompPred* cpredp = &( (*(*compList)[i])[0] );
         ComparisonPredicate(relTable , *cpredp , resList);
         relExistsInRL[cpredp->rel1] = true;
@@ -690,7 +690,7 @@ int main(int argc , char* argv[])
     jp.colRel1 = 0;
     jp.colRel2 = 1;
     joinList->ListInsert(jp);
-    
+
     // cp.type = 1;
     // cp.rel1 = 0;
     // cp.colRel1 = 2;
@@ -711,7 +711,7 @@ int main(int argc , char* argv[])
     // cp.comp = '>';
     // cp.num = (uint64_t)9726819158084351267;
     // compList->ListInsert(cp);
-    
+
     List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
 
     cout << "ONE\n" << endl;
@@ -784,5 +784,5 @@ int main(int argc , char* argv[])
     }
     delete[] relTable;
     delete[] relExistsInRL;
-    
+
 }
