@@ -473,7 +473,7 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
         (*frl1->tableList) += (*frl2->tableList);
 
         resList->DeleteBucket(pos2);
-        
+
     }
     else if (exists1 == true && exists2 == false){
         DeleteTargeted(frl1 , 0 , doubleKeyList);
@@ -570,7 +570,7 @@ int DoAllJoinPreds(RelationTable* relTable , List<JoinPred>* joinList , List<Ful
     bool last = false;
     bool firstTime = true;
     while (joinList->GetTotalItems() > 0){
-        
+
 
         JoinPred* jpredp = &( (*(*joinList)[i])[0] );
 
@@ -657,7 +657,7 @@ int main(int argc , char* argv[])
     // uniform_int_distribution<uint64_t> distribution(1,ULLONG_MAX);
 
     // rowIDs1 = new uint32_t[size1x];
-    // rowIDs2 = new uint32_t[size2x];
+    // rowIDs2 = new uint32_t[size2x]; 
 
     // gen.seed((unsigned int) time(NULL));
     gen.seed(2);
