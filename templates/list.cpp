@@ -8,7 +8,7 @@
 
 template <typename T>
 Bucket<T>::Bucket(const uint32_t& items) : slots(items), remaining_slots(items), next_bucket(NULL)
-{ 
+{
     data = new T[items]();
 }
 
