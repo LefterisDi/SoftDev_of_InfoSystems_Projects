@@ -259,6 +259,8 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
     FullResList* frl1 = NULL;
     FullResList* frl2 = NULL;
 
+    uint32_t pos2 = -1;
+
 
     bool exists1 = true;
     bool exists2 = true;
@@ -277,6 +279,7 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
         existingRel2 = FindInResList( (* (*resList)[i])[0].tableList , jpred.rel2);
         if (existingRel2 != NULL){
             frl2 = &( (*(*resList)[i])[0] );
+            pos2 = i;
             break;
         }
     }
@@ -464,6 +467,13 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
     }
     else if (exists1 == true && exists2 == true){
         cout << "FUUUUUUUU-SION HAAAAAAA" << endl;
+        DeleteTargeted(frl1 , 0 , doubleKeyList);
+        DeleteTargeted(frl2 , 1 , doubleKeyList);
+
+        (*frl1->tableList) += (*frl2->tableList);
+
+        resList->DeleteBucket(pos2);
+        
     }
     else if (exists1 == true && exists2 == false){
         DeleteTargeted(frl1 , 0 , doubleKeyList);
@@ -560,6 +570,7 @@ int DoAllJoinPreds(RelationTable* relTable , List<JoinPred>* joinList , List<Ful
     bool last = false;
     bool firstTime = true;
     while (joinList->GetTotalItems() > 0){
+        
 
         JoinPred* jpredp = &( (*(*joinList)[i])[0] );
 
@@ -725,7 +736,7 @@ int main(int argc , char* argv[])
     }
     cout << endl;
 
-    cin.get();
+    // cin.get();
 
     cout << "TWO\n" << endl;
 
