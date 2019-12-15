@@ -30,7 +30,22 @@ ResStruct* FindInResList(List<ResStruct>* resList , uint64_t elemID){
 
     while (bucket != NULL) {
         for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
-            cout << "TABLE IDDDDDDDD-> " << (*bucket)[j].tableID << endl;
+
+
+            
+
+            ResStruct* rss = &( (*bucket)[j] );
+            cout << "TABLE IDDDDDDDD-> " << rss->tableID << endl;
+            for (uint32_t i = 0 ; i < rss->rowIDlist->GetTotalItems() ; i++){
+                uint32_t rowID = (*(*rss->rowIDlist)[i])[0];
+                cout << (*(*rss->rowIDlist)[i])[0] << endl;
+            }
+            cout << endl;
+
+
+
+
+            
             if (elemID == (*bucket)[j].tableID){
                 found = &(*bucket)[j];
                 return found;
@@ -559,6 +574,7 @@ int DoAllCompPreds(RelationTable* relTable , List<CompPred>* compList , List<Ful
         CompPred* cpredp = &( (*(*compList)[i])[0] );
         ComparisonPredicate(relTable , *cpredp , resList);
         relExistsInRL[cpredp->rel1] = true;
+        cout << cpredp->rel1 << endl;
     }
 
     return 1;
@@ -570,7 +586,8 @@ int DoAllJoinPreds(RelationTable* relTable , List<JoinPred>* joinList , List<Ful
     bool last = false;
     bool firstTime = true;
     while (joinList->GetTotalItems() > 0){
-        
+
+        cout << joinList->GetTotalItems() << endl;
 
         JoinPred* jpredp = &( (*(*joinList)[i])[0] );
 
@@ -586,12 +603,22 @@ int DoAllJoinPreds(RelationTable* relTable , List<JoinPred>* joinList , List<Ful
         if (jpredp->rel1 == jpredp->rel2){
             if (jpredp->colRel1 == jpredp->colRel2){
                 joinList->DeleteBucket(i);
+                if (last == true){
+                    i = 0;
+                    last = false;
+                    firstTime = false; 
+                }
                 continue;
             }
             else {
                 JoinSelf(relTable , *jpredp , resList);
                 relExistsInRL[jpredp->rel1] = true;
                 joinList->DeleteBucket(i);
+                if (last == true){
+                    i = 0;
+                    last = false;
+                    firstTime = false; 
+                }
                 continue;
             }
         }
@@ -600,6 +627,11 @@ int DoAllJoinPreds(RelationTable* relTable , List<JoinPred>* joinList , List<Ful
             relExistsInRL[jpredp->rel1] = true;
             relExistsInRL[jpredp->rel2] = true;
             joinList->DeleteBucket(i);
+            if (last == true){
+                i = 0;
+                last = false;
+                firstTime = false; 
+            }
             continue;
         }
 
@@ -689,6 +721,7 @@ int main(int argc , char* argv[])
 
     JoinPred jp;
     CompPred cp;
+
     jp.type = 0;
     jp.rel1 = 1;
     jp.rel2 = 0;
@@ -702,18 +735,18 @@ int main(int argc , char* argv[])
     jp.colRel2 = 1;
     joinList->ListInsert(jp);
     
-    // cp.type = 1;
-    // cp.rel1 = 0;
-    // cp.colRel1 = 2;
-    // cp.comp = '>';
-    // cp.num = (uint64_t)1;
-    // compList->ListInsert(cp);
+    cp.type = 1;
+    cp.rel1 = 1;
+    cp.colRel1 = 2;
+    cp.comp = '>';
+    cp.num = (uint64_t)0;
+    compList->ListInsert(cp);
 
     cp.type = 1;
     cp.rel1 = 2;
     cp.colRel1 = 1;
     cp.comp = '>';
-    cp.num = (uint64_t)2;
+    cp.num = (uint64_t)0;
     compList->ListInsert(cp);
 
     // cp.type = 1;
@@ -744,7 +777,10 @@ int main(int argc , char* argv[])
 
     for (uint32_t i = 0 ; i < resList->GetTotalItems() ; i++){
         cout << "BUCKET " << i << endl;
+        ResStruct* existingRel = NULL;
         FindInResList( (* (*resList)[i])[0].tableList , 5);
+      
+        cout << endl;
     }
 
 
