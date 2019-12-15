@@ -214,7 +214,7 @@ int8_t List<T>::DeleteBucket(int const& pos)
 template <typename T>
 int8_t List<T>::DeleteLastBucket(void)
 {
-    this->DeleteBucket(total_buckets-1);
+    return this->DeleteBucket(total_buckets-1);
 }
 
 // template <typename T>
