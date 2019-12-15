@@ -36,6 +36,12 @@ uint32_t Bucket<T>::GetBucketItems(void) const
     return (slots - remaining_slots);
 }
 
+template <typename T>
+uint32_t Bucket<T>::GetRemainingSlots(void) const
+{
+    return remaining_slots;
+}
+
 // template <typename T>
 // void Bucket<T>::BucketPrint (void) const
 // {
@@ -64,7 +70,7 @@ void Bucket<T>::LinkNextBucket(Bucket<T>* new_bucket)
 }
 
 template <typename T>
-int8_t Bucket<T>::BucketInsert(const T& item)
+int8_t Bucket<T>::BucketInsertEntry(const T& item)
 {
     if (!remaining_slots)
         return -1;
@@ -75,10 +81,28 @@ int8_t Bucket<T>::BucketInsert(const T& item)
 }
 
 template <typename T>
+int8_t Bucket<T>::BucketDeleteEntry(const uint32_t& index)
+{
+    if (index < 0 || index >= slots)
+        return -1;
+
+    memset(&data[index], 0, sizeof(T));
+    data[index] = data[slots - remaining_slots - 1];
+
+    remaining_slots++;
+
+    // Indicates that the bucket is empty
+    if (remaining_slots == slots)
+        return 1;
+
+    return 0;
+}
+
+template <typename T>
 int8_t Bucket<T>::ClearBucket(void)
 {
-    memset(data, 0, slots);
-    this->remaining_slots = this->slots;
+    memset(data, 0, sizeof(data));
+    remaining_slots = slots;
 
     return 1;
 }
@@ -94,9 +118,9 @@ List<T>::List(const uint32_t& bk_size, const uint32_t& dt_size) : bucket_size(bk
         return;
     }
 
-    head = new Bucket<T>(bucket_size / data_size);
-    tail      = head;
-    last_used = head;
+    head          = new Bucket<T>(bucket_size / data_size);
+    tail          = head;
+    last_used     = head;
     last_used_pos = 0;
 }
 
@@ -122,7 +146,7 @@ int8_t List<T>::ListInsert(const T& item)
         tail = tmp;
     }
 
-    tail->BucketInsert(item);
+    tail->BucketInsertEntry(item);
     total_items++;
     return 0;
 }
@@ -185,6 +209,12 @@ int8_t List<T>::DeleteBucket(int const& pos)
     }
 
     return 1;
+}
+
+template <typename T>
+int8_t List<T>::DeleteLastBucket(void)
+{
+    this->DeleteBucket(total_buckets-1);
 }
 
 // template <typename T>
