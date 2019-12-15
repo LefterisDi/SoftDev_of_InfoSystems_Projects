@@ -41,7 +41,7 @@ class List {
     Bucket<T>* last_used;
 
     uint32_t   last_used_pos;
-
+ 
     uint32_t   total_items;
     uint32_t   total_buckets;
 
