@@ -11,12 +11,12 @@
 // #include <iterator>
 
 #include "./opts/getopts.hpp"
-#include "./relationStructs.h"
-#include "./sortingAlg/quicksort.hpp"
-#include "./sortingAlg/tablesort.hpp"
-#include "./templates/list.hpp"
+// #include "./relationStructs.h"
+// #include "./sortingAlg/quicksort.hpp"
+// #include "./sortingAlg/tablesort.hpp"
+// #include "./templates/list.hpp"
 #include "./utils/predicates.hpp"
-#include "./utils/utils.hpp"
+// #include "./utils/utils.hpp"
 
 using namespace std;
 
