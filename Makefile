@@ -3,7 +3,7 @@ MAIN_OBJ   = main.o
 PARSER_OBJ = ./opts/getopts.o
 SORT_OBJS  = ./sortingAlg/quicksort.o ./sortingAlg/tablesort.o
 SEARCH_OBJ = ./searchingAlg/binarySearch.o
-UTILS_OBJ  = ./utils/utils.o
+UTILS_OBJ  = ./utils/utils.o ./utils/predicates.o
 TMPL_OBJ   = ./templates/list.o
 OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(UTILS_OBJ) $(TMPL_OBJ) $(SORT_OBJS) $(SEARCH_OBJ)
 
@@ -12,15 +12,15 @@ MAIN_SRC   = main.cpp
 PARSER_SRC = ./opts/getopts.cpp
 SORT_SRCS  = ./sortingAlg/quicksort.cpp ./sortingAlg/tablesort.cpp
 SEARCH_SRC = ./searchingAlg/binarySearch.cpp
-UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp
+UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp ./utils/predicates.cpp
 TMPL_SRC   = ./templates/list.cpp
 SOURCES    = $(UNIT_SRC) $(MAIN_SRCS) $(PARSER_SRC) $(UTILS_SRC) $(TMPL_SRC) $(SORT_SRCS) $(SEARCH_SRC)
 
 # HEADERS
 PARSER_HDR = ./opts/getopts.hpp
-SORT_HDRS  = ./sortingAlg/quicksort.cpp ./sortingAlg/tablesort.cpp
-SEARCH_HDR = ./searchingAlg/binarySearch.cpp
-UTILS_HDR  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp
+SORT_HDRS  = ./sortingAlg/quicksort.hpp ./sortingAlg/tablesort.hpp
+SEARCH_HDR = ./searchingAlg/binarySearch.hpp
+UTILS_HDR  = ./sortingAlg/quicksort.hpp ./searchingAlg/binarySearch.hpp ./utils/predicates.hpp
 TMPL_HDR   = ./templates/list.hpp
 HEADERS    = $(PARSER_HDR) $(SORT_HDRS) $(UTILS_HDR) $(TMPL_HDR) $(SEARCH_HDR)
 
@@ -56,6 +56,9 @@ main.o : main.cpp
 
 ./utils/utils.o : ./utils/utils.cpp
 	$(CC) $(DEBUG) -o ./utils/utils.o               $(FLAGS) ./utils/utils.cpp
+
+./utils/predicates.o : ./utils/predicates.cpp
+	$(CC) $(DEBUG) -o ./utils/predicates.o          $(FLAGS) ./utils/predicates.cpp
 
 ./sortingAlg/quicksort.o : ./sortingAlg/quicksort.cpp
 	$(CC) $(DEBUG) -o ./sortingAlg/quicksort.o      $(FLAGS) ./sortingAlg/quicksort.cpp
