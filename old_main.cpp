@@ -12,7 +12,7 @@
 #include <iterator>
 
 
-#include "./relationStructs.h"
+#include "./relationStructs.hpp"
 #include "./sortingAlg/tablesort.hpp"
 #include "./sortingAlg/quicksort.hpp"
 #include "./templates/list.hpp"

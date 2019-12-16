@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "list.hpp"
-#include "../relationStructs.h"
+#include "../relationStructs.hpp"
 
 template <typename T>
 Bucket<T>::Bucket(const uint32_t& items) : slots(items), remaining_slots(items), next_bucket(NULL)

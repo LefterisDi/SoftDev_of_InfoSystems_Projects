@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "../relationStructs.h"
+#include "../relationStructs.hpp"
 #include "../sortingAlg/tablesort.hpp"
 
 using namespace std;

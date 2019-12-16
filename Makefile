@@ -1,28 +1,29 @@
 # OBJECT FILES
 MAIN_OBJ   = main.o
 PARSER_OBJ = ./opts/getopts.o
-SORT_OBJS  = ./sortingAlg/quicksort.o ./sortingAlg/tablesort.o
 SEARCH_OBJ = ./searchingAlg/binarySearch.o
-UTILS_OBJ  = ./utils/utils.o ./utils/predicates.o
+SORT_OBJS  = ./sortingAlg/quicksort.o ./sortingAlg/tablesort.o
 TMPL_OBJ   = ./templates/list.o
-OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(UTILS_OBJ) $(TMPL_OBJ) $(SORT_OBJS) $(SEARCH_OBJ)
+UTILS_OBJ  = ./utils/utils.o ./utils/predicates.o
+OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(SEARCH_OBJ) $(SORT_OBJS) $(TMPL_OBJ) $(UTILS_OBJ)
 
 # SOURCES
 MAIN_SRC   = main.cpp
 PARSER_SRC = ./opts/getopts.cpp
-SORT_SRCS  = ./sortingAlg/quicksort.cpp ./sortingAlg/tablesort.cpp
 SEARCH_SRC = ./searchingAlg/binarySearch.cpp
-UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp ./utils/predicates.cpp
+SORT_SRCS  = ./sortingAlg/quicksort.cpp ./sortingAlg/tablesort.cpp
 TMPL_SRC   = ./templates/list.cpp
-SOURCES    = $(UNIT_SRC) $(MAIN_SRCS) $(PARSER_SRC) $(UTILS_SRC) $(TMPL_SRC) $(SORT_SRCS) $(SEARCH_SRC)
+UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp ./utils/predicates.cpp
+SOURCES    = $(MAIN_SRCS) $(PARSER_SRC) $(SEARCH_SRC) $(SORT_SRCS) $(TMPL_SRC) $(UTILS_SRC)
 
 # HEADERS
+RELS_HDR   = relationStructs.hpp
 PARSER_HDR = ./opts/getopts.hpp
-SORT_HDRS  = ./sortingAlg/quicksort.hpp ./sortingAlg/tablesort.hpp
 SEARCH_HDR = ./searchingAlg/binarySearch.hpp
-UTILS_HDR  = ./sortingAlg/quicksort.hpp ./searchingAlg/binarySearch.hpp ./utils/predicates.hpp
+SORT_HDRS  = ./sortingAlg/quicksort.hpp ./sortingAlg/tablesort.hpp
 TMPL_HDR   = ./templates/list.hpp
-HEADERS    = $(PARSER_HDR) $(SORT_HDRS) $(UTILS_HDR) $(TMPL_HDR) $(SEARCH_HDR)
+UTILS_HDR  = ./sortingAlg/quicksort.hpp ./searchingAlg/binarySearch.hpp ./utils/predicates.hpp
+HEADERS    = $(PARSER_HDR) $(SEARCH_HDR) $(SORT_HDRS) $(TMPL_HDR) $(UTILS_HDR)
 
 # EXECUTABLES
 MAIN_OUT   = main

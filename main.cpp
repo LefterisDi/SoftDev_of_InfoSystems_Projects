@@ -11,7 +11,7 @@
 // #include <iterator>
 
 #include "./opts/getopts.hpp"
-// #include "./relationStructs.h"
+// #include "./relationStructs.hpp"
 // #include "./sortingAlg/quicksort.hpp"
 // #include "./sortingAlg/tablesort.hpp"
 // #include "./templates/list.hpp"
