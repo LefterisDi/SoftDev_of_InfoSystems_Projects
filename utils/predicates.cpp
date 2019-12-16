@@ -37,7 +37,7 @@ ResStruct* FindInResList(List<ResStruct>* resList , uint64_t elemID)
     return found;
 }
 
-int ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<FullResList>* resList)
+int ComparisonPredicate(List<RelationTable>* relTableList , CompPred& cpred , List<FullResList>* resList)
 {
     ResStruct*   existingRel = NULL;
     FullResList* frl         = NULL;
@@ -61,7 +61,7 @@ int ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<FullRes
         existingRel->tableID   = cpred.rel1;
         existingRel->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
 
-        for (uint64_t i = 0 ; i < relTable[cpred.rel1].rows ; i++)
+        for (uint64_t i = 0 ; i < (*(*relTableList)[cpred.rel1])[0].rows ; i++)
             existingRel->rowIDlist->ListInsert(i);
 
         // frl->tableList->ListInsert(*existingRel);
@@ -76,7 +76,7 @@ int ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<FullRes
             for (uint64_t i = 0; i < totalBuckets ;i++){
                 uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
                 // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
-                if ( (relTable[cpred.rel1].table[cpred.colRel1][rowID] > cpred.num) == false ) {
+                if ( (  (*(*relTableList)[cpred.rel1])[0].table[cpred.colRel1][rowID] > cpred.num) == false ) {
                     existingRel->rowIDlist->DeleteBucket(i);
                     i--;
                     totalBuckets--;
@@ -88,7 +88,7 @@ int ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<FullRes
             for (uint64_t i = 0; i < totalBuckets ;i++){
                 uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
                 // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
-                if ( (relTable[cpred.rel1].table[cpred.colRel1][rowID] < cpred.num) == false ) {
+                if ( ( (*(*relTableList)[cpred.rel1])[0].table[cpred.colRel1][rowID] < cpred.num) == false ) {
                     existingRel->rowIDlist->DeleteBucket(i);
                     i--;
                     totalBuckets--;
@@ -100,7 +100,7 @@ int ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<FullRes
             for (uint64_t i = 0; i < totalBuckets ;i++){
                 uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
                 // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
-                if ( (relTable[cpred.rel1].table[cpred.colRel1][rowID] == cpred.num) == false ) {
+                if ( ( (*(*relTableList)[cpred.rel1])[0].table[cpred.colRel1][rowID] == cpred.num) == false ) {
                     existingRel->rowIDlist->DeleteBucket(i);
                     i--;
                     totalBuckets--;
@@ -111,7 +111,7 @@ int ComparisonPredicate(RelationTable* relTable , CompPred& cpred , List<FullRes
 
     for (uint64_t i = 0; i < existingRel->rowIDlist->GetTotalItems() ;i++) {
         uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
-        cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
+        cout << (*(*relTableList)[cpred.rel1])[0].table[cpred.colRel1][rowID] << endl;
     }
     cout << endl;
 
@@ -182,7 +182,7 @@ int DeleteTargeted( FullResList* listOfArrays , int mask , List<uint64_t>* doubl
     return 1;
 }
 
-int JoinSelf(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* resList)
+int JoinSelf(List<RelationTable>* relTableList , JoinPred& jpred ,  List<FullResList>* resList)
 {
     ResStruct*   existingRel = NULL;
     FullResList* frl         = NULL;
@@ -206,7 +206,7 @@ int JoinSelf(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* res
         existingRel->tableID   = jpred.rel1;
         existingRel->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
 
-        for (uint64_t i = 0 ; i < relTable[jpred.rel1].rows ; i++)
+        for (uint64_t i = 0 ; i < (*(*relTableList)[jpred.rel1])[0].rows ; i++)
             existingRel->rowIDlist->ListInsert(i);
 
         // frl->tableList->ListInsert(*existingRel);
@@ -219,7 +219,7 @@ int JoinSelf(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* res
 
         uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
         // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
-        if ( (relTable[jpred.rel1].table[jpred.colRel1][rowID] == relTable[jpred.rel2].table[jpred.colRel2][rowID]) == false ) {
+        if ( (  (*(*relTableList)[jpred.rel1])[0].table[jpred.colRel1][rowID] == (*(*relTableList)[jpred.rel2])[0].table[jpred.colRel2][rowID]) == false ) {
             existingRel->rowIDlist->DeleteBucket(i);
             i--;
             totalBuckets--;
@@ -229,7 +229,7 @@ int JoinSelf(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* res
     for (uint64_t i = 0; i < existingRel->rowIDlist->GetTotalItems() ;i++) {
 
         uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
-        cout << relTable[jpred.rel1].table[jpred.colRel1][rowID] << endl;
+        cout << (*(*relTableList)[jpred.rel1])[0].table[jpred.colRel1][rowID] << endl;
     }
     cout << endl;
 
@@ -243,7 +243,7 @@ int JoinSelf(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* res
     return 1;
 }
 
-void TablesExistInMidStruct(RelationTable* relTable     , JoinPred&     jpred       ,
+void TablesExistInMidStruct(List<RelationTable>* relTableList , JoinPred&     jpred       ,
                             ResStruct*&    existingRel1 , ResStruct*&   existingRel2,
                             FullResList*&  frl1         , FullResList*& frl2        ,
                             bool&          exists1      , bool&         exists2)
@@ -260,14 +260,14 @@ void TablesExistInMidStruct(RelationTable* relTable     , JoinPred&     jpred   
         existingRel1->tableID   = jpred.rel1;
         existingRel1->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
 
-        for (uint64_t i = 0 ; i < relTable[jpred.rel1].rows ; i++)
+        for (uint64_t i = 0 ; i < (*(*relTableList)[jpred.rel1])[0].rows ; i++)
             existingRel1->rowIDlist->ListInsert(i);
 
         existingRel2            = new ResStruct;
         existingRel2->tableID   = jpred.rel2;
         existingRel2->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
 
-        for (uint64_t i = 0 ; i < relTable[jpred.rel2].rows ; i++)
+        for (uint64_t i = 0 ; i < (*(*relTableList)[jpred.rel2])[0].rows ; i++)
             existingRel2->rowIDlist->ListInsert(i);
 
         // frl1->tableList->ListInsert(*existingRel1);
@@ -287,7 +287,7 @@ void TablesExistInMidStruct(RelationTable* relTable     , JoinPred&     jpred   
         existingRel2->tableID   = jpred.rel2;
         existingRel2->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
 
-        for (uint64_t i = 0 ; i < relTable[jpred.rel2].rows ; i++)
+        for (uint64_t i = 0 ; i < (*(*relTableList)[jpred.rel2])[0].rows ; i++)
             existingRel2->rowIDlist->ListInsert(i);
 
         // frl1->tableList->ListInsert(*existingRel2);
@@ -300,37 +300,37 @@ void TablesExistInMidStruct(RelationTable* relTable     , JoinPred&     jpred   
         existingRel1->tableID   = jpred.rel1;
         existingRel1->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
 
-        for (uint64_t i = 0 ; i < relTable[jpred.rel1].rows ; i++)
+        for (uint64_t i = 0 ; i < (*(*relTableList)[jpred.rel1])[0].rows ; i++)
             existingRel1->rowIDlist->ListInsert(i);
 
         // frl2->tableList->ListInsert(*existingRel1);
     }
 }
 
-void CreateTableForJoin(RelationTable* relTable , uint64_t relID , bool exists , uint64_t**& table , uint32_t& rowNum , ResStruct*& existingRel)
+void CreateTableForJoin(List<RelationTable>* relTableList , uint64_t relID , bool exists , uint64_t**& table , uint32_t& rowNum , ResStruct*& existingRel)
 {
     if (exists == true) {
 
-        table  = new uint64_t*[relTable[relID].cols];
+        table  = new uint64_t*[(*(*relTableList)[relID])[0].cols];
         rowNum = existingRel->rowIDlist->GetTotalItems();
 
-        for(int i = 0; i < relTable[relID].cols; i++)
+        for(int i = 0; i < (*(*relTableList)[relID])[0].cols; i++)
             table[i] = new uint64_t[rowNum];
 
         //columns change with the first parameter and rowIDs with the second
         for (int j =  0 ; j < rowNum ; j++) {
-            for (int i = 0 ; i < relTable[relID].cols ; i++) {
+            for (int i = 0 ; i < (*(*relTableList)[relID])[0].cols ; i++) {
 
                 uint64_t rowID = (*(*existingRel->rowIDlist)[j])[0];
-                table[i][j] = relTable[relID].table[i][rowID];
+                table[i][j] = (*(*relTableList)[relID])[0].table[i][rowID];
             }
         }
 
     } else {
 
-        table  = relTable[relID].table;
+        table  = (*(*relTableList)[relID])[0].table;
         // table1 = new uint64_t*[relTable[relID].cols];
-        rowNum = (uint32_t)relTable[relID].rows;
+        rowNum = (uint32_t)(*(*relTableList)[relID])[0].rows;
         // for(int i = 0; i < relTable[relID].cols; i++)
         //     table1[i] = new uint64_t[rowNum1];
         // for (int j =  0 ; j < rowNum1 ; j++){
@@ -424,7 +424,7 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
 
 }
 
-int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* resList)
+int JoinPredicate(List<RelationTable>* relTableList , JoinPred& jpred ,  List<FullResList>* resList)
 {
     ResStruct* existingRel1 = NULL;
     ResStruct* existingRel2 = NULL;
@@ -467,14 +467,14 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
         }
     }
 
-    TablesExistInMidStruct(relTable , jpred , existingRel1 , existingRel2 , frl1 , frl2 , exists1 , exists2);
+    TablesExistInMidStruct(relTableList , jpred , existingRel1 , existingRel2 , frl1 , frl2 , exists1 , exists2);
 
-    CreateTableForJoin(relTable , jpred.rel1 , exists1 , table1 , rowNum1 , existingRel1);
-    CreateTableForJoin(relTable , jpred.rel2 , exists2 , table2 , rowNum2 , existingRel2);
+    CreateTableForJoin(relTableList , jpred.rel1 , exists1 , table1 , rowNum1 , existingRel1);
+    CreateTableForJoin(relTableList , jpred.rel2 , exists2 , table2 , rowNum2 , existingRel2);
 
     cout << "FIRST TABLE " << endl;
     for (uint32_t i = 0 ; i < rowNum1 ; i++) {
-        for (uint32_t j = 0 ; j < relTable[jpred.rel1].cols ; j++) {
+        for (uint32_t j = 0 ; j < (*(*relTableList)[jpred.rel1])[0].cols ; j++) {
             cout << table1[j][i] << " ";
         }
         cout << endl;
@@ -483,7 +483,7 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
 
     cout << "SECOND TABLE " << endl;
     for (uint32_t i = 0 ; i < rowNum2 ; i++) {
-        for (uint32_t j = 0 ; j < relTable[jpred.rel2].cols ; j++) {
+        for (uint32_t j = 0 ; j < (*(*relTableList)[jpred.rel2])[0].cols ; j++) {
             cout << table2[j][i] << " ";
         }
         cout << endl;
@@ -522,7 +522,7 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
         delete existingRel1;
 
     else {
-        for(int i = 0; i < relTable[jpred.rel1].cols; i++)
+        for(int i = 0; i < (*(*relTableList)[jpred.rel1])[0].cols; i++)
             delete[] table1[i];
         delete[] table1;
     }
@@ -531,7 +531,7 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
         delete existingRel2;
 
     else {
-        for(int i = 0; i < relTable[jpred.rel2].cols; i++)
+        for(int i = 0; i < (*(*relTableList)[jpred.rel2])[0].cols; i++)
             delete[] table2[i];
         delete[] table2;
     }
@@ -542,12 +542,12 @@ int JoinPredicate(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>
     return 1;
 }
 
-int DoAllCompPreds(RelationTable* relTable , List<CompPred>* compList , List<FullResList>* resList , bool* relExistsInRL)
+int DoAllCompPreds( List<RelationTable>* relTableList , List<CompPred>* compList , List<FullResList>* resList , bool* relExistsInRL)
 {
     for (uint32_t i = 0 ; i < compList->GetTotalItems() ; i++) {
 
         CompPred* cpredp = &( (*(*compList)[i])[0] );
-        ComparisonPredicate(relTable , *cpredp , resList);
+        ComparisonPredicate(relTableList , *cpredp , resList);
         relExistsInRL[cpredp->rel1] = true;
         cout << cpredp->rel1 << endl;
     }
@@ -555,7 +555,7 @@ int DoAllCompPreds(RelationTable* relTable , List<CompPred>* compList , List<Ful
     return 1;
 }
 
-int DoAllJoinPreds(RelationTable* relTable , List<JoinPred>* joinList , List<FullResList>* resList ,  bool* relExistsInRL)
+int DoAllJoinPreds(List<RelationTable>* relTableList , List<JoinPred>* joinList , List<FullResList>* resList ,  bool* relExistsInRL)
 {
     uint32_t i         = 0;
     bool     last      = false;
@@ -585,7 +585,7 @@ int DoAllJoinPreds(RelationTable* relTable , List<JoinPred>* joinList , List<Ful
                 continue;
 
             } else {
-                JoinSelf(relTable , *jpredp , resList);
+                JoinSelf(relTableList , *jpredp , resList);
                 relExistsInRL[jpredp->rel1] = true;
                 joinList->DeleteBucket(i);
                 if (last == true) {
@@ -597,7 +597,7 @@ int DoAllJoinPreds(RelationTable* relTable , List<JoinPred>* joinList , List<Ful
             }
 
         } else {
-            JoinPredicate(relTable , *jpredp , resList);
+            JoinPredicate(relTableList , *jpredp , resList);
             relExistsInRL[jpredp->rel1] = true;
             relExistsInRL[jpredp->rel2] = true;
             joinList->DeleteBucket(i);

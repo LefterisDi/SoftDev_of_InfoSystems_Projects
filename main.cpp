@@ -32,6 +32,9 @@ int main(int argc , char* argv[])
     if (!getopts(argc,argv,(char*)"w:p",args))
         return -1;
 
+    ReadRelations(args[0].optType.cp);
+
+    return 0;
 
     List<JoinPred>* joinList = new List<JoinPred>(sizeof(JoinPred) , sizeof(JoinPred));
     List<CompPred>* compList = new List<CompPred>(sizeof(CompPred) , sizeof(CompPred));
@@ -40,47 +43,57 @@ int main(int argc , char* argv[])
     // uint32_t*  rowIDs1;
     // uint32_t*  rowIDs2;
 
-    // int relations = 3;
-    // bool* relExistsInRL = new bool[relations];
-    // for (uint32_t i = 0; i < relations ; i++){
-    //     relExistsInRL[i] = false;
-    // }
+    int relations = 3;
+    bool* relExistsInRL = new bool[relations];
+    for (uint32_t i = 0; i < relations ; i++){
+        relExistsInRL[i] = false;
+    }
     // RelationTable* relTable = new RelationTable[relations];
-    // relTable[0].rows = 4;
-    // relTable[0].cols = 5;
-    // relTable[0].table = new uint64_t*[relTable[0].cols];
-    // for(int i = 0; i < relTable[0].cols; i++)
-    //     relTable[0].table[i] = new uint64_t[relTable[0].rows];
-    //
-    // relTable[1].rows = 6;
-    // relTable[1].cols = 3;
-    // relTable[1].table = new uint64_t*[relTable[1].cols];
-    // for(int i = 0; i < relTable[1].cols; i++)
-    //     relTable[1].table[i] = new uint64_t[relTable[1].rows];
-    //
-    // relTable[2].rows = 6;
-    // relTable[2].cols = 4;
-    // relTable[2].table = new uint64_t*[relTable[2].cols];
-    // for(int i = 0; i < relTable[2].cols; i++)
-    //     relTable[2].table[i] = new uint64_t[relTable[2].rows];
-    //
-    //
-    //
-    // default_random_engine gen;
-    // uniform_int_distribution<uint64_t> distribution(1,5);
-    // // uniform_int_distribution<uint64_t> distribution(1,ULLONG_MAX);
-    //
-    // // rowIDs1 = new uint32_t[size1x];
-    // // rowIDs2 = new uint32_t[size2x];
-    //
-    // // gen.seed((unsigned int) time(NULL));
-    // gen.seed(2);
-    //
-    // // for (int i = 0 ; i < size1x ; i++)
-    // //     rowIDs1[i] = i;
-    //
-    // // for (int i = 0 ; i < size2x ; i++)
-    // //     rowIDs2[i] = i;
+    List<RelationTable>* relTableList = new List<RelationTable>(sizeof(RelationTable), sizeof(RelationTable));
+    RelationTable rt;
+    rt.rows = 4;
+    rt.cols = 5;
+    rt.table = new uint64_t*[rt.cols];
+    for(int i = 0; i < rt.cols; i++)
+        rt.table[i] = new uint64_t[rt.rows];
+    
+    relTableList->ListInsert(rt);
+
+    rt.rows = 6;
+    rt.cols = 3;
+    rt.table = new uint64_t*[rt.cols];
+    for(int i = 0; i < rt.cols; i++)
+        rt.table[i] = new uint64_t[rt.rows];
+
+    relTableList->ListInsert(rt);
+    
+
+    rt.rows = 6;
+    rt.cols = 4;
+    rt.table = new uint64_t*[rt.cols];
+    for(int i = 0; i < rt.cols; i++)
+        rt.table[i] = new uint64_t[rt.rows];
+
+    relTableList->ListInsert(rt);
+
+
+    
+
+    default_random_engine gen;
+    uniform_int_distribution<uint64_t> distribution(1,5);
+    // uniform_int_distribution<uint64_t> distribution(1,ULLONG_MAX);
+
+    // rowIDs1 = new uint32_t[size1x];
+    // rowIDs2 = new uint32_t[size2x];
+
+    // gen.seed((unsigned int) time(NULL));
+    gen.seed(2);
+
+    // for (int i = 0 ; i < size1x ; i++)
+    //     rowIDs1[i] = i;
+
+    // for (int i = 0 ; i < size2x ; i++)
+    //     rowIDs2[i] = i;
     // for (int l = 0 ; l < relations ; l++){
     //     for (int i = 0 ; i < relTable[l].cols ; i++) {
     //         for (int j = 0 ; j < relTable[l].rows ; j++) {
@@ -88,7 +101,17 @@ int main(int argc , char* argv[])
     //         }
     //     }
     // }
-    //
+
+
+    for (int l = 0 ; l < relTableList->GetTotalItems(); l++){
+        RelationTable* rtable = &((*(*relTableList)[l])[0]);
+        for (int i = 0 ; i < rtable->cols ; i++) {
+            for (int j = 0 ; j < rtable->rows ; j++) {
+                rtable->table[i][j] = distribution(gen);
+            }
+        }
+    }
+
     // for (int l = 0 ; l < relations ; l++){
     //     for (int i = 0 ; i < relTable[l].rows ; i++) {
     //         for (int j = 0 ; j < relTable[l].cols ; j++) {
@@ -99,7 +122,18 @@ int main(int argc , char* argv[])
     //     cout << endl;
     // }
 
-    List<RelationTable>* relTable = ReadRelations(args[0].optType.cp);
+    for (int l = 0 ; l < relTableList->GetTotalItems(); l++){
+        RelationTable* rtable = &((*(*relTableList)[l])[0]);
+        for (int i = 0 ; i < rtable->rows ; i++) {
+            for (int j = 0 ; j < rtable->cols ; j++) {
+                cout << rtable->table[j][i] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+    }
+
+
 
     JoinPred jp;
     CompPred cp;
@@ -142,7 +176,7 @@ int main(int argc , char* argv[])
 
     cout << "ONE\n" << endl;
 
-    DoAllCompPreds(relTable , compList , resList , relExistsInRL);
+    DoAllCompPreds(relTableList , compList , resList , relExistsInRL);
 
 
     for (uint32_t i = 0 ; i < resList->GetTotalItems() ; i++){
@@ -155,7 +189,7 @@ int main(int argc , char* argv[])
 
     cout << "TWO\n" << endl;
 
-    DoAllJoinPreds(relTable , joinList , resList , relExistsInRL);
+    DoAllJoinPreds(relTableList , joinList , resList , relExistsInRL);
 
     for (uint32_t i = 0 ; i < resList->GetTotalItems() ; i++){
         cout << "BUCKET " << i << endl;
@@ -205,13 +239,14 @@ int main(int argc , char* argv[])
     delete resList;
     delete joinList;
     delete compList;
+    delete relTableList;
 
-    for (int j = 0; j < relations ; j++){
-        for(int i = 0; i < relTable[j].cols; i++)
-            delete[] relTable[j].table[i];
-        delete[] relTable[j].table;
-    }
-    delete[] relTable;
+    // for (int j = 0; j < relations ; j++){
+    //     for(int i = 0; i < relTable[j].cols; i++)
+    //         delete[] relTable[j].table[i];
+    //     delete[] relTable[j].table;
+    // }
+    // delete[] relTable;'
     delete[] relExistsInRL;
 
 }
