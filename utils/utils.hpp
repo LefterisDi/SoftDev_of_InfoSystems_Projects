@@ -3,7 +3,7 @@
 #ifndef __UTILS_HEADER__
 #define __UTILS_HEADER__
 
-#include <iostream>
+#include "../relationStructs.hpp"
 #include "../templates/list.hpp"
 
 typedef struct tuple {
@@ -11,6 +11,7 @@ typedef struct tuple {
     uint64_t rowID;
 } MergeTuple;
 
+List<RelationTable>* ReadRelations (const char *);
 uint64_t** ReadFile      (const char *, uint32_t &, uint32_t &);
 uint32_t   BitConversion (uint64_t, uint32_t);
 void       SwitchElements(uint64_t **, uint32_t, uint32_t, uint32_t);

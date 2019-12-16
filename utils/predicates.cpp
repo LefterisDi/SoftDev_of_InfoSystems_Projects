@@ -243,13 +243,11 @@ int JoinSelf(RelationTable* relTable , JoinPred& jpred ,  List<FullResList>* res
     return 1;
 }
 
-
-void TablesExistInMidStruct( RelationTable* relTable ,JoinPred& jpred ,\
-                           ResStruct*& existingRel1 , ResStruct*& existingRel2 , \
-                           FullResList*& frl1 , FullResList*& frl2 , \
-                           bool& exists1 , bool& exists2){
-
-
+void TablesExistInMidStruct(RelationTable* relTable     , JoinPred&     jpred       ,
+                            ResStruct*&    existingRel1 , ResStruct*&   existingRel2,
+                            FullResList*&  frl1         , FullResList*& frl2        ,
+                            bool&          exists1      , bool&         exists2)
+{
     if (existingRel1 == NULL && existingRel2 == NULL)
     {
         exists1 = false;
@@ -307,11 +305,10 @@ void TablesExistInMidStruct( RelationTable* relTable ,JoinPred& jpred ,\
 
         // frl2->tableList->ListInsert(*existingRel1);
     }
-
 }
 
-void CreateTableForJoin(RelationTable* relTable , uint64_t relID , bool exists , uint64_t**& table , uint32_t& rowNum , ResStruct*& existingRel){
-
+void CreateTableForJoin(RelationTable* relTable , uint64_t relID , bool exists , uint64_t**& table , uint32_t& rowNum , ResStruct*& existingRel)
+{
     if (exists == true) {
 
         table  = new uint64_t*[relTable[relID].cols];
@@ -344,12 +341,11 @@ void CreateTableForJoin(RelationTable* relTable , uint64_t relID , bool exists ,
     }
 }
 
-void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList ,List<FullResList>*& resList , uint32_t& pos2 ,\
-                           ResStruct*& existingRel1 , ResStruct*& existingRel2 , \
-                           FullResList*& frl1 , FullResList*& frl2 , \
-                           bool& exists1 , bool& exists2){
-
-    
+void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>*& resList , uint32_t& pos2 ,
+                              ResStruct*&      existingRel1  , ResStruct*&         existingRel2             ,
+                              FullResList*&    frl1          , FullResList*&       frl2                     ,
+                              bool&            exists1       , bool&               exists2)
+{
     if (exists1 == false && exists2 == false) {
 
         DeleteTargetedSL(existingRel1 , 0 , doubleKeyList);

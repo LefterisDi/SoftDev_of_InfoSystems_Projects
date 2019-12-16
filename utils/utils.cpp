@@ -4,7 +4,6 @@
 #include <fstream>
 #include <string.h>
 
-#include "../templates/list.hpp"
 #include "utils.hpp"
 
 uint32_t BitConversion(uint64_t num, uint32_t key)
@@ -76,6 +75,56 @@ void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X
             }
         }
     }
+}
+
+List<RelationTable>* ReadRelations(const char* workloads_path)
+{
+    char*  line = NULL;
+    size_t len  = 0;
+
+    size_t work_len  = strlen(workloads_path);
+
+    List<RelationTable>* relations = new List<RelationTable>(sizeof(RelationTable), sizeof(RelationTable));
+    // List<RelationTable> relations(sizeof(RelationTable), sizeof(RelationTable));
+
+    while (getline(&line, &len, stdin) != -1) {
+
+        RelationTable* tmp_rel_node = new RelationTable;
+
+        char rel_path[work_len + strlen(line) + 2];
+        memset(rel_path, 0, work_len + strlen(line) + 2);
+
+        // Remove '\n'
+        line[strlen(line) - 1] = '\0';
+
+        // Build the new path
+        strcpy(rel_path, workloads_path);
+        rel_path[work_len] = '/';
+        strcat(rel_path, line);
+
+        // std::cout << rel_path << '\n';
+
+        FILE* rel_fp;
+
+        rel_fp = fopen(rel_path,"rb");
+
+        fread(&tmp_rel_node->rows, sizeof(uint64_t), 1, rel_fp);
+        fread(&tmp_rel_node->cols, sizeof(uint64_t), 1, rel_fp);
+
+        tmp_rel_node->table  = new uint64_t*[tmp_rel_node->cols];
+        for (int i = 0; i < tmp_rel_node->cols; i++)
+            tmp_rel_node->table[i] = new uint64_t[tmp_rel_node->rows];
+
+        for (int i = 0 ; i < tmp_rel_node->cols ; i++)
+            for (int j = 0 ; j < tmp_rel_node->rows ; j++)
+                fread(&tmp_rel_node->table[i][j], sizeof(uint64_t), 1, rel_fp);
+
+        fclose(rel_fp);
+
+        relations->ListInsert(*tmp_rel_node);
+    }
+
+    return relations;
 }
 
 uint64_t** ReadFile(const char* inp_data, uint32_t& table_rows, uint32_t& table_cols)
