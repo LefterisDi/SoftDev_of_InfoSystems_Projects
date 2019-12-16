@@ -12,8 +12,8 @@ class Bucket {
     uint32_t remaining_slots;
     Bucket*  next_bucket;
 
-    private:
-        T&       operator =      (int const &) const;
+    // private:
+        // T&       operator =      (int const &) const;
 
     public:
         Bucket(const uint32_t & = 1);
