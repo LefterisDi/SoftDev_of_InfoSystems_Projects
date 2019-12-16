@@ -22,19 +22,6 @@ using namespace std;
 
 int main(int argc , char* argv[])
 {
-    struct opt_types args[2];
-
-    /*
-     * +------------------------------------+
-     * | args[0].optType.cp = <relA file>   |
-     * +------------------------------------+
-     */
-    if (!getopts(argc,argv,(char*)"w:p",args))
-        return -1;
-
-    ReadRelations(args[0].optType.cp);
-
-    return 0;
 
     List<JoinPred>* joinList = new List<JoinPred>(sizeof(JoinPred) , sizeof(JoinPred));
     List<CompPred>* compList = new List<CompPred>(sizeof(CompPred) , sizeof(CompPred));
