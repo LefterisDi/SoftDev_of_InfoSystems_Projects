@@ -347,6 +347,8 @@ template class Bucket<uint64_t>;
 template class List<CompPred>;
 template class List<FullResList>;
 template class List<JoinPred>;
+template class List<Projection>;
+template class List<Query>;
 template class List<RelationTable>;
 template class List<ResStruct>;
 template class List<uint64_t>;

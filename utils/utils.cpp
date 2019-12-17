@@ -77,6 +77,158 @@ void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X
     }
 }
 
+List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_path, List<RelationTable>& rels)
+{
+    char*  line = NULL;
+    size_t len  = 0;
+
+    size_t work_len  = strlen(workloads_path);
+    size_t qr_len    = strlen(queries_path);
+
+    char qr_path[work_len + qr_len + 2];
+    memset(qr_path, 0, work_len + qr_len + 2);
+
+    // Build the new path
+    strcpy(qr_path, workloads_path);
+    qr_path[work_len] = '/';
+    strcat(qr_path, queries_path);
+
+    // std::cout << qr_path << '\n';
+
+    FILE* query_fp;
+
+    query_fp = fopen(qr_path,"r");
+    // if (query_fp == NULL) {
+        // std::cout << "ERROR" << '\n';
+    // }
+
+    List<Query>* queries = new List<Query>(sizeof(Query), sizeof(Query));
+    // List<RelationTable> relations(sizeof(RelationTable), sizeof(RelationTable));
+
+    while (getline(&line, &len, query_fp) != -1 && strcmp(line, "F\n"))
+    {
+        char* tables      = NULL;
+        char* predicates  = NULL;
+        char* projections = NULL;
+
+        tables      = strtok(line, "|" );
+        predicates  = strtok(NULL, "|" );
+        projections = strtok(NULL, "\n");
+
+        // Count the relations that will be used
+        int index    = 0;
+        int cnt_rels = 0;
+        while (tables[index] != '\0')
+            if (tables[index++] == ' ')
+                cnt_rels++;
+
+        // Create the query_list's entry
+        Query* qr      = new Query;
+        qr->query_rels = new RelationTable*[cnt_rels];
+
+
+        // >>>> Read and Store relations that will be used <<<<
+        char* tbl = NULL;
+        index = 0;
+        while ( (tbl = strtok( (tbl == NULL) ? tables : NULL, " \0") ) != NULL)
+            qr->query_rels[index] = &(*rels[atoi(tbl)])[0];
+
+
+        // >>>> Read and Store (comparison & join) predicates <<<<
+        qr->comp_preds = new List<CompPred>(sizeof(CompPred), sizeof(CompPred));
+        qr->join_preds = new List<JoinPred>(sizeof(JoinPred), sizeof(JoinPred));
+
+        char* pred = NULL;
+        while ( (pred = strtok( (pred == NULL) ? predicates : NULL, "&\0") ) != NULL) {
+
+            char* bak_tok    = NULL;
+            char* left_pred  = NULL;
+            char* right_pred = NULL;
+
+            char orig_pred[strlen(pred) + 1];
+            strcpy(orig_pred, pred);
+
+            std::cout << "\nPRED  = " << pred << '\n';
+
+            left_pred  = strtok_r(pred, "=<>", &bak_tok);
+            right_pred = strtok_r(NULL, ""   , &bak_tok);
+
+            char pred_symb = orig_pred[strlen(left_pred)];
+
+            if (pred_symb == '=') {
+
+                char* rel2    = strtok_r(right_pred, ".", &bak_tok);
+                char* colRel2 = strtok_r(NULL      , "" , &bak_tok);
+
+                // If evaluates to true, we have a Join Predicate
+                if (colRel2 != NULL) {
+
+                    JoinPred* jp = new JoinPred;
+
+                    jp->rel1    = atoi(strtok_r(left_pred, ".", &bak_tok));
+                    jp->colRel1 = atoi(strtok_r(NULL     , "" , &bak_tok));
+
+                    jp->rel2    = atoi(rel2);
+                    jp->colRel2 = atoi(colRel2);
+
+                    qr->join_preds->ListInsert(*jp);
+
+                // Otherwise, we have a Comparison Predicate (=)
+                } else {
+
+                    CompPred* cp = new CompPred;
+
+                    cp->comp = '=';
+                    cp->rel1    = atoi(strtok_r(left_pred, ".", &bak_tok));
+                    cp->colRel1 = atoi(strtok_r(NULL     , "" , &bak_tok));
+                    cp->num     = atoi(right_pred);
+
+                    qr->comp_preds->ListInsert(*cp);
+                }
+
+            // We have a Comparison Predicate (< or >)
+            } else {
+
+                CompPred* cp = new CompPred;
+
+                if (pred_symb == '>')
+                    cp->comp = '>';
+                else if (pred_symb == '<')
+                    cp->comp = '<';
+
+                cp->rel1    = atoi(strtok_r(left_pred, ".", &bak_tok));
+                cp->colRel1 = atoi(strtok_r(NULL     , "" , &bak_tok));
+                cp->num     = atoi(right_pred);
+
+                qr->comp_preds->ListInsert(*cp);
+            }
+        } // end of reading predicates
+
+
+        // >>>> Read and Store (comparison & join) predicates <<<<
+        qr->proj = new List<Projection>(sizeof(Projection), sizeof(Projection));
+
+        tbl = NULL;
+        index = 0;
+        while ( (tbl = strtok( (tbl == NULL) ? projections : NULL, " \0") ) != NULL) {
+
+            Projection* pr = new Projection;
+
+            char* bak_tok  = NULL;
+            pr->rel    = atoi(strtok_r(tbl , ".", &bak_tok));
+            pr->colRel = atoi(strtok_r(NULL, "" , &bak_tok));
+
+            qr->proj->ListInsert(*pr);
+        }
+
+        queries->ListInsert(*qr);
+    }
+
+    fclose(query_fp);
+
+    return queries;
+}
+
 List<RelationTable>* ReadRelations(const char* workloads_path)
 {
     char*  line = NULL;

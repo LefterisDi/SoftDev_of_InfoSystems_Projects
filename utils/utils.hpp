@@ -11,6 +11,7 @@ typedef struct tuple {
     uint64_t rowID;
 } MergeTuple;
 
+List<Query>*         ReadQueryBatches(const char *, const char *, List<RelationTable> &);
 List<RelationTable>* ReadRelations (const char *);
 uint64_t** ReadFile      (const char *, uint32_t &, uint32_t &);
 uint32_t   BitConversion (uint64_t, uint32_t);

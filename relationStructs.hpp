@@ -12,7 +12,7 @@ typedef struct RelationTable {
 } RelationTable;
 
 typedef struct JoinPred {
-    uint32_t type;
+    // uint8_t  type : 1;
     uint64_t rel1;
     uint64_t rel2;
     uint64_t colRel1;
@@ -20,12 +20,24 @@ typedef struct JoinPred {
 } JoinPred;
 
 typedef struct CompPred {
+    // uint8_t  type : 1;
     char     comp;
-    uint32_t type;
     uint64_t rel1;
     uint64_t colRel1;
     uint64_t num;
 } CompPred;
+
+typedef struct Projection {
+    uint64_t rel;
+    uint64_t colRel;
+} Projection;
+
+typedef struct Query {
+    RelationTable**   query_rels;
+    List<CompPred>*   comp_preds;
+    List<JoinPred>*   join_preds;
+    List<Projection>* proj;
+} Query;
 
 typedef struct ResStruct {
     uint64_t tableID;
