@@ -96,8 +96,11 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
     // std::cout << qr_path << '\n';
 
     FILE* query_fp;
+    static long int fp_pos;
 
     query_fp = fopen(qr_path,"r");
+
+    fseek(query_fp, fp_pos, SEEK_SET);
     // if (query_fp == NULL) {
         // std::cout << "ERROR" << '\n';
     // }
@@ -105,7 +108,8 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
     List<Query>* queries = new List<Query>(sizeof(Query), sizeof(Query));
     // List<RelationTable> relations(sizeof(RelationTable), sizeof(RelationTable));
 
-    while (getline(&line, &len, query_fp) != -1 && strcmp(line, "F\n"))
+    int res = 0;
+    while ((res = getline(&line, &len, query_fp)) != -1 && strcmp(line, "F\n"))
     {
         char* tables      = NULL;
         char* predicates  = NULL;
@@ -127,14 +131,14 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         qr->query_rels = new RelationTable*[cnt_rels];
 
 
-        // >>>> Read and Store relations that will be used <<<<
+        // >>>> Read and Store Relations that will be used <<<<
         char* tbl = NULL;
         index = 0;
         while ( (tbl = strtok( (tbl == NULL) ? tables : NULL, " \0") ) != NULL)
             qr->query_rels[index] = &(*rels[atoi(tbl)])[0];
 
 
-        // >>>> Read and Store (comparison & join) predicates <<<<
+        // >>>> Read and Store (Comparison & Join) Predicates <<<<
         qr->comp_preds = new List<CompPred>(sizeof(CompPred), sizeof(CompPred));
         qr->join_preds = new List<JoinPred>(sizeof(JoinPred), sizeof(JoinPred));
 
@@ -148,7 +152,7 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
             char orig_pred[strlen(pred) + 1];
             strcpy(orig_pred, pred);
 
-            std::cout << "\nPRED  = " << pred << '\n';
+            std::cout << "\nPRED  = " << pred;
 
             left_pred  = strtok_r(pred, "=<>", &bak_tok);
             right_pred = strtok_r(NULL, ""   , &bak_tok);
@@ -205,7 +209,7 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         } // end of reading predicates
 
 
-        // >>>> Read and Store (comparison & join) predicates <<<<
+        // >>>> Read and Store Projections <<<<
         qr->proj = new List<Projection>(sizeof(Projection), sizeof(Projection));
 
         tbl = NULL;
@@ -224,7 +228,11 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         queries->ListInsert(*qr);
     }
 
+    fp_pos = ftell(query_fp);
     fclose(query_fp);
+
+    if (res == -1)
+        return NULL;
 
     return queries;
 }

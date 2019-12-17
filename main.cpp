@@ -36,6 +36,15 @@ int main(int argc , char* argv[])
     relTableList = ReadRelations(args[0].optType.cp);
 
     ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
+    std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
+    ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
+    std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
+    ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
+    std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
+    ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
+    std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
+    ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
+    std::cout << '\n';
 
     return 0;
 
