@@ -68,12 +68,11 @@ int main(int argc , char* argv[])
             
             DoAllJoinPreds( (*(*batchQueries)[i])[0].query_rels , (*(*batchQueries)[i])[0].join_preds , resList , relExistsInRL );
 
-            cout << "Sleeping" << endl;
-            sleep(10);
-
             delete[] relExistsInRL;
             delete resList;
         }
+        cout << "Returning" << endl;
+        return 0;
     }
 
     return 0;

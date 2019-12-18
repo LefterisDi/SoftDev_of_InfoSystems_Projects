@@ -503,13 +503,13 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
     uint32_t mask32_right = 0xFFFFFFFF;
     mask32_left <<= 32;
 
-    // for (int i = 0 ; i < doubleKeyList->GetTotalBuckets() ; i++) {
-    //     for (int j = 0 ; j < (*doubleKeyList)[i]->GetBucketItems() ; j++) {
-    //         cout << ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[j]  & mask32_right );
-    //         cout << endl;
-    //     }
-    //     cout << endl;
-    // }
+    for (int i = 0 ; i < doubleKeyList->GetTotalBuckets() ; i++) {
+        for (int j = 0 ; j < (*doubleKeyList)[i]->GetBucketItems() ; j++) {
+            cout << ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[j]  & mask32_right );
+            cout << endl;
+        }
+        cout << endl;
+    }
 
     InsertAndFuseInMidStruct(doubleKeyList , resList , pos2 , existingRel1 , existingRel2 , frl1 , frl2 , exists1 , exists2);
 
