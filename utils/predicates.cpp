@@ -102,7 +102,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
                 // cout << relTable[cpred.rel1]->table[cpred.colRel1][rowID] << endl;
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] == cpred.num) == false ) {
-                    
+
                     existingRel->rowIDlist->DeleteBucket(i);
                     i--;
                     totalBuckets--;
@@ -402,7 +402,7 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
         }
 
         // cout << "FUUUUUUUU-SION HAAAAAAA" << endl;
-        
+
 
     } else if (exists1 == true && exists2 == false) {
 
