@@ -57,8 +57,8 @@ int main(int argc , char* argv[])
         std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
         for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++){
     
-            bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].size];
-            for (uint32_t i = 0; i < (*(*batchQueries)[i])[0].size ; i++)
+            bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels];
+            for (uint32_t i = 0; i < (*(*batchQueries)[i])[0].total_rels ; i++)
                 relExistsInRL[i] = false;
             
             List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
@@ -68,6 +68,9 @@ int main(int argc , char* argv[])
             
             DoAllJoinPreds( (*(*batchQueries)[i])[0].query_rels , (*(*batchQueries)[i])[0].join_preds , resList , relExistsInRL );
 
+            cout << "Sleeping" << endl;
+            sleep(10);
+
             delete[] relExistsInRL;
             delete resList;
         }
@@ -75,27 +78,27 @@ int main(int argc , char* argv[])
 
     return 0;
 
-    relExistsInRL = new bool[relTableList->GetTotalItems()];
-    for (uint32_t i = 0; i < relTableList->GetTotalItems() ; i++)
-        relExistsInRL[i] = false;
+    // relExistsInRL = new bool[relTableList->GetTotalItems()];
+    // for (uint32_t i = 0; i < relTableList->GetTotalItems() ; i++)
+    //     relExistsInRL[i] = false;
 
-    for (int l = 0 ; l < relTableList->GetTotalItems(); l++) {
-        cout << "TableID -> " << l << endl;
-        sleep(1);
-        RelationTable* rtable = &((*(*relTableList)[l])[0]);
-        for (int i = 0 ; i < rtable->rows ; i++) {
-            for (int j = 0 ; j < rtable->cols ; j++) {
-                cout << rtable->table[j][i] << " ";
-            }
-            cout << endl;
-        }
-        cout << endl;
-    }
+    // for (int l = 0 ; l < relTableList->GetTotalItems(); l++) {
+    //     cout << "TableID -> " << l << endl;
+    //     sleep(1);
+    //     RelationTable* rtable = &((*(*relTableList)[l])[0]);
+    //     for (int i = 0 ; i < rtable->rows ; i++) {
+    //         for (int j = 0 ; j < rtable->cols ; j++) {
+    //             cout << rtable->table[j][i] << " ";
+    //         }
+    //         cout << endl;
+    //     }
+    //     cout << endl;
+    // }
 
-    delete relTableList;
-    delete relExistsInRL;
-    delete joinList;
-    delete compList;
+    // delete relTableList;
+    // delete relExistsInRL;
+    // delete joinList;
+    // delete compList;
 
     return 0;
 }
