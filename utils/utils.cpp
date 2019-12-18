@@ -193,6 +193,8 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
 
                     qr->join_preds->ListInsert(*jp);
 
+                    // delete jp;
+
                 // Otherwise, we have a Comparison Predicate (=)
                 } else {
 
@@ -204,6 +206,8 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
                     cp->num     = atoi(right_pred);
 
                     qr->comp_preds->ListInsert(*cp);
+
+                    // delete cp;
                 }
 
             // We have a Comparison Predicate (< or >)
@@ -239,9 +243,13 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
             pr->colRel = atoi(strtok_r(NULL, "" , &bak_tok));
 
             qr->proj->ListInsert(*pr);
+
+            // delete pr;
         }
 
         queries->ListInsert(*qr);
+
+        // delete qr;
     }
 
     fp_pos = ftell(query_fp);
@@ -299,6 +307,8 @@ List<RelationTable>* ReadRelations(const char* workloads_path)
         fclose(rel_fp);
 
         relations->ListInsert(*tmp_rel_node);
+
+        // delete tmp_rel_node;
     }
 
     free(line);
