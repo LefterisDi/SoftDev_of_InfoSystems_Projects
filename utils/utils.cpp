@@ -115,6 +115,9 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         char* predicates  = NULL;
         char* projections = NULL;
 
+        // char bak_line[strlen(line)];
+        // strcpy(bak_line, line);
+
         tables      = strtok(line, "|" );
         predicates  = strtok(NULL, "|" );
         projections = strtok(NULL, "\n");
@@ -132,7 +135,7 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         qr->query_rels = new RelationTable*[cnt_rels];
         qr->total_rels = cnt_rels;
 
-        std::cout << qr->total_rels << '\n';
+        std::cout << "\n\n" << qr->total_rels;
 
 
         // >>>> Read and Store Relations that will be used <<<<
