@@ -28,43 +28,23 @@ int main(int argc , char* argv[])
 
 
     List<RelationTable>* relTableList;
+    bool* relExistsInRL;
 
-    // List<JoinPred>* joinList = new List<JoinPred>(sizeof(JoinPred) , sizeof(JoinPred));
-    // List<CompPred>* compList = new List<CompPred>(sizeof(CompPred) , sizeof(CompPred));
-    List<Query>* batchQueries = NULL;
+    List<JoinPred>* joinList = new List<JoinPred>(sizeof(JoinPred) , sizeof(JoinPred));
+    List<CompPred>* compList = new List<CompPred>(sizeof(CompPred) , sizeof(CompPred));
 
     relTableList = ReadRelations(args[0].optType.cp);
 
-    // ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
-    // std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
-    // ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
-    // std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
-    // ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
-    // std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
-    // ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
-    // std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
-    // ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
-    // std::cout << '\n';
-    // cout << ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
-    // std::cout << '\n';
-    // cout << ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
-    // std::cout << '\n';
-    // cout << ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
-    // std::cout << '\n';
-
-    
-    while( (batchQueries = ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList) ) != NULL ){
-        std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
-        for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++){
-    
-            bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].size];
-            
-            List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
-            
-
-            DoAllCompPreds((*(*batchQueries)[i])[0].query_rels , (*(*batchQueries)[i])[0].comp_preds , resList , relExistsInRL);
-        }
-    }
+    ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
+    std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
+    ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
+    std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
+    ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
+    std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
+    ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
+    std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
+    ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
+    std::cout << '\n';
 
     return 0;
 
