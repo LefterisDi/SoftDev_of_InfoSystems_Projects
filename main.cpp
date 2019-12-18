@@ -66,7 +66,7 @@ int main(int argc , char* argv[])
             // cout << query->total_rels << endl;
 
             bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels];
-            for (uint32_t i = 0; i < (*(*batchQueries)[i])[0].total_rels ; i++)
+            for (uint32_t j = 0; j < (*(*batchQueries)[i])[0].total_rels ; j++)
                 relExistsInRL[i] = false;
 
             List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
