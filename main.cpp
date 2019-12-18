@@ -60,11 +60,10 @@ int main(int argc , char* argv[])
 
             Query* query = &( (*(*batchQueries)[i])[0] );
 
-            cout << "\nPROJECTIONS!!!!!!!!!!!! = " << query->proj->GetTotalItems() << endl;
+            cout << query->proj->GetTotalItems() << endl;
             cout << query->join_preds->GetTotalItems() << endl;
             cout << query->comp_preds->GetTotalItems() << endl;
             cout << query->total_rels << endl;
-
 
             bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels];
             for (uint32_t i = 0; i < (*(*batchQueries)[i])[0].total_rels ; i++)
