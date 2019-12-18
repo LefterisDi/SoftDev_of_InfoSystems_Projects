@@ -60,10 +60,10 @@ int main(int argc , char* argv[])
 
             Query* query = &( (*(*batchQueries)[i])[0] );
 
-            cout << query->proj->GetTotalItems() << endl;
-            cout << query->join_preds->GetTotalItems() << endl;
-            cout << query->comp_preds->GetTotalItems() << endl;
-            cout << query->total_rels << endl;
+            // cout << "\nPROJECTIONS!!!!!!!!!!!! = " << query->proj->GetTotalItems() << endl;
+            // cout << query->join_preds->GetTotalItems() << endl;
+            // cout << query->comp_preds->GetTotalItems() << endl;
+            // cout << query->total_rels << endl;
 
             bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels];
             for (uint32_t i = 0; i < (*(*batchQueries)[i])[0].total_rels ; i++)
@@ -76,33 +76,31 @@ int main(int argc , char* argv[])
 
             DoAllJoinPreds( query->query_rels , query->join_preds , resList , relExistsInRL );
 
-            // for (uint32_t l = 0 ; l < query->proj->GetTotalItems() ; l++){
+            for (uint32_t l = 0 ; l < query->proj->GetTotalItems() ; l++){
 
-                // Projection* pr = &( (*(*query->proj)[l])[0] );
-                // ResStruct* res = NULL;
+                Projection* pr = &( (*(*query->proj)[l])[0] );
+                ResStruct* res = NULL;
 
-                // for (uint32_t m = 0 ; m < resList->GetTotalItems() ; m++){
-                //     cout << "SEARCHING " << endl;
-                //     FullResList* fres = &( (*(*resList)[m])[0] );
-                //     res = FindInResList(fres->tableList , 0);
-                //     if (res != NULL){
-                //         break;
-                //     }
-                // }
-                // if (res == NULL){
-                //     exit(1);
-                // }
-                // cout << "FOUND IT " << endl;
-                // uint64_t sum = 0;
-                // for (uint32_t m = 0 ; m < res->rowIDlist->GetTotalItems() ; m++){
-                //     uint64_t rowID = (*(*res->rowIDlist)[m])[0];
-                //     sum += query->query_rels[0]->table[4][rowID];
-                // }
+                for (uint32_t m = 0 ; m < resList->GetTotalItems() ; m++){
+                    FullResList* fres = &( (*(*resList)[m])[0] );
+                    res = FindInResList(fres->tableList , pr->rel);
+                    if (res != NULL){
+                        break;
+                    }
+                }
+                if (res == NULL){
+                    exit(1);
+                }
+                uint64_t sum = 0;
+                for (uint32_t m = 0 ; m < res->rowIDlist->GetTotalItems() ; m++){
+                    uint64_t rowID = (*(*res->rowIDlist)[m])[0];
+                    sum += query->query_rels[pr->rel]->table[pr->colRel][rowID];
+                }
 
-                // cout << sum << " ";
+                cout << sum << " ";
 
-            // }
-            // cout << endl;
+            }
+            cout << endl;
 
             delete[] relExistsInRL;
             for (uint32_t l = 0 ; l < resList->GetTotalItems() ; l++){
@@ -113,8 +111,6 @@ int main(int argc , char* argv[])
                 delete tableList;
             }
             delete resList;
-
-            break;
 
         }
 
@@ -128,8 +124,6 @@ int main(int argc , char* argv[])
         // }
 
         // delete batchQueries;
-        std::cout << "Returning" << endl;
-        break;
     }
 
     for (uint32_t l = 0; l < relTableList->GetTotalItems() ; l++){
