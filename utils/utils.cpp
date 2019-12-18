@@ -234,6 +234,7 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
 
     fp_pos = ftell(query_fp);
     fclose(query_fp);
+    free(line);
 
     if (res == -1)
         return NULL;
