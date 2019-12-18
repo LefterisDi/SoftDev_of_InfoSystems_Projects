@@ -118,7 +118,7 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         // char bak_line[strlen(line)];
         // strcpy(bak_line, line);
 
-        // std::cout << "LINE = " << line << '\n';
+        std::cout << "QUERY = " << line;
         tables      = strtok(line, "|" );
         // std::cout << "LINE = " << line << '\n';
         predicates  = strtok(NULL, "|" );
@@ -129,7 +129,7 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         // if (projections == NULL)
             // std::cout << "PROJECTIONS NULL" << '\n';
         // else
-        std::cout << "\nPROJECTIONS" << projections << '\n';
+        // std::cout << "\nPROJECTIONS" << projections << '\n';
 
         // Count the relations that will be used
         int index    = 0;
@@ -144,7 +144,7 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         qr->query_rels = new RelationTable*[cnt_rels];
         qr->total_rels = cnt_rels;
 
-        std::cout << "\n\n" << qr->total_rels;
+        // std::cout << "\n\n" << qr->total_rels;
 
 
         // >>>> Read and Store Relations that will be used <<<<
@@ -168,7 +168,7 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
             char orig_pred[strlen(pred) + 1];
             strcpy(orig_pred, pred);
 
-            std::cout << "\nPRED  = " << pred;
+            // std::cout << "\nPRED  = " << pred;
 
             left_pred  = strtok_r(pred, "=<>", &bak_tok);
             right_pred = strtok_r(NULL, ""   , &bak_tok);

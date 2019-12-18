@@ -53,8 +53,8 @@ int main(int argc , char* argv[])
     // std::cout << '\n';
 
 
-    while( (batchQueries = ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList) ) != NULL ){
-        std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
+    while( (batchQueries = ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList) ) != NULL ) {
+        std::cout << "\n\n";
 
         for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++){
 
@@ -124,6 +124,8 @@ int main(int argc , char* argv[])
         // }
 
         // delete batchQueries;
+
+        std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
     }
 
     for (uint32_t l = 0; l < relTableList->GetTotalItems() ; l++){
