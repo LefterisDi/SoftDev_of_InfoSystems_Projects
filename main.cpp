@@ -61,6 +61,10 @@ int main(int argc , char* argv[])
             Query* query = &( (*(*batchQueries)[i])[0] );
 
             // cout << query->proj->GetTotalItems() << endl;
+            cout << query->join_preds->GetTotalItems() << endl;
+            cout << query->comp_preds->GetTotalItems() << endl;
+            cout << query->total_rels << endl;
+            
 
             bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels];
             for (uint32_t i = 0; i < (*(*batchQueries)[i])[0].total_rels ; i++)
@@ -78,25 +82,25 @@ int main(int argc , char* argv[])
                 // Projection* pr = &( (*(*query->proj)[l])[0] );
                 // ResStruct* res = NULL;
 
-            //     for (uint32_t m = 0 ; m < resList->GetTotalItems() ; m++){
-            //         cout << "SEARCHING " << endl;
-            //         FullResList* fres = &( (*(*resList)[m])[0] );
-            //         res = FindInResList(fres->tableList , pr->rel);
-            //         if (res != NULL){
-            //             break;
-            //         }
-            //     }
-            //     if (res == NULL){
-            //         exit(1);
-            //     }
-            //     cout << "FOUND IT " << endl;
-            //     uint64_t sum = 0;
-            //     for (uint32_t m = 0 ; m < res->rowIDlist->GetTotalItems() ; m++){
-            //         uint64_t rowID = (*(*res->rowIDlist)[m])[0];
-            //         sum += query->query_rels[pr->rel]->table[pr->colRel][rowID];
-            //     }
+                // for (uint32_t m = 0 ; m < resList->GetTotalItems() ; m++){
+                //     cout << "SEARCHING " << endl;
+                //     FullResList* fres = &( (*(*resList)[m])[0] );
+                //     res = FindInResList(fres->tableList , 0);
+                //     if (res != NULL){
+                //         break;
+                //     }
+                // }
+                // if (res == NULL){
+                //     exit(1);
+                // }
+                // cout << "FOUND IT " << endl;
+                // uint64_t sum = 0;
+                // for (uint32_t m = 0 ; m < res->rowIDlist->GetTotalItems() ; m++){
+                //     uint64_t rowID = (*(*res->rowIDlist)[m])[0];
+                //     sum += query->query_rels[0]->table[4][rowID];
+                // }
 
-            //     cout << sum << " ";
+                // cout << sum << " ";
 
             // }
             // cout << endl;
@@ -140,22 +144,18 @@ int main(int argc , char* argv[])
     delete relTableList;
     return 0;
 
-    // relExistsInRL = new bool[relTableList->GetTotalItems()];
-    // for (uint32_t i = 0; i < relTableList->GetTotalItems() ; i++)
-    //     relExistsInRL[i] = false;
-
-    // for (int l = 0 ; l < relTableList->GetTotalItems(); l++) {
-    //     cout << "TableID -> " << l << endl;
-    //     sleep(1);
-    //     RelationTable* rtable = &((*(*relTableList)[l])[0]);
-    //     for (int i = 0 ; i < rtable->rows ; i++) {
-    //         for (int j = 0 ; j < rtable->cols ; j++) {
-    //             cout << rtable->table[j][i] << " ";
-    //         }
-    //         cout << endl;
-    //     }
-    //     cout << endl;
-    // }
+    for (int l = 0 ; l < relTableList->GetTotalItems(); l++) {
+        cout << "TableID -> " << l << endl;
+        sleep(1);
+        RelationTable* rtable = &((*(*relTableList)[l])[0]);
+        for (int i = 0 ; i < rtable->rows ; i++) {
+            for (int j = 0 ; j < rtable->cols ; j++) {
+                cout << rtable->table[j][i] << " ";
+            }
+            cout << endl;
+        }
+        cout << endl;
+    }
 
     // delete relTableList;
     // delete relExistsInRL;
