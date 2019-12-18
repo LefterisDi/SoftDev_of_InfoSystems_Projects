@@ -384,21 +384,40 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
             resList->DeleteBucket(pos2);
         }
         else {
-            // cout << frl1->tableList;
-            DeleteTargeted(frl1 , 0 , doubleKeyList);
-            DeleteTargeted(frl2 , 1 , doubleKeyList);
+            // // cout << frl1->tableList;
+            // DeleteTargeted(frl1 , 0 , doubleKeyList);
+            // DeleteTargeted(frl2 , 1 , doubleKeyList);
 
             uint64_t mask32_left  = 0xFFFFFFFF;
             uint32_t mask32_right = 0xFFFFFFFF;
             mask32_left <<= 32;
 
-            for (int i = 0 ; i < doubleKeyList->GetTotalBuckets() ; i++) {
-                for (int j = 0 ; j < (*doubleKeyList)[i]->GetBucketItems() ; j++) {
-                    cout << ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[j]  & mask32_right );
-                    cout << endl;
+            // for (int i = 0 ; i < doubleKeyList->GetTotalBuckets() ; i++) {
+            //     for (int j = 0 ; j < (*doubleKeyList)[i]->GetBucketItems() ; j++) {
+            //         if ( ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) != (*(*doubleKeyList)[i])[j]  & mask32_right ){
+            //             cout << ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[j]  & mask32_right );
+            //             doubleKeyList->DeleteBucket(i);
+            //             i--;
+            //         }
+            //         // cout << ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[j]  & mask32_right );
+            //         // cout << endl;
+            //     }
+            //     cout << endl;
+            // }
+
+
+
+            for (int i = 0 ; i < doubleKeyList->GetTotalItems() ; i++) {
+
+                if ( ( ( (*(*doubleKeyList)[i])[0]  & mask32_left ) >> 32) != ( (*(*doubleKeyList)[i])[0]  & mask32_right ) ){
+                    // cout << ( ( (*(*doubleKeyList)[i])[0]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[0]  & mask32_right ) << endl;
+                    doubleKeyList->DeleteBucket(i);
+                    i--;
                 }
-                cout << endl;
             }
+
+            DeleteTargeted(frl1 , 0 , doubleKeyList);
+            DeleteTargeted(frl2 , 1 , doubleKeyList);
         }
 
         // cout << "FUUUUUUUU-SION HAAAAAAA" << endl;
@@ -453,6 +472,40 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
 
 }
 
+void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* resList ,\
+                     ResStruct*& existingRel1 , ResStruct*& existingRel2 , FullResList*& frl1 ){
+    
+
+    uint32_t totalItems = existingRel1->rowIDlist->GetTotalItems();
+
+    for (uint64_t i = 0; i < totalItems ;i++) {
+
+        uint64_t rowID1 = ( *((*existingRel1->rowIDlist)[i]) )[0];
+        uint64_t rowID2 = ( *((*existingRel2->rowIDlist)[i]) )[0];
+
+        // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
+        
+        if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID1] == relTable[jpred.rel2]->table[jpred.colRel2][rowID2]) == false ) {
+            for (uint64_t j = 0 ; j < frl1->tableList->GetTotalItems() ; j++){
+                ResStruct* res =  &( (*(*frl1->tableList)[j])[0] );
+                res->rowIDlist->DeleteBucket(i);
+            }
+            i--;
+            totalItems--;
+        }
+        // else {
+        //     cout << rowID << endl;
+        // }
+    }
+
+    // for (uint64_t i = 0; i < existingRel->rowIDlist->GetTotalItems() ;i++) {
+
+    //     uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+    //     cout << relTable[jpred.rel1]->table[jpred.colRel1][rowID] << endl;
+    // }
+    // cout << endl;
+}
+
 int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* resList)
 {
     ResStruct* existingRel1 = NULL;
@@ -494,6 +547,11 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
             pos2 = i;
             break;
         }
+    }
+
+    if (frl1 == frl2 && existingRel1 != NULL && existingRel2 != NULL){
+        JoinInSameBucket(relTable , jpred , resList , existingRel1 , existingRel2 , frl1);
+        return 1;
     }
 
     TablesExistInMidStruct(relTable , jpred , existingRel1 , existingRel2 , frl1 , frl2 , exists1 , exists2);
