@@ -33,6 +33,7 @@ typedef struct Projection {
 } Projection;
 
 typedef struct Query {
+    uint32_t          total_rels;
     RelationTable**   query_rels;
     List<CompPred>*   comp_preds;
     List<JoinPred>*   join_preds;

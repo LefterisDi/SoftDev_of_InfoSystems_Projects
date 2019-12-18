@@ -134,8 +134,10 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         // >>>> Read and Store Relations that will be used <<<<
         char* tbl = NULL;
         index = 0;
-        while ( (tbl = strtok( (tbl == NULL) ? tables : NULL, " \0") ) != NULL)
+        while ( (tbl = strtok( (tbl == NULL) ? tables : NULL, " \0") ) != NULL) {
             qr->query_rels[index] = &(*rels[atoi(tbl)])[0];
+            qr->total_rels++;
+        }
 
 
         // >>>> Read and Store (Comparison & Join) Predicates <<<<
