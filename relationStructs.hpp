@@ -6,6 +6,7 @@
 #include "./templates/list.hpp"
 
 typedef struct RelationTable {
+    uint32_t   tableID;
     uint64_t   rows;
     uint64_t   cols;
     uint64_t** table;
