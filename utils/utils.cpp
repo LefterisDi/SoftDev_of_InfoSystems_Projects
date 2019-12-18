@@ -93,20 +93,14 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
     qr_path[work_len] = '/';
     strcat(qr_path, queries_path);
 
-    // std::cout << qr_path << '\n';
-
     FILE* query_fp;
     static long int fp_pos;
 
     query_fp = fopen(qr_path,"r");
 
     fseek(query_fp, fp_pos, SEEK_SET);
-    // if (query_fp == NULL) {
-        // std::cout << "ERROR" << '\n';
-    // }
 
     List<Query>* queries = new List<Query>(sizeof(Query), sizeof(Query));
-    // List<RelationTable> relations(sizeof(RelationTable), sizeof(RelationTable));
 
     int res = 0;
     while ((res = getline(&line, &len, query_fp)) != -1 && strcmp(line, "F\n"))
@@ -115,23 +109,10 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         char* predicates  = NULL;
         char* projections = NULL;
 
-        // char bak_line[strlen(line)];
-        // strcpy(bak_line, line);
-
-        std::cout << "QUERY = " << line;
         tables      = strtok(line, "|" );
-        // std::cout << "LINE = " << line << '\n';
         predicates  = strtok(NULL, "|" );
-        // std::cout << "LINE = " << line << '\n';
         projections = strtok(NULL, "\n");
-        // std::cout << "LINE = " << line << '\n';
 
-        // if (projections == NULL)
-            // std::cout << "PROJECTIONS NULL" << '\n';
-        // else
-        // std::cout << "\nPROJECTIONS" << projections << '\n';
-
-        // Count the relations that will be used
         int index    = 0;
         int cnt_rels = 0;
         while (tables[index] != '\0')
@@ -143,8 +124,6 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
         Query* qr      = new Query;
         qr->query_rels = new RelationTable*[cnt_rels];
         qr->total_rels = cnt_rels;
-
-        // std::cout << "\n\n" << qr->total_rels;
 
 
         // >>>> Read and Store Relations that will be used <<<<
@@ -168,7 +147,6 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
             char orig_pred[strlen(pred) + 1];
             strcpy(orig_pred, pred);
 
-            // std::cout << "\nPRED  = " << pred;
 
             left_pred  = strtok_r(pred, "=<>", &bak_tok);
             right_pred = strtok_r(NULL, ""   , &bak_tok);
@@ -272,7 +250,6 @@ List<RelationTable>* ReadRelations(const char* workloads_path)
     size_t work_len  = strlen(workloads_path);
 
     List<RelationTable>* relations = new List<RelationTable>(sizeof(RelationTable), sizeof(RelationTable));
-    // List<RelationTable> relations(sizeof(RelationTable), sizeof(RelationTable));
 
     while (getline(&line, &len, stdin) != -1) {
 
@@ -289,7 +266,6 @@ List<RelationTable>* ReadRelations(const char* workloads_path)
         rel_path[work_len] = '/';
         strcat(rel_path, line);
 
-        // std::cout << rel_path << '\n';
 
         FILE* rel_fp;
 
@@ -316,61 +292,4 @@ List<RelationTable>* ReadRelations(const char* workloads_path)
     free(line);
 
     return relations;
-}
-
-uint64_t** ReadFile(const char* inp_data, uint32_t& table_rows, uint32_t& table_cols)
-{
-    uint64_t** fl_data;
-
-    FILE* fp;
-
-    fp = fopen(inp_data,"r");
-
-    char*  line = NULL;
-    size_t len  = 0;
-
-    uint32_t rows = 0;
-    uint32_t cols = 0;
-
-    while (getline(&line, &len, fp) != -1)
-        rows++;
-
-    char* columns = NULL;
-    while ((columns = strtok((columns == NULL) ? line : NULL, ",")) != NULL)
-        cols++;
-
-    free(line);
-
-    // --------------------------------------------------------------- //
-
-    fl_data = new uint64_t*[cols];
-    for(uint32_t i = 0 ; i < cols ; i++)
-        fl_data[i] = new uint64_t[rows];
-
-    // --------------------------------------------------------------- //
-
-    fseek(fp, 0, SEEK_SET);
-
-    line = NULL;
-    len  = 0;
-
-    int col_i = 0;
-    while (getline(&line, &len, fp) != -1) {
-        char* tmp_col = NULL;
-
-        int row_i = 0;
-        while ((tmp_col = strtok((tmp_col == NULL) ? line : NULL, ",\n")) != NULL) {
-            fl_data[row_i][col_i] = strtoul(tmp_col, NULL, 0);
-            row_i++;
-        }
-        col_i++;
-    }
-
-    free(line);
-    fclose(fp);
-
-    table_rows = cols;
-    table_cols = rows;
-
-    return fl_data;
 }

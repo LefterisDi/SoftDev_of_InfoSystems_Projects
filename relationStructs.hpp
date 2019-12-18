@@ -13,7 +13,6 @@ typedef struct RelationTable {
 } RelationTable;
 
 typedef struct JoinPred {
-    // uint8_t  type : 1;
     uint64_t rel1;
     uint64_t rel2;
     uint64_t colRel1;
@@ -21,7 +20,6 @@ typedef struct JoinPred {
 } JoinPred;
 
 typedef struct CompPred {
-    // uint8_t  type : 1;
     char     comp;
     uint64_t rel1;
     uint64_t colRel1;

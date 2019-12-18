@@ -20,12 +20,6 @@ ResStruct* FindInResList(List<ResStruct>* resList , uint64_t elemID)
         for (int j = 0 ; j < bucket->GetBucketItems() ; j++) {
 
             ResStruct* rss = &( (*bucket)[j] );
-            // cout << "TABLE IDDDDDDDD-> " << rss->tableID << endl;
-            // for (uint32_t i = 0 ; i < rss->rowIDlist->GetTotalItems() ; i++){
-            //     uint32_t rowID = (*(*rss->rowIDlist)[i])[0];
-            //     cout << (*(*rss->rowIDlist)[i])[0] << endl;
-            // }
-            // cout << endl;
 
             if (elemID == (*bucket)[j].tableID) {
                 found = &(*bucket)[j];
@@ -63,9 +57,6 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
 
         for (uint64_t i = 0 ; i < relTable[cpred.rel1]->rows ; i++)
             existingRel->rowIDlist->ListInsert(i);
-
-        // frl->tableList->ListInsert(*existingRel);
-        // resList.ListInsert(*frl);
     }
 
     uint32_t totalBuckets = existingRel->rowIDlist->GetTotalItems();
@@ -75,7 +66,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
         case '>':
             for (uint64_t i = 0; i < totalBuckets ;i++){
                 uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
-                // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
+
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] > cpred.num) == false ) {
                     existingRel->rowIDlist->DeleteBucket(i);
                     i--;
@@ -87,7 +78,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
         case '<':
             for (uint64_t i = 0; i < totalBuckets ;i++){
                 uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
-                // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
+
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] < cpred.num) == false ) {
                     existingRel->rowIDlist->DeleteBucket(i);
                     i--;
@@ -99,7 +90,6 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
         case '=':
             for (uint64_t i = 0; i < totalBuckets ;i++){
                 uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
-                // cout << relTable[cpred.rel1]->table[cpred.colRel1][rowID] << endl;
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] == cpred.num) == false ) {
 
@@ -107,21 +97,9 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
                     i--;
                     totalBuckets--;
                 }
-                // else {
-                //     cout << relTable[cpred.rel1]->table[cpred.colRel1][rowID] << endl;
-                //     cout << cpred.colRel1 << endl;
-                //     cout << relTable[cpred.rel1]->table[2][rowID] << endl;
-
-                // }
             }
         break;
     }
-
-    // for (uint64_t i = 0; i < existingRel->rowIDlist->GetTotalItems() ;i++) {
-    //     uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
-    //     cout << relTable[cpred.rel1]->table[cpred.colRel1][rowID] << endl;
-    // }
-    // cout << endl;
 
     if (exists == false) {
         frl->tableList->ListInsert(*existingRel);
@@ -216,9 +194,6 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel1]->rows ; i++)
             existingRel->rowIDlist->ListInsert(i);
-
-        // frl->tableList->ListInsert(*existingRel);
-        // resList.ListInsert(*frl);
     }
 
     uint32_t totalBuckets = existingRel->rowIDlist->GetTotalItems();
@@ -226,20 +201,13 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
     for (uint64_t i = 0; i < totalBuckets ;i++) {
 
         uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
-        // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
+
         if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID] == relTable[jpred.rel2]->table[jpred.colRel2][rowID]) == false ) {
             existingRel->rowIDlist->DeleteBucket(i);
             i--;
             totalBuckets--;
         }
     }
-
-    // for (uint64_t i = 0; i < existingRel->rowIDlist->GetTotalItems() ;i++) {
-
-    //     uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
-    //     cout << relTable[jpred.rel1]->table[jpred.colRel1][rowID] << endl;
-    // }
-    // cout << endl;
 
     if (exists == false) {
         frl->tableList->ListInsert(*existingRel);
@@ -252,9 +220,9 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
 }
 
 void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred       ,
-                            ResStruct*&    existingRel1 , ResStruct*&   existingRel2,
-                            FullResList*&  frl1         , FullResList*& frl2        ,
-                            bool&          exists1      , bool&         exists2)
+                            ResStruct*&     existingRel1 , ResStruct*&   existingRel2,
+                            FullResList*&   frl1         , FullResList*& frl2        ,
+                            bool&           exists1      , bool&         exists2)
 {
     if (existingRel1 == NULL && existingRel2 == NULL)
     {
@@ -278,15 +246,7 @@ void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred  
         for (uint64_t i = 0 ; i < relTable[jpred.rel2]->rows ; i++)
             existingRel2->rowIDlist->ListInsert(i);
 
-        // frl1->tableList->ListInsert(*existingRel1);
-        // frl1->tableList->ListInsert(*existingRel2);
-        // resList.ListInsert(*frl);
-    }
-    // else if (existingRel1 != NULL && existingRel2 != NULL){
-    //     // frl1->tableList->GetLast()
-    //     //fuse the two
-    // }
-    else if (existingRel1 != NULL && existingRel2 == NULL) {
+    } else if (existingRel1 != NULL && existingRel2 == NULL) {
 
         exists1 = true;
         exists2 = false;
@@ -298,7 +258,6 @@ void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred  
         for (uint64_t i = 0 ; i < relTable[jpred.rel2]->rows ; i++)
             existingRel2->rowIDlist->ListInsert(i);
 
-        // frl1->tableList->ListInsert(*existingRel2);
     } else if (existingRel1 == NULL && existingRel2 != NULL) {
 
         exists1 = false;
@@ -310,8 +269,6 @@ void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred  
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel1]->rows ; i++)
             existingRel1->rowIDlist->ListInsert(i);
-
-        // frl2->tableList->ListInsert(*existingRel1);
     }
 }
 
@@ -325,7 +282,7 @@ void CreateTableForJoin(RelationTable** relTable , uint64_t relID , bool exists 
         for(int i = 0; i < relTable[relID]->cols; i++)
             table[i] = new uint64_t[rowNum];
 
-        //columns change with the first parameter and rowIDs with the second
+        // Columns change with the first parameter and rowIDs with the second
         for (int j =  0 ; j < rowNum ; j++) {
             for (int i = 0 ; i < relTable[relID]->cols ; i++) {
 
@@ -335,17 +292,8 @@ void CreateTableForJoin(RelationTable** relTable , uint64_t relID , bool exists 
         }
 
     } else {
-
         table  = relTable[relID]->table;
-        // table1 = new uint64_t*[relTable[relID].cols];
         rowNum = (uint32_t)relTable[relID]->rows;
-        // for(int i = 0; i < relTable[relID].cols; i++)
-        //     table1[i] = new uint64_t[rowNum1];
-        // for (int j =  0 ; j < rowNum1 ; j++){
-        //     for (int i = 0 ; i < relTable[relID].cols ; i++){
-        //         table1[i][j] = relTable[relID].table[i][j];
-        //     }
-        // }
     }
 }
 
@@ -359,58 +307,30 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
         DeleteTargetedSL(existingRel1 , 0 , doubleKeyList);
         DeleteTargetedSL(existingRel2 , 1 , doubleKeyList);
 
-        // cout << "T ID Solo " << existingRel1->tableID << endl;
-        // for (uint32_t i = 0 ; i < existingRel1->rowIDlist->GetTotalItems() ; i++) {
-        //     cout << (*(*existingRel1->rowIDlist)[i])[0] << endl;
-        // }
-        // cout << endl;
-
-        // cout << "T ID Solo " << existingRel2->tableID << endl;
-        // for (uint32_t i = 0 ; i < existingRel2->rowIDlist->GetTotalItems() ; i++)
-        //     cout << (*(*existingRel2->rowIDlist)[i])[0] << endl;
-
         frl1->tableList->ListInsert(*existingRel1);
         frl1->tableList->ListInsert(*existingRel2);
         resList->ListInsert(*frl1);
 
     } else if (exists1 == true && exists2 == true) {
 
-        if (frl1 != frl2){
+        if (frl1 != frl2) {
+
             DeleteTargeted(frl1 , 0 , doubleKeyList);
             DeleteTargeted(frl2 , 1 , doubleKeyList);
 
             (*frl1->tableList) += (*frl2->tableList);
 
             resList->DeleteBucket(pos2);
-        }
-        else {
-            // // cout << frl1->tableList;
-            // DeleteTargeted(frl1 , 0 , doubleKeyList);
-            // DeleteTargeted(frl2 , 1 , doubleKeyList);
+
+        } else {
 
             uint64_t mask32_left  = 0xFFFFFFFF;
             uint32_t mask32_right = 0xFFFFFFFF;
             mask32_left <<= 32;
 
-            // for (int i = 0 ; i < doubleKeyList->GetTotalBuckets() ; i++) {
-            //     for (int j = 0 ; j < (*doubleKeyList)[i]->GetBucketItems() ; j++) {
-            //         if ( ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) != (*(*doubleKeyList)[i])[j]  & mask32_right ){
-            //             cout << ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[j]  & mask32_right );
-            //             doubleKeyList->DeleteBucket(i);
-            //             i--;
-            //         }
-            //         // cout << ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[j]  & mask32_right );
-            //         // cout << endl;
-            //     }
-            //     cout << endl;
-            // }
-
-
-
             for (int i = 0 ; i < doubleKeyList->GetTotalItems() ; i++) {
 
                 if ( ( ( (*(*doubleKeyList)[i])[0]  & mask32_left ) >> 32) != ( (*(*doubleKeyList)[i])[0]  & mask32_right ) ){
-                    // cout << ( ( (*(*doubleKeyList)[i])[0]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[0]  & mask32_right ) << endl;
                     doubleKeyList->DeleteBucket(i);
                     i--;
                 }
@@ -420,28 +340,10 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
             DeleteTargeted(frl2 , 1 , doubleKeyList);
         }
 
-        // cout << "FUUUUUUUU-SION HAAAAAAA" << endl;
-
-
     } else if (exists1 == true && exists2 == false) {
 
         DeleteTargeted(frl1 , 0 , doubleKeyList);
         DeleteTargetedSL(existingRel2 , 1 , doubleKeyList);
-
-        // for (uint32_t i = 0 ; i < frl1->tableList->GetTotalItems() ; i++) {
-
-        //     ResStruct* rs = &( (*(*frl1->tableList)[i])[0] );
-        //     // cout << "T ID DUO " << rs->tableID << endl;
-        //     // for (uint32_t j = 0 ; j < rs->rowIDlist->GetTotalItems() ; j++){
-        //     //     cout << (*(*rs->rowIDlist)[j])[0] << " ";
-        //     // }
-        //     // cout << endl;
-        // }
-        // cout << endl;
-
-        // cout << "T ID Solo " << existingRel2->tableID << endl;
-        // for (uint32_t i = 0 ; i < existingRel2->rowIDlist->GetTotalItems() ; i++)
-        //     cout << (*(*existingRel2->rowIDlist)[i])[0] << endl;
 
         frl1->tableList->ListInsert(*existingRel2);
 
@@ -450,32 +352,18 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
         DeleteTargeted(frl2 , 1 , doubleKeyList);
         DeleteTargetedSL(existingRel1 , 0 , doubleKeyList);
 
-        // cout << "T ID Solo " << existingRel1->tableID << endl;
-        // for (uint32_t i = 0 ; i < existingRel1->rowIDlist->GetTotalItems() ; i++) {
-        //     cout << (*(*existingRel1->rowIDlist)[i])[0] << endl;
-        // }
-        // cout << endl;
-
         for (uint32_t i = 0 ; i < frl2->tableList->GetTotalItems() ; i++) {
 
             ResStruct* rs = &( (*(*frl2->tableList)[i])[0] );
-            // cout << "T ID DUO " << rs->tableID << endl;
-            // for (uint32_t j = 0 ; j < rs->rowIDlist->GetTotalItems() ; j++) {
-            //     cout << (*(*rs->rowIDlist)[j])[0] << " ";
-            // }
-            // cout << endl;
         }
-        // cout << endl;
 
         frl2->tableList->ListInsert(*existingRel1);
     }
-
 }
 
-void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* resList ,\
-                     ResStruct*& existingRel1 , ResStruct*& existingRel2 , FullResList*& frl1 ){
-    
-
+void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* resList,
+                      ResStruct*& existingRel1 , ResStruct*& existingRel2 , FullResList*& frl1)
+{
     uint32_t totalItems = existingRel1->rowIDlist->GetTotalItems();
 
     for (uint64_t i = 0; i < totalItems ;i++) {
@@ -483,9 +371,8 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
         uint64_t rowID1 = ( *((*existingRel1->rowIDlist)[i]) )[0];
         uint64_t rowID2 = ( *((*existingRel2->rowIDlist)[i]) )[0];
 
-        // cout << relTable[cpred.rel1].table[cpred.colRel1][rowID] << endl;
-        
         if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID1] == relTable[jpred.rel2]->table[jpred.colRel2][rowID2]) == false ) {
+
             for (uint64_t j = 0 ; j < frl1->tableList->GetTotalItems() ; j++){
                 ResStruct* res =  &( (*(*frl1->tableList)[j])[0] );
                 res->rowIDlist->DeleteBucket(i);
@@ -493,17 +380,7 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
             i--;
             totalItems--;
         }
-        // else {
-        //     cout << rowID << endl;
-        // }
     }
-
-    // for (uint64_t i = 0; i < existingRel->rowIDlist->GetTotalItems() ;i++) {
-
-    //     uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
-    //     cout << relTable[jpred.rel1]->table[jpred.colRel1][rowID] << endl;
-    // }
-    // cout << endl;
 }
 
 int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* resList)
@@ -559,45 +436,14 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
     CreateTableForJoin(relTable , jpred.rel1 , exists1 , table1 , rowNum1 , existingRel1);
     CreateTableForJoin(relTable , jpred.rel2 , exists2 , table2 , rowNum2 , existingRel2);
 
-    // cout << "FIRST TABLE " << endl;
-    // for (uint32_t i = 0 ; i < rowNum1 ; i++) {
-    //     for (uint32_t j = 0 ; j < relTable[jpred.rel1]->cols ; j++) {
-    //         cout << table1[j][i] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // cout << endl;
-
-    // cout << "SECOND TABLE " << endl;
-    // for (uint32_t i = 0 ; i < rowNum2 ; i++) {
-    //     for (uint32_t j = 0 ; j < relTable[jpred.rel2]->cols ; j++) {
-    //         cout << table2[j][i] << " ";
-    //     }
-    //     cout << endl;
-    // }
-    // cout << endl;
-
     MergeTuple* sortedTable1 = TableSortOnKey(table1 , rowNum1 , jpred.colRel1 , 8192);
     MergeTuple* sortedTable2 = TableSortOnKey(table2 , rowNum2 , jpred.colRel2 , 8192);
 
-    // for (int i = 0 ; i < rowNum1 ; i++){
-    //     cout << sortedTable1[i].rowID << endl;
-    // }
-
-    // cout << rowNum1 << " " << rowNum2 << endl;
     MergeTables(*doubleKeyList, sortedTable1 , rowNum1 , sortedTable2 , rowNum2);
 
     uint64_t mask32_left  = 0xFFFFFFFF;
     uint32_t mask32_right = 0xFFFFFFFF;
     mask32_left <<= 32;
-
-    // for (int i = 0 ; i < doubleKeyList->GetTotalBuckets() ; i++) {
-    //     for (int j = 0 ; j < (*doubleKeyList)[i]->GetBucketItems() ; j++) {
-    //         cout << ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[j]  & mask32_right );
-    //         cout << endl;
-    //     }
-    //     cout << endl;
-    // }
 
     InsertAndFuseInMidStruct(doubleKeyList , resList , pos2 , existingRel1 , existingRel2 , frl1 , frl2 , exists1 , exists2);
 
@@ -637,9 +483,7 @@ int DoAllCompPreds(RelationTable** relTable , List<CompPred>* compList , List<Fu
         CompPred* cpredp = &( (*(*compList)[i])[0] );
         ComparisonPredicate(relTable , *cpredp , resList);
         relExistsInRL[cpredp->rel1] = true;
-        // cout << cpredp->rel1 << endl;
     }
-
     return 1;
 }
 
