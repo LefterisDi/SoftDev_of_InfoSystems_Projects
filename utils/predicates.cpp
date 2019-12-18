@@ -375,13 +375,34 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
 
     } else if (exists1 == true && exists2 == true) {
 
+        if (frl1 != frl2){
+            DeleteTargeted(frl1 , 0 , doubleKeyList);
+            DeleteTargeted(frl2 , 1 , doubleKeyList);
+
+            (*frl1->tableList) += (*frl2->tableList);
+
+            resList->DeleteBucket(pos2);
+        }
+        else {
+            // cout << frl1->tableList;
+            DeleteTargeted(frl1 , 0 , doubleKeyList);
+            DeleteTargeted(frl2 , 1 , doubleKeyList);
+
+            uint64_t mask32_left  = 0xFFFFFFFF;
+            uint32_t mask32_right = 0xFFFFFFFF;
+            mask32_left <<= 32;
+
+            for (int i = 0 ; i < doubleKeyList->GetTotalBuckets() ; i++) {
+                for (int j = 0 ; j < (*doubleKeyList)[i]->GetBucketItems() ; j++) {
+                    cout << ( ( (*(*doubleKeyList)[i])[j]  & mask32_left ) >> 32) << " " << ( (*(*doubleKeyList)[i])[j]  & mask32_right );
+                    cout << endl;
+                }
+                cout << endl;
+            }
+        }
+
         // cout << "FUUUUUUUU-SION HAAAAAAA" << endl;
-        DeleteTargeted(frl1 , 0 , doubleKeyList);
-        DeleteTargeted(frl2 , 1 , doubleKeyList);
-
-        (*frl1->tableList) += (*frl2->tableList);
-
-        resList->DeleteBucket(pos2);
+        
 
     } else if (exists1 == true && exists2 == false) {
 
