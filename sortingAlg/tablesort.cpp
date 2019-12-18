@@ -19,7 +19,7 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , uint32_t size , int
     uint32_t hist[UCHAR_MAX+1] = {};
 
     if (key == 8)
-        exit(1);
+        return;
 
     // Checks if the quicksort conditions are met
     if (size <= qsAfterNumOfEntries/* 64KB or 8192 entries */) {

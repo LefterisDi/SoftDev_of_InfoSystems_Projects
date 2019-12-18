@@ -66,21 +66,29 @@ int main(int argc , char* argv[])
             // cout << query->total_rels << endl;
 
             bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels];
-            for (uint32_t j = 0; j < (*(*batchQueries)[i])[0].total_rels ; j++)
-                relExistsInRL[i] = false;
+            for (uint32_t k = 0; k < (*(*batchQueries)[i])[0].total_rels ; k++)
+                relExistsInRL[k] = false;
 
             List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
 
+            // cout << "BEEEFFFFOOOOOORE" << endl;
 
             DoAllCompPreds( query->query_rels , query->comp_preds , resList , relExistsInRL );
 
+            // cout << "IIIINNNN MIIIIIDDDDDLLLELEEE"  << endl;
+            // cout << resList->GetTotalItems() << endl;
+
+
             DoAllJoinPreds( query->query_rels , query->join_preds , resList , relExistsInRL );
+
+            // cout << "AAAAAFTTTTEEEEER " << endl;
 
             for (uint32_t l = 0 ; l < query->proj->GetTotalItems() ; l++){
 
                 Projection* pr = &( (*(*query->proj)[l])[0] );
                 ResStruct* res = NULL;
-
+                
+                // cout << resList->GetTotalItems() << endl;
                 for (uint32_t m = 0 ; m < resList->GetTotalItems() ; m++){
                     FullResList* fres = &( (*(*resList)[m])[0] );
                     res = FindInResList(fres->tableList , pr->rel);
@@ -89,6 +97,7 @@ int main(int argc , char* argv[])
                     }
                 }
                 if (res == NULL){
+                    // cout << "RRRRRRRR " << endl;
                     exit(1);
                 }
                 uint64_t sum = 0;
@@ -127,6 +136,8 @@ int main(int argc , char* argv[])
 
         std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
     }
+
+    // cout << "Batch " << batchQueries << endl;
 
     for (uint32_t l = 0; l < relTableList->GetTotalItems() ; l++){
         RelationTable* rtable = &((*(*relTableList)[l])[0]);
