@@ -1,4 +1,0 @@
-1)numerical comparison
-2)then search if there is another comparison using the array you already have
-3)do the smallest array joins
-4)do the rest
