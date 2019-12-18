@@ -60,11 +60,11 @@ int main(int argc , char* argv[])
 
             Query* query = &( (*(*batchQueries)[i])[0] );
 
-            // cout << query->proj->GetTotalItems() << endl;
+            cout << "\nPROJECTIONS!!!!!!!!!!!! = " << query->proj->GetTotalItems() << endl;
             cout << query->join_preds->GetTotalItems() << endl;
             cout << query->comp_preds->GetTotalItems() << endl;
             cout << query->total_rels << endl;
-            
+
 
             bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels];
             for (uint32_t i = 0; i < (*(*batchQueries)[i])[0].total_rels ; i++)
@@ -121,7 +121,7 @@ int main(int argc , char* argv[])
 
         // for (uint32_t j = 0; j < batchQueries->GetTotalItems() ; j++){
         //     Query* q = &( (*(*batchQueries)[j])[0] );
-            
+
         //     delete q->comp_preds;
         //     delete q->join_preds;
         //     delete q->proj;
@@ -132,7 +132,7 @@ int main(int argc , char* argv[])
         std::cout << "Returning" << endl;
         break;
     }
-    
+
     for (uint32_t l = 0; l < relTableList->GetTotalItems() ; l++){
         RelationTable* rtable = &((*(*relTableList)[l])[0]);
         for (uint32_t i = 0 ; i < rtable->cols ; i++){
