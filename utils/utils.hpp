@@ -3,7 +3,7 @@
 #ifndef __UTILS_HEADER__
 #define __UTILS_HEADER__
 
-#include "../relationStructs.hpp"
+#include "../utils/relationStructs.hpp"
 #include "../templates/list.hpp"
 
 typedef struct tuple {

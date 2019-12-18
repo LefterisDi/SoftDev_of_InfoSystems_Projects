@@ -3,7 +3,7 @@
 #ifndef __RELATION_STRCUS_HEADER__
 #define __RELATION_STRCUS_HEADER__
 
-#include "./templates/list.hpp"
+#include "../templates/list.hpp"
 
 typedef struct RelationTable {
     uint32_t   tableID;

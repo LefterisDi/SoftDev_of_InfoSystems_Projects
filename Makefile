@@ -17,13 +17,13 @@ UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp ./utils/
 SOURCES    = $(MAIN_SRCS) $(PARSER_SRC) $(SEARCH_SRC) $(SORT_SRCS) $(TMPL_SRC) $(UTILS_SRC)
 
 # HEADERS
-RELS_HDR   = relationStructs.hpp
+RELS_HDR   = ./utils/relationStructs.hpp
 PARSER_HDR = ./opts/getopts.hpp
 SEARCH_HDR = ./searchingAlg/binarySearch.hpp
 SORT_HDRS  = ./sortingAlg/quicksort.hpp ./sortingAlg/tablesort.hpp
 TMPL_HDR   = ./templates/list.hpp
 UTILS_HDR  = ./sortingAlg/quicksort.hpp ./searchingAlg/binarySearch.hpp ./utils/predicates.hpp
-HEADERS    = $(PARSER_HDR) $(SEARCH_HDR) $(SORT_HDRS) $(TMPL_HDR) $(UTILS_HDR)
+HEADERS    = $(PARSER_HDR) $(RELS_HDR) $(SEARCH_HDR) $(SORT_HDRS) $(TMPL_HDR) $(UTILS_HDR)
 
 # EXECUTABLES
 MAIN_OUT   = main
