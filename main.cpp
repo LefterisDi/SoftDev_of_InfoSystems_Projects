@@ -58,11 +58,18 @@ int main(int argc , char* argv[])
         for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++){
     
             bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].size];
+            for (uint32_t i = 0; i < (*(*batchQueries)[i])[0].size ; i++)
+                relExistsInRL[i] = false;
             
             List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
             
 
-            DoAllCompPreds((*(*batchQueries)[i])[0].query_rels , (*(*batchQueries)[i])[0].comp_preds , resList , relExistsInRL);
+            DoAllCompPreds( (*(*batchQueries)[i])[0].query_rels , (*(*batchQueries)[i])[0].comp_preds , resList , relExistsInRL );
+            
+            DoAllJoinPreds( (*(*batchQueries)[i])[0].query_rels , (*(*batchQueries)[i])[0].join_preds , resList , relExistsInRL );
+
+            delete[] relExistsInRL;
+            delete resList;
         }
     }
 
