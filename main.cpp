@@ -52,28 +52,28 @@ int main(int argc , char* argv[])
     // cout << ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList);
     // std::cout << '\n';
 
-    
+
     while( (batchQueries = ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList) ) != NULL ){
         std::cout << "\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << '\n';
-        for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++){
-    
-            bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels];
-            for (uint32_t i = 0; i < (*(*batchQueries)[i])[0].total_rels ; i++)
-                relExistsInRL[i] = false;
-            
-            List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
-            
-
-            DoAllCompPreds( (*(*batchQueries)[i])[0].query_rels , (*(*batchQueries)[i])[0].comp_preds , resList , relExistsInRL );
-            
-            DoAllJoinPreds( (*(*batchQueries)[i])[0].query_rels , (*(*batchQueries)[i])[0].join_preds , resList , relExistsInRL );
-
-            cout << "Sleeping" << endl;
-            sleep(10);
-
-            delete[] relExistsInRL;
-            delete resList;
-        }
+        // for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++){
+        //
+        //     bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels];
+        //     for (uint32_t i = 0; i < (*(*batchQueries)[i])[0].total_rels ; i++)
+        //         relExistsInRL[i] = false;
+        //
+        //     List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
+        //
+        //
+        //     DoAllCompPreds( (*(*batchQueries)[i])[0].query_rels , (*(*batchQueries)[i])[0].comp_preds , resList , relExistsInRL );
+        //
+        //     DoAllJoinPreds( (*(*batchQueries)[i])[0].query_rels , (*(*batchQueries)[i])[0].join_preds , resList , relExistsInRL );
+        //
+        //     cout << "Sleeping" << endl;
+        //     sleep(10);
+        //
+        //     delete[] relExistsInRL;
+        //     delete resList;
+        // }
     }
 
     return 0;
