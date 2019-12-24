@@ -72,10 +72,23 @@ int main(int argc , char* argv[])
                     sum += query->query_rels[pr->rel]->table[pr->colRel][rowID];
                 }
 
-                if (!sum)
-                    cout << "NULL ";
-                else
-                    cout << sum << " ";
+                if (sum == 0){
+                    if (l != query->proj->GetTotalItems()-1){
+                        cout << "NULL ";
+                    }
+                    else {
+                        cout << "NULL";
+                    }
+
+                }
+                else{
+                    if (l != query->proj->GetTotalItems()-1){
+                        cout << sum << " ";
+                    }
+                    else {
+                        cout << sum;
+                    }
+                }
             }
             cout << endl;
 
