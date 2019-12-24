@@ -83,43 +83,54 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
     switch (cpred.comp)
     {
         case '>':
-            for (uint64_t i = 0; i < totalItems ;i++){
-                // uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+
+            for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
+
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] > cpred.num) == false ) {
                     existingRel->rowIDvec->Remove(i);
-                    i--;
-                    totalItems--;
+                }
+
+                if (i == 0){
+                    break;
                 }
             }
+            
         break;
 
         case '<':
-            for (uint64_t i = 0; i < totalItems ;i++){
-                // uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+
+            for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
+
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] < cpred.num) == false ) {
                     existingRel->rowIDvec->Remove(i);
-                    i--;
-                    totalItems--;
+                }
+
+                if (i == 0){
+                    break;
                 }
             }
+
         break;
 
         case '=':
-            for (uint64_t i = 0; i < totalItems ;i++){
-                // uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+
+            for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
+
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] == cpred.num) == false ) {
-
                     existingRel->rowIDvec->Remove(i);
-                    i--;
-                    totalItems--;
+                }
+
+                if (i == 0){
+                    break;
                 }
             }
+
         break;
     }
 
@@ -218,18 +229,20 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
             existingRel->rowIDvec->PushBack(i);
     }
 
-    uint32_t totalBuckets = existingRel->rowIDvec->GetTotalItems();
+    uint32_t totalItems = existingRel->rowIDvec->GetTotalItems();
 
-    for (uint64_t i = 0; i < totalBuckets ;i++) {
+    for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
 
-        // uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
         uint64_t rowID = (*existingRel->rowIDvec)[i];
 
         if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID] == relTable[jpred.rel2]->table[jpred.colRel2][rowID]) == false ) {
             existingRel->rowIDvec->Remove(i);
-            i--;
-            totalBuckets--;
         }
+
+        if (i == 0){
+            break;
+        }
+    
     }
 
     if (exists == false) {
@@ -390,7 +403,7 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
 {
     uint32_t totalItems = existingRel1->rowIDvec->GetTotalItems();
 
-    for (uint64_t i = 0; i < totalItems ;i++) {
+    for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
 
         // uint64_t rowID1 = ( *((*existingRel1->rowIDlist)[i]) )[0];
         // uint64_t rowID2 = ( *((*existingRel2->rowIDlist)[i]) )[0];
@@ -404,9 +417,12 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
                 ResStruct* res =  &( (*(*frl1->tableList)[j])[0] );
                 res->rowIDvec->Remove(i);
             }
-            i--;
-            totalItems--;
         }
+
+        if (i == 0){
+            break;
+        }
+    
     }
 }
 
