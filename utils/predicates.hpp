@@ -6,6 +6,7 @@
 #include "../utils/relationStructs.hpp"
 
 ResStruct* FindInResList      (List<ResStruct> *, uint64_t);
+ResStruct* FindInResVec       (MiniVector<ResStruct>* , uint64_t);
 
 int        DeleteTargeted     (FullResList   *, int, List<uint64_t> *);
 int        DeleteTargetedSL   (ResStruct     *, int, List<uint64_t> *);

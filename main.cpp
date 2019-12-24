@@ -66,8 +66,9 @@ int main(int argc , char* argv[])
                     exit(1);
 
                 uint64_t sum = 0;
-                for (uint32_t m = 0 ; m < res->rowIDlist->GetTotalItems() ; m++) {
-                    uint64_t rowID = (*(*res->rowIDlist)[m])[0];
+                for (uint32_t m = 0 ; m < res->rowIDvec->GetTotalItems() ; m++) {
+                    // uint64_t rowID = (*(*res->rowIDlist)[m])[0];
+                    uint64_t rowID = (*res->rowIDvec)[m];
                     sum += query->query_rels[pr->rel]->table[pr->colRel][rowID];
                 }
 
@@ -83,7 +84,7 @@ int main(int argc , char* argv[])
 
                 List<ResStruct>* tableList = (*(*resList)[l])[0].tableList;
                 for (uint32_t k = 0 ; k < tableList->GetTotalItems() ; k++)
-                    delete (*(*tableList)[k])[0].rowIDlist;
+                    delete (*(*tableList)[k])[0].rowIDvec;
                 delete tableList;
             }
             delete resList;

@@ -4,6 +4,7 @@
 #define __RELATION_STRCUS_HEADER__
 
 #include "../templates/list.hpp"
+#include "../templates/vector.hpp"
 
 typedef struct RelationTable {
     uint32_t   tableID;
@@ -41,7 +42,7 @@ typedef struct Query {
 
 typedef struct ResStruct {
     uint64_t tableID;
-    List<uint64_t>* rowIDlist;
+    MiniVector<uint64_t>* rowIDvec;
 } ResStruct;
 
 typedef struct FullResList {

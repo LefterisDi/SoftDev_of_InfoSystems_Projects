@@ -31,6 +31,25 @@ ResStruct* FindInResList(List<ResStruct>* resList , uint64_t elemID)
     return found;
 }
 
+ResStruct* FindInResVec(MiniVector<ResStruct>* resVec , uint64_t elemID)
+{
+    if (resVec == NULL)
+        return NULL;
+
+    ResStruct* found = NULL;
+
+    for (uint64_t i = 0 ; i < resVec->GetTotalItems() ; i++){
+        ResStruct* rss = &( (*resVec)[i] );
+
+        if (elemID == (*resVec)[i].tableID) {
+            found = &(*resVec)[i];
+            return found;
+        }
+    }
+
+    return found;
+}
+
 int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullResList>* resList)
 {
     ResStruct*   existingRel = NULL;
@@ -53,49 +72,52 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
 
         existingRel            = new ResStruct;
         existingRel->tableID   = cpred.rel1;
-        existingRel->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        existingRel->rowIDvec = new MiniVector<uint64_t>();
 
         for (uint64_t i = 0 ; i < relTable[cpred.rel1]->rows ; i++)
-            existingRel->rowIDlist->ListInsert(i);
+            existingRel->rowIDvec->PushBack(i);
     }
 
-    uint32_t totalBuckets = existingRel->rowIDlist->GetTotalItems();
+    uint32_t totalItems = existingRel->rowIDvec->GetTotalItems();
 
     switch (cpred.comp)
     {
         case '>':
-            for (uint64_t i = 0; i < totalBuckets ;i++){
-                uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+            for (uint64_t i = 0; i < totalItems ;i++){
+                // uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+                uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] > cpred.num) == false ) {
-                    existingRel->rowIDlist->DeleteBucket(i);
+                    existingRel->rowIDvec->Remove(i);
                     i--;
-                    totalBuckets--;
+                    totalItems--;
                 }
             }
         break;
 
         case '<':
-            for (uint64_t i = 0; i < totalBuckets ;i++){
-                uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+            for (uint64_t i = 0; i < totalItems ;i++){
+                // uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+                uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] < cpred.num) == false ) {
-                    existingRel->rowIDlist->DeleteBucket(i);
+                    existingRel->rowIDvec->Remove(i);
                     i--;
-                    totalBuckets--;
+                    totalItems--;
                 }
             }
         break;
 
         case '=':
-            for (uint64_t i = 0; i < totalBuckets ;i++){
-                uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+            for (uint64_t i = 0; i < totalItems ;i++){
+                // uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+                uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] == cpred.num) == false ) {
 
-                    existingRel->rowIDlist->DeleteBucket(i);
+                    existingRel->rowIDvec->Remove(i);
                     i--;
-                    totalBuckets--;
+                    totalItems--;
                 }
             }
         break;
@@ -117,7 +139,7 @@ int DeleteTargetedSL(ResStruct* resStr , int mask , List<uint64_t>* doubleKeyLis
     uint32_t mask32_right = 0xFFFFFFFF;
     mask32_left <<= 32;
 
-    List<uint64_t>* newList = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+    MiniVector<uint64_t>* newVec = new MiniVector<uint64_t>();
 
     for (uint32_t i = 0 ; i < doubleKeyList->GetTotalBuckets() ; i++) {
         for (uint32_t j = 0 ; j < (*doubleKeyList)[i]->GetBucketItems() ; j++) {
@@ -133,13 +155,13 @@ int DeleteTargetedSL(ResStruct* resStr , int mask , List<uint64_t>* doubleKeyLis
                     newRowID = ( (*(*doubleKeyList)[i])[j]  & mask32_right );
                 break;
             }
-            newList->ListInsert( (*(*resStr->rowIDlist)[newRowID])[0] );
+            newVec->PushBack((*resStr->rowIDvec)[newRowID]);
         }
     }
 
-    delete resStr->rowIDlist;
-    resStr->rowIDlist = NULL;
-    resStr->rowIDlist = newList;
+    delete resStr->rowIDvec;
+    resStr->rowIDvec = NULL;
+    resStr->rowIDvec = newVec;
 
     return 1;
 }
@@ -190,20 +212,21 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
 
         existingRel            = new ResStruct;
         existingRel->tableID   = jpred.rel1;
-        existingRel->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        existingRel->rowIDvec = new MiniVector<uint64_t>();
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel1]->rows ; i++)
-            existingRel->rowIDlist->ListInsert(i);
+            existingRel->rowIDvec->PushBack(i);
     }
 
-    uint32_t totalBuckets = existingRel->rowIDlist->GetTotalItems();
+    uint32_t totalBuckets = existingRel->rowIDvec->GetTotalItems();
 
     for (uint64_t i = 0; i < totalBuckets ;i++) {
 
-        uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+        // uint64_t rowID = ( *((*existingRel->rowIDlist)[i]) )[0];
+        uint64_t rowID = (*existingRel->rowIDvec)[i];
 
         if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID] == relTable[jpred.rel2]->table[jpred.colRel2][rowID]) == false ) {
-            existingRel->rowIDlist->DeleteBucket(i);
+            existingRel->rowIDvec->Remove(i);
             i--;
             totalBuckets--;
         }
@@ -234,17 +257,17 @@ void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred  
 
         existingRel1            = new ResStruct;
         existingRel1->tableID   = jpred.rel1;
-        existingRel1->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        existingRel1->rowIDvec = new MiniVector<uint64_t>();
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel1]->rows ; i++)
-            existingRel1->rowIDlist->ListInsert(i);
+            existingRel1->rowIDvec->PushBack(i);
 
         existingRel2            = new ResStruct;
         existingRel2->tableID   = jpred.rel2;
-        existingRel2->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        existingRel2->rowIDvec = new MiniVector<uint64_t>();
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel2]->rows ; i++)
-            existingRel2->rowIDlist->ListInsert(i);
+            existingRel2->rowIDvec->PushBack(i);
 
     } else if (existingRel1 != NULL && existingRel2 == NULL) {
 
@@ -253,10 +276,10 @@ void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred  
 
         existingRel2            = new ResStruct;
         existingRel2->tableID   = jpred.rel2;
-        existingRel2->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        existingRel2->rowIDvec = new MiniVector<uint64_t>();
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel2]->rows ; i++)
-            existingRel2->rowIDlist->ListInsert(i);
+            existingRel2->rowIDvec->PushBack(i);
 
     } else if (existingRel1 == NULL && existingRel2 != NULL) {
 
@@ -265,10 +288,10 @@ void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred  
 
         existingRel1            = new ResStruct;
         existingRel1->tableID   = jpred.rel1;
-        existingRel1->rowIDlist = new List<uint64_t>(sizeof(uint64_t) , sizeof(uint64_t));
+        existingRel1->rowIDvec = new MiniVector<uint64_t>();
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel1]->rows ; i++)
-            existingRel1->rowIDlist->ListInsert(i);
+            existingRel1->rowIDvec->PushBack(i);
     }
 }
 
@@ -277,7 +300,7 @@ void CreateTableForJoin(RelationTable** relTable , uint64_t relID , bool exists 
     if (exists == true) {
 
         table  = new uint64_t*[relTable[relID]->cols];
-        rowNum = existingRel->rowIDlist->GetTotalItems();
+        rowNum = existingRel->rowIDvec->GetTotalItems();
 
         for(int i = 0; i < relTable[relID]->cols; i++)
             table[i] = new uint64_t[rowNum];
@@ -286,7 +309,8 @@ void CreateTableForJoin(RelationTable** relTable , uint64_t relID , bool exists 
         for (int j =  0 ; j < rowNum ; j++) {
             for (int i = 0 ; i < relTable[relID]->cols ; i++) {
 
-                uint64_t rowID = (*(*existingRel->rowIDlist)[j])[0];
+                // uint64_t rowID = (*(*existingRel->rowIDlist)[j])[0];
+                uint64_t rowID = (*existingRel->rowIDvec)[j];
                 table[i][j] = relTable[relID]->table[i][rowID];
             }
         }
@@ -352,11 +376,6 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
         DeleteTargeted(frl2 , 1 , doubleKeyList);
         DeleteTargetedSL(existingRel1 , 0 , doubleKeyList);
 
-        for (uint32_t i = 0 ; i < frl2->tableList->GetTotalItems() ; i++) {
-
-            ResStruct* rs = &( (*(*frl2->tableList)[i])[0] );
-        }
-
         frl2->tableList->ListInsert(*existingRel1);
     }
 }
@@ -364,18 +383,21 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
 void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* resList,
                       ResStruct*& existingRel1 , ResStruct*& existingRel2 , FullResList*& frl1)
 {
-    uint32_t totalItems = existingRel1->rowIDlist->GetTotalItems();
+    uint32_t totalItems = existingRel1->rowIDvec->GetTotalItems();
 
     for (uint64_t i = 0; i < totalItems ;i++) {
 
-        uint64_t rowID1 = ( *((*existingRel1->rowIDlist)[i]) )[0];
-        uint64_t rowID2 = ( *((*existingRel2->rowIDlist)[i]) )[0];
+        // uint64_t rowID1 = ( *((*existingRel1->rowIDlist)[i]) )[0];
+        // uint64_t rowID2 = ( *((*existingRel2->rowIDlist)[i]) )[0];
+
+        uint64_t rowID1 = (*existingRel1->rowIDvec)[i];
+        uint64_t rowID2 = (*existingRel2->rowIDvec)[i];
 
         if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID1] == relTable[jpred.rel2]->table[jpred.colRel2][rowID2]) == false ) {
 
             for (uint64_t j = 0 ; j < frl1->tableList->GetTotalItems() ; j++){
                 ResStruct* res =  &( (*(*frl1->tableList)[j])[0] );
-                res->rowIDlist->DeleteBucket(i);
+                res->rowIDvec->Remove(i);
             }
             i--;
             totalItems--;
@@ -494,20 +516,13 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
     bool     firstTime = true;
 
     while (joinList->GetTotalItems() > 0) {
-
         JoinPred* jpredp = &( (*(*joinList)[i])[0] );
 
         if ( (*joinList)[i] == joinList->GetLast() )
             last = true;
 
-        if ( firstTime == true && relExistsInRL[jpredp->rel1] == false && relExistsInRL[jpredp->rel2] == false) {
-            i++;
-            continue;
-        }
-
         if (jpredp->rel1 == jpredp->rel2) {
-
-            if (jpredp->colRel1 == jpredp->colRel2) {
+             if (jpredp->colRel1 == jpredp->colRel2) {
                 joinList->DeleteBucket(i);
                 if (last == true) {
                     i = 0;
@@ -527,29 +542,41 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
                 }
                 continue;
             }
-
-        } else {
-            JoinPredicate(relTable , *jpredp , resList);
-            relExistsInRL[jpredp->rel1] = true;
-            relExistsInRL[jpredp->rel2] = true;
-            joinList->DeleteBucket(i);
-
-            if (last == true) {
-                i = 0;
-                last = false;
-                firstTime = false;
-            }
-            continue;
         }
-
-        if (last == false)
+       
+       if (last == false)
             i++;
 
         else {
+            break;
+        }
+    }
+
+    i = 0;
+    last = false;
+    while (joinList->GetTotalItems() > 0) {
+
+        JoinPred* jpredp = &( (*(*joinList)[i])[0] );
+
+        if ( (*joinList)[i] == joinList->GetLast() )
+            last = true;
+
+        if ( firstTime == true && relExistsInRL[jpredp->rel1] == false && relExistsInRL[jpredp->rel2] == false) {
+            i++;
+            continue;
+        }
+
+        JoinPredicate(relTable , *jpredp , resList);
+        relExistsInRL[jpredp->rel1] = true;
+        relExistsInRL[jpredp->rel2] = true;
+        joinList->DeleteBucket(i);
+
+        if (last == true) {
             i = 0;
             last = false;
             firstTime = false;
         }
     }
+
     return 1;
 }
