@@ -58,7 +58,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
 
     for (uint32_t i = 0 ; i < resList->GetTotalBuckets() ; i++) {
 
-        existingRel = FindInResList( (* (*resList)[i])[0].tableList , cpred.rel1);
+        existingRel = FindInResVec( (* (*resList)[i])[0].tableList , cpred.rel1);
 
         if (existingRel != NULL)
             break;
@@ -68,7 +68,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
 
         exists         = false;
         frl            = new FullResList;
-        frl->tableList = new List<ResStruct>(sizeof(ResStruct) , sizeof(ResStruct));
+        frl->tableList = new MiniVector<ResStruct>();
 
         existingRel            = new ResStruct;
         existingRel->tableID   = cpred.rel1;
@@ -124,7 +124,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
     }
 
     if (exists == false) {
-        frl->tableList->ListInsert(*existingRel);
+        frl->tableList->PushBack(*existingRel);
         resList->ListInsert(*frl);
         delete existingRel;
         delete frl;
@@ -174,7 +174,7 @@ int DeleteTargeted( FullResList* listOfArrays , int mask , List<uint64_t>* doubl
 
     for (uint32_t l = 0; l < listOfArrays->tableList->GetTotalItems() ; l++) {
 
-        ResStruct* res = &( (*(*(listOfArrays->tableList))[l])[0] );
+        ResStruct* res = &( (*listOfArrays->tableList)[l] );
 
         switch (mask)
         {
@@ -198,7 +198,7 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
 
     for (uint32_t i = 0 ; i < resList->GetTotalBuckets() ; i++) {
 
-        existingRel = FindInResList( (* (*resList)[i])[0].tableList , jpred.rel1);
+        existingRel = FindInResVec( (* (*resList)[i])[0].tableList , jpred.rel1);
 
         if (existingRel != NULL)
             break;
@@ -208,7 +208,7 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
 
         exists         = false;
         frl            = new FullResList;
-        frl->tableList = new List<ResStruct>(sizeof(ResStruct) , sizeof(ResStruct));
+        frl->tableList = new MiniVector<ResStruct>();
 
         existingRel            = new ResStruct;
         existingRel->tableID   = jpred.rel1;
@@ -233,7 +233,7 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
     }
 
     if (exists == false) {
-        frl->tableList->ListInsert(*existingRel);
+        frl->tableList->PushBack(*existingRel);
         resList->ListInsert(*frl);
         delete existingRel;
         delete frl;
@@ -253,7 +253,7 @@ void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred  
         exists2 = false;
 
         frl1            = new FullResList;
-        frl1->tableList = new List<ResStruct>(sizeof(ResStruct) , sizeof(ResStruct));
+        frl1->tableList = new MiniVector<ResStruct>();
 
         existingRel1            = new ResStruct;
         existingRel1->tableID   = jpred.rel1;
@@ -331,8 +331,8 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
         DeleteTargetedSL(existingRel1 , 0 , doubleKeyList);
         DeleteTargetedSL(existingRel2 , 1 , doubleKeyList);
 
-        frl1->tableList->ListInsert(*existingRel1);
-        frl1->tableList->ListInsert(*existingRel2);
+        frl1->tableList->PushBack(*existingRel1);
+        frl1->tableList->PushBack(*existingRel2);
         resList->ListInsert(*frl1);
 
     } else if (exists1 == true && exists2 == true) {
@@ -342,7 +342,11 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
             DeleteTargeted(frl1 , 0 , doubleKeyList);
             DeleteTargeted(frl2 , 1 , doubleKeyList);
 
-            (*frl1->tableList) += (*frl2->tableList);
+            for (uint64_t k = 0 ; k < (*frl2->tableList).GetTotalItems() ; k++){
+                (*frl1->tableList).PushBack((*frl2->tableList)[k]);
+            }
+
+            delete frl2->tableList;
 
             resList->DeleteBucket(pos2);
 
@@ -369,14 +373,14 @@ void InsertAndFuseInMidStruct(List<uint64_t>*& doubleKeyList , List<FullResList>
         DeleteTargeted(frl1 , 0 , doubleKeyList);
         DeleteTargetedSL(existingRel2 , 1 , doubleKeyList);
 
-        frl1->tableList->ListInsert(*existingRel2);
+        frl1->tableList->PushBack(*existingRel2);
 
     } else {
 
         DeleteTargeted(frl2 , 1 , doubleKeyList);
         DeleteTargetedSL(existingRel1 , 0 , doubleKeyList);
 
-        frl2->tableList->ListInsert(*existingRel1);
+        frl2->tableList->PushBack(*existingRel1);
     }
 }
 
@@ -396,7 +400,7 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
         if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID1] == relTable[jpred.rel2]->table[jpred.colRel2][rowID2]) == false ) {
 
             for (uint64_t j = 0 ; j < frl1->tableList->GetTotalItems() ; j++){
-                ResStruct* res =  &( (*(*frl1->tableList)[j])[0] );
+                ResStruct* res =  &( (*frl1->tableList)[j]);
                 res->rowIDvec->Remove(i);
             }
             i--;
@@ -429,7 +433,7 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
 
     for (uint32_t i = 0 ; i < resList->GetTotalItems() ; i++) {
 
-        existingRel1 = FindInResList( (* (*resList)[i])[0].tableList , jpred.rel1);
+        existingRel1 = FindInResVec( (* (*resList)[i])[0].tableList , jpred.rel1);
 
         if (existingRel1 != NULL) {
             frl1 = &( (*(*resList)[i])[0] );
@@ -439,7 +443,7 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
 
     for (uint32_t i = 0 ; i < resList->GetTotalItems() ; i++) {
 
-        existingRel2 = FindInResList( (* (*resList)[i])[0].tableList , jpred.rel2);
+        existingRel2 = FindInResVec( (* (*resList)[i])[0].tableList , jpred.rel2);
 
         if (existingRel2 != NULL) {
             frl2 = &( (*(*resList)[i])[0] );
