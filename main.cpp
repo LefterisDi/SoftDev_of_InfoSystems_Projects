@@ -56,7 +56,7 @@ int main(int argc , char* argv[])
                 for (uint32_t m = 0 ; m < resList->GetTotalItems() ; m++) {
 
                     FullResList* fres = &( (*(*resList)[m])[0] );
-                    res = FindInResVec(fres->tableList , pr->rel);
+                    res = FindInResList(fres->tableList , pr->rel);
                     if (res != NULL){
                         break;
                     }
@@ -82,9 +82,9 @@ int main(int argc , char* argv[])
             delete[] relExistsInRL;
             for (uint32_t l = 0 ; l < resList->GetTotalItems() ; l++) {
 
-                MiniVector<ResStruct>* tableList = (*(*resList)[l])[0].tableList;
+                List<ResStruct>* tableList = (*(*resList)[l])[0].tableList;
                 for (uint32_t k = 0 ; k < tableList->GetTotalItems() ; k++)
-                    delete (*tableList)[k].rowIDvec;
+                    delete (*(*tableList)[k])[0].rowIDvec;
                 delete tableList;
             }
             delete resList;

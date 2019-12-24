@@ -46,7 +46,7 @@ typedef struct ResStruct {
 } ResStruct;
 
 typedef struct FullResList {
-    MiniVector<ResStruct>* tableList;
+    List<ResStruct>* tableList;
 } FullResList;
 
 #endif // __RELATION_STRCUS_HEADER__
