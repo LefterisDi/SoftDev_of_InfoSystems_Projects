@@ -39,9 +39,9 @@ int main(int argc , char* argv[])
         {
             Query* query = &( (*(*batchQueries)[i])[0] );
 
-            bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels];
+            bool* relExistsInRL = new bool[(*(*batchQueries)[i])[0].total_rels]();
             for (uint32_t j = 0; j < (*(*batchQueries)[i])[0].total_rels ; j++)
-                relExistsInRL[i] = false;
+                relExistsInRL[j] = false;
 
             List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
 
@@ -101,6 +101,7 @@ int main(int argc , char* argv[])
                 delete tableList;
             }
             delete resList;
+
         }
 
         for (uint32_t j = 0; j < batchQueries->GetTotalItems() ; j++) {
@@ -110,6 +111,7 @@ int main(int argc , char* argv[])
             delete q->comp_preds;
             delete q->join_preds;
             delete q->proj;
+            // delete q->query_rels;
         }
         delete batchQueries;
     }

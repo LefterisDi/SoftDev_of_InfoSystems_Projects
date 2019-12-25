@@ -1,6 +1,8 @@
 /* File: predicates.cpp */
 
 #include <iostream>
+#include <unistd.h>
+
 
 #include "../utils/relationStructs.hpp"
 #include "../sortingAlg/tablesort.hpp"
@@ -96,7 +98,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
                     break;
                 }
             }
-            
+
         break;
 
         case '<':
@@ -312,8 +314,13 @@ void CreateTableForJoin(RelationTable** relTable , uint64_t relID , bool exists 
 {
     if (exists == true) {
 
-        table  = new uint64_t*[relTable[relID]->cols];
         rowNum = existingRel->rowIDvec->GetTotalItems();
+
+        if (rowNum == 0){
+            return;
+        }
+
+        table  = new uint64_t*[relTable[relID]->cols];
 
         for(int i = 0; i < relTable[relID]->cols; i++)
             table[i] = new uint64_t[rowNum];
@@ -478,6 +485,25 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
 
     CreateTableForJoin(relTable , jpred.rel1 , exists1 , table1 , rowNum1 , existingRel1);
     CreateTableForJoin(relTable , jpred.rel2 , exists2 , table2 , rowNum2 , existingRel2);
+
+    if (rowNum1 == 0 || rowNum2 == 0){
+
+        InsertAndFuseInMidStruct(doubleKeyList , resList , pos2 , existingRel1 , existingRel2 , frl1 , frl2 , exists1 , exists2);
+
+        delete doubleKeyList;
+
+        if (exists1 == false)
+            delete existingRel1;
+
+
+        if (exists2 == false)
+            delete existingRel2;
+
+        if (exists1 == false && exists2 == false)
+            delete frl1;
+
+        return 1;
+    }
 
     MergeTuple* sortedTable1 = TableSortOnKey(table1 , rowNum1 , jpred.colRel1 , 8192);
     MergeTuple* sortedTable2 = TableSortOnKey(table2 , rowNum2 , jpred.colRel2 , 8192);
