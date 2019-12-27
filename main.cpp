@@ -111,7 +111,7 @@ int main(int argc , char* argv[])
             delete q->comp_preds;
             delete q->join_preds;
             delete q->proj;
-            // delete q->query_rels;
+            delete[] q->query_rels;
         }
         delete batchQueries;
     }

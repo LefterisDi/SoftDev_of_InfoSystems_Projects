@@ -81,6 +81,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
     }
 
     uint32_t totalItems = existingRel->rowIDvec->GetTotalItems();
+    MiniVector<uint64_t> * pvec = new MiniVector<uint64_t>();
 
     switch (cpred.comp)
     {
@@ -91,13 +92,33 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] > cpred.num) == false ) {
-                    existingRel->rowIDvec->Remove(i);
+                    pvec->PushBack(i);
+                    // existingRel->rowIDvec->Remove(i);
                 }
 
                 if (i == 0){
                     break;
                 }
             }
+
+            // for (uint64_t i = 0 ; i < pvec->GetTotalItems() ; i++){
+            //     cout << (*pvec)[i] << endl;
+            // }
+
+            // // cout << pvec->GetTotalItems() << endl;
+
+
+            // sleep(5);
+
+            pvec->Reverse();
+
+            // for (uint64_t i = 0 ; i < pvec->GetTotalItems() ; i++){
+            //     cout << (*pvec)[i] << endl;
+            // }
+
+            // cout << pvec->GetTotalItems() << endl;
+
+            existingRel->rowIDvec->RemoveManyFromTo(pvec);
 
         break;
 
@@ -108,13 +129,19 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] < cpred.num) == false ) {
-                    existingRel->rowIDvec->Remove(i);
+                    pvec->PushBack(i);
+                    // existingRel->rowIDvec->Remove(i);
                 }
 
                 if (i == 0){
                     break;
                 }
             }
+
+            pvec->Reverse();
+
+            existingRel->rowIDvec->RemoveManyFromTo(pvec);
+            
 
         break;
 
@@ -125,13 +152,19 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] == cpred.num) == false ) {
-                    existingRel->rowIDvec->Remove(i);
+                    pvec->PushBack(i);
+                    // existingRel->rowIDvec->Remove(i);
                 }
 
                 if (i == 0){
                     break;
                 }
             }
+
+            pvec->Reverse();
+
+            existingRel->rowIDvec->RemoveManyFromTo(pvec);
+
 
         break;
     }
@@ -142,6 +175,8 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
         delete existingRel;
         delete frl;
     }
+
+    delete pvec;
 
     return 1;
 }
@@ -232,13 +267,16 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
     }
 
     uint32_t totalItems = existingRel->rowIDvec->GetTotalItems();
+    MiniVector<uint64_t> * pvec = new MiniVector<uint64_t>();
+
 
     for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
 
         uint64_t rowID = (*existingRel->rowIDvec)[i];
 
         if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID] == relTable[jpred.rel2]->table[jpred.colRel2][rowID]) == false ) {
-            existingRel->rowIDvec->Remove(i);
+            // existingRel->rowIDvec->Remove(i);
+            pvec->PushBack(i);
         }
 
         if (i == 0){
@@ -246,6 +284,11 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
         }
     
     }
+
+    pvec->Reverse();
+    pvec->RemoveManyFromTo(pvec);
+
+    delete pvec;
 
     if (exists == false) {
         frl->tableList->ListInsert(*existingRel);
@@ -409,6 +452,11 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
                       ResStruct*& existingRel1 , ResStruct*& existingRel2 , FullResList*& frl1)
 {
     uint32_t totalItems = existingRel1->rowIDvec->GetTotalItems();
+    MiniVector<uint64_t> ** pvec = new MiniVector<uint64_t>*[frl1->tableList->GetTotalItems()];
+    for (uint64_t i = 0 ; i < frl1->tableList->GetTotalItems() ; i++){
+        pvec[i] = new MiniVector<uint64_t>();
+    }
+
 
     for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
 
@@ -422,7 +470,8 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
 
             for (uint64_t j = 0 ; j < frl1->tableList->GetTotalItems() ; j++){
                 ResStruct* res =  &( (*(*frl1->tableList)[j])[0] );
-                res->rowIDvec->Remove(i);
+                // res->rowIDvec->Remove(i);
+                pvec[j]->PushBack(i);
             }
         }
 
@@ -431,6 +480,18 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
         }
     
     }
+
+    for (uint64_t i = 0 ; i < frl1->tableList->GetTotalItems() ; i++){
+        pvec[i]->Reverse();
+        ResStruct* res =  &( (*(*frl1->tableList)[i])[0] );
+        res->rowIDvec->RemoveManyFromTo(pvec[i]);
+    }
+
+
+    for (uint64_t i = 0 ; i < frl1->tableList->GetTotalItems() ; i++){
+        delete pvec[i];
+    }
+    delete[] pvec;
 }
 
 int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* resList)
