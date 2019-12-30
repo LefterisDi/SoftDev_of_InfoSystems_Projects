@@ -5,6 +5,8 @@
 #include <string.h>
 
 #include "utils.hpp"
+#include "../templates/list.hpp"
+#include "../templates/vector.hpp"
 
 uint32_t BitConversion(uint64_t num, uint32_t key)
 {//key must be between 0 and 7

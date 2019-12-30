@@ -7,10 +7,14 @@
 #include <iostream>
 #include <random>
 #include <unistd.h>
+#include <cstdint>
+
 
 #include "./opts/getopts.hpp"
 #include "./utils/predicates.hpp"
 #include "./utils/utils.hpp"
+#include "./templates/list.hpp"
+#include "./templates/vector.hpp"
 
 using namespace std;
 

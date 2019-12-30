@@ -3,6 +3,8 @@
 #ifndef __PREDICATES_HEADER__
 #define __PREDICATES_HEADER__
 
+#include <cstdint>
+
 #include "../utils/relationStructs.hpp"
 
 ResStruct* FindInResList      (List<ResStruct> *, uint64_t);

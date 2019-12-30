@@ -2,10 +2,13 @@
 
 #include <iostream>
 #include <unistd.h>
+#include <cstdint>
 
 
 #include "../utils/relationStructs.hpp"
 #include "../sortingAlg/tablesort.hpp"
+#include "../templates/list.hpp"
+#include "../templates/vector.hpp"
 
 using namespace std;
 
@@ -455,6 +458,10 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
     MiniVector<uint64_t> ** pvec = new MiniVector<uint64_t>*[frl1->tableList->GetTotalItems()];
     for (uint64_t i = 0 ; i < frl1->tableList->GetTotalItems() ; i++){
         pvec[i] = new MiniVector<uint64_t>();
+    }
+
+    if (totalItems == 0 ){
+        return;
     }
 
 

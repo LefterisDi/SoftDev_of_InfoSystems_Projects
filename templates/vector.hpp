@@ -4,6 +4,8 @@
 #include <iostream>
 #include <stdexcept>
 #include <unistd.h>
+#include <cstdint>
+
 
 template <class T> 
 class MiniVector {
@@ -15,10 +17,10 @@ class MiniVector {
 
         void RemoveManyTillIndex(uint64_t startIndex , uint64_t endIndex , uint64_t steps){
 
-            if (steps > startIndex + 1){
-                std::cout << "DDDDDD" << std::endl;
-                sleep(5);
-            }
+            // if (steps > startIndex + 1){
+            //     std::cout << "DDDDDD" << std::endl;
+            //     sleep(5);
+            // }
             
             for (uint64_t i = startIndex+1 ; i < endIndex ; i++){
                     vArr[i-steps] = vArr[i];

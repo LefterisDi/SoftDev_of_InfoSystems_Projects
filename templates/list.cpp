@@ -2,6 +2,8 @@
 
 #include <cstring>
 #include <iostream>
+#include <cstdint>
+
 
 #include "list.hpp"
 #include "../utils/relationStructs.hpp"
