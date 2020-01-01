@@ -44,17 +44,23 @@ int main(int argc , char* argv[])
     while( (batchQueries = ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList) ) != NULL )
     {
         JobScheduler* js = new JobScheduler(batchQueries->GetTotalItems() , batchQueries->GetTotalItems()+1);
+        QueryJobArgs* qja = new QueryJobArgs[batchQueries->GetTotalItems()];
         for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++)
-        {
-            Query* query = &( (*(*batchQueries)[i])[0] );
+        {   
+            qja[i].query = &( (*(*batchQueries)[i])[0] );
+            qja[i].qNum = i;
 
-            js->addNewJob(&QueryJob , (void*)query);
+            js->addNewJob(&QueryJob , (void*)&qja[i]);
 
             // QueryJob(query);
 
         }
         js->destroyScheduler(1);
+        for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++){
+            cout << qja[i].res << endl;
+        }
         delete batchQueries;
+        delete[] qja;
     }
 
     for (uint32_t l = 0; l < relTableList->GetTotalItems() ; l++) {

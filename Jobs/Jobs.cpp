@@ -8,12 +8,14 @@
 #include "../utils/predicates.hpp"
 #include "../JobScheduler/JobScheduler.hpp"
 #include "../utils/String/String.hpp"
+#include "./Jobs.hpp"
 
 using namespace std;
 
 void QueryJob(void* arg){
 
-    Query* query = (Query*)arg;
+    QueryJobArgs* qja = (QueryJobArgs*)arg;
+    Query* query = qja->query;
     jd::String resStr = "";
     
 
@@ -73,7 +75,7 @@ void QueryJob(void* arg){
             }
         }
     }
-    cout << resStr << endl;
+    qja->res = resStr;
 
     delete[] relExistsInRL;
     for (uint32_t l = 0 ; l < resList->GetTotalItems() ; l++) {
