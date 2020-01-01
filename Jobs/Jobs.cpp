@@ -1,16 +1,21 @@
-#include "iostream"
+#include <iostream>
+#include <semaphore.h>
+#include <cinttypes>
 
 #include "../utils/relationStructs.hpp"
 #include "../templates/list.hpp"
 #include "../templates/vector.hpp"
 #include "../utils/predicates.hpp"
 #include "../JobScheduler/JobScheduler.hpp"
+#include "../utils/String/String.hpp"
 
 using namespace std;
 
 void QueryJob(void* arg){
 
     Query* query = (Query*)arg;
+    jd::String resStr = "";
+    
 
     bool* relExistsInRL = new bool[query->total_rels]();
     for (uint32_t j = 0; j < query->total_rels ; j++)
@@ -46,23 +51,29 @@ void QueryJob(void* arg){
 
         if (sum == 0){
             if (l != query->proj->GetTotalItems()-1){
-                cout << "NULL ";
+                resStr += "NULL ";
             }
             else {
-                cout << "NULL";
+                resStr += "NULL";
             }
 
         }
         else{
             if (l != query->proj->GetTotalItems()-1){
-                cout << sum << " ";
+                char buff[21];
+                sprintf(buff, "%" PRIu64, sum);
+                resStr += buff;
+                resStr += " ";
+                
             }
             else {
-                cout << sum;
+                char buff[21];
+                sprintf(buff, "%" PRIu64, sum);
+                resStr += buff;
             }
         }
     }
-    cout << endl;
+    cout << resStr << endl;
 
     delete[] relExistsInRL;
     for (uint32_t l = 0 ; l < resList->GetTotalItems() ; l++) {

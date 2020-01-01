@@ -3,7 +3,7 @@
 #include <iostream>
 #include <unistd.h>
 #include <cstdint>
-
+#include <semaphore.h> 
 
 #include "../utils/relationStructs.hpp"
 #include "../sortingAlg/tablesort.hpp"

@@ -8,6 +8,7 @@
 #include <random>
 #include <unistd.h>
 #include <cstdint>
+#include <semaphore.h> 
 
 
 #include "./opts/getopts.hpp"
@@ -52,8 +53,8 @@ int main(int argc , char* argv[])
             // QueryJob(query);
 
         }
-        delete batchQueries;
         js->destroyScheduler(1);
+        delete batchQueries;
     }
 
     for (uint32_t l = 0; l < relTableList->GetTotalItems() ; l++) {
