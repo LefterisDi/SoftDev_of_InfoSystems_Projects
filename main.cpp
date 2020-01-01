@@ -1,0 +1,70 @@
+/* File: main.cpp */
+
+#include <bitset>
+#include <climits>
+#include <cstdlib>
+#include <ctime>
+#include <iostream>
+#include <random>
+#include <unistd.h>
+#include <cstdint>
+
+
+#include "./opts/getopts.hpp"
+#include "./utils/predicates.hpp"
+#include "./utils/utils.hpp"
+#include "./templates/list.hpp"
+#include "./templates/vector.hpp"
+#include "./Jobs/Jobs.hpp"
+#include "./JobScheduler/JobScheduler.hpp"
+
+
+using namespace std;
+
+int main(int argc , char* argv[])
+{
+    struct opt_types args[2];
+
+    /*
+     * +------------------------------------+
+     * | args[0].optType.cp = <relA file>   |
+     * +------------------------------------+
+     */
+    if (!getopts(argc,argv,(char*)"w:p,q:p",args))
+        return -1;
+
+
+    List<RelationTable>* relTableList;
+
+    List<Query>* batchQueries = NULL;
+
+    relTableList = ReadRelations(args[0].optType.cp);
+
+    while( (batchQueries = ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList) ) != NULL )
+    {
+        JobScheduler* js = new JobScheduler(batchQueries->GetTotalItems() , batchQueries->GetTotalItems()+1);
+        for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++)
+        {
+            Query* query = &( (*(*batchQueries)[i])[0] );
+
+            js->addNewJob(&QueryJob , (void*)query);
+
+            // QueryJob(query);
+
+        }
+        delete batchQueries;
+        js->destroyScheduler(1);
+    }
+
+    for (uint32_t l = 0; l < relTableList->GetTotalItems() ; l++) {
+
+        RelationTable* rtable = &((*(*relTableList)[l])[0]);
+        for (uint32_t i = 0 ; i < rtable->cols ; i++)
+            delete[] rtable->table[i];
+        delete[] rtable->table;
+    }
+    delete relTableList;
+
+    return 0;
+}
+ 
