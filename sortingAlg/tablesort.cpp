@@ -11,6 +11,8 @@
 #include "../searchingAlg/binarySearch.hpp"
 #include "../sortingAlg/quicksort.hpp"
 #include "../utils/utils.hpp"
+#include "../Jobs/Jobs.hpp"
+#include "../JobScheduler/JobScheduler.hpp"
 
 using namespace std;
 
@@ -74,6 +76,7 @@ void SimpleSortRec(MergeTuple* table1 , MergeTuple* table2 , uint32_t size , int
 
     int newKey = key + 1;
 
+
     for (int i = 0 ; i < psumCount ; i++) {
         if (i < psumCount-1)
             SimpleSortRec(&table2[psum[i][1]] , &table1[psum[i][1]] , psum[i+1][1] - psum[i][1] , newKey , qsAfterNumOfEntries);
@@ -96,7 +99,18 @@ MergeTuple* TableSortOnKey(uint64_t** tableMain, uint32_t rows , int key , int e
         table1[i].rowID = i;
     }
 
-    SimpleSortRec(table1 , table2 , rows , 0 , entriesQuicksort);
+    SortJobArgs* sja = new SortJobArgs;
+
+    sja->table1 = table1;
+    sja->table2 = table2;
+    sja->size = rows;
+    sja->key = 0;
+    sja->qsAfterNumOfEntries = entriesQuicksort;
+
+    SortJob((void*)sja);
+    // SimpleSortRec(table1 , table2 , rows , 0 , entriesQuicksort);
+
+    delete sja;
 
     delete[] table1;
 

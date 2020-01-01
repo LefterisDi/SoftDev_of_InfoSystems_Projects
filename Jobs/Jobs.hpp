@@ -3,6 +3,7 @@
 
 #include "../utils/relationStructs.hpp"
 #include "../utils/String/String.hpp"
+#include "../utils/utils.hpp"
 
 typedef struct QueryJobArgs{
     Query* query;
@@ -10,6 +11,15 @@ typedef struct QueryJobArgs{
     jd::String res;
 }QueryJobArgs;
 
+typedef struct SortJobArgs{
+    MergeTuple* table1;
+    MergeTuple* table2; 
+    uint32_t size;
+    int key;
+    int qsAfterNumOfEntries;
+}SortJobArgs;
+
 void QueryJob(void*); 
+void SortJob(void*);
 
 #endif

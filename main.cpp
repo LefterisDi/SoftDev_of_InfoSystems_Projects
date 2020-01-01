@@ -52,8 +52,6 @@ int main(int argc , char* argv[])
 
             js->addNewJob(&QueryJob , (void*)&qja[i]);
 
-            // QueryJob(query);
-
         }
         js->destroyScheduler(1);
         for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++){

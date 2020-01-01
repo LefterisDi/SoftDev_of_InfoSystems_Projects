@@ -9,6 +9,8 @@
 #include "../sortingAlg/tablesort.hpp"
 #include "../templates/list.hpp"
 #include "../templates/vector.hpp"
+#include "../Jobs/Jobs.hpp"
+#include "../JobScheduler/JobScheduler.hpp"
 
 using namespace std;
 
@@ -536,6 +538,8 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
     uint32_t rowNum1 = 0;
     uint32_t rowNum2 = 0;
 
+    // JobScheduler* js = new JobScheduler(2 , 3);
+    
 
     for (uint32_t i = 0 ; i < resList->GetTotalItems() ; i++) {
 
