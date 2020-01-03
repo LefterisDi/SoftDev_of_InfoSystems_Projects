@@ -538,6 +538,11 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
     uint32_t rowNum1 = 0;
     uint32_t rowNum2 = 0;
 
+    uint32_t** psum1 = NULL;
+    uint32_t psumCount1 = 0;
+
+    uint32_t** psum2 = NULL;
+    uint32_t psumCount2 = 0;
     // JobScheduler* js = new JobScheduler(2 , 3);
     
 
@@ -591,14 +596,22 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
         return 1;
     }
 
-    MergeTuple* sortedTable1 = TableSortOnKey(table1 , rowNum1 , jpred.colRel1 , 8192);
-    MergeTuple* sortedTable2 = TableSortOnKey(table2 , rowNum2 , jpred.colRel2 , 8192);
+    MergeTuple* sortedTable1 = TableSortOnKey(table1 , rowNum1 , jpred.colRel1 , 8192 , psum1 , psumCount1);
+    MergeTuple* sortedTable2 = TableSortOnKey(table2 , rowNum2 , jpred.colRel2 , 8192 , psum2 , psumCount2);
 
-    MergeTables(*doubleKeyList, sortedTable1 , rowNum1 , sortedTable2 , rowNum2);
 
-    uint64_t mask32_left  = 0xFFFFFFFF;
-    uint32_t mask32_right = 0xFFFFFFFF;
-    mask32_left <<= 32;
+    if (psumCount1 != 0 && psumCount2 != 0){
+        
+        MergeJobFirst(&doubleKeyList, sortedTable1 , rowNum1 , sortedTable2 , rowNum2 , psum1 , psumCount1 , psum2 , psumCount2);
+        MergeTables(*doubleKeyList, sortedTable1 , rowNum1 , sortedTable2 , rowNum2);
+    }
+    else {
+        MergeTables(*doubleKeyList, sortedTable1 , rowNum1 , sortedTable2 , rowNum2);
+    }
+
+    // uint64_t mask32_left  = 0xFFFFFFFF;
+    // uint32_t mask32_right = 0xFFFFFFFF;
+    // mask32_left <<= 32;
 
     InsertAndFuseInMidStruct(doubleKeyList , resList , pos2 , existingRel1 , existingRel2 , frl1 , frl2 , exists1 , exists2);
 

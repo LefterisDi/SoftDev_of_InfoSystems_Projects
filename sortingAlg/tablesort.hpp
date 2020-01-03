@@ -7,6 +7,7 @@
 
 #include "../utils/utils.hpp"
 
-MergeTuple* TableSortOnKey(uint64_t **, uint32_t, int , int);
+MergeTuple* TableSortOnKey(uint64_t **, uint32_t, int , int , uint32_t**& , uint32_t&);
+void SimpleSortRec(MergeTuple* , MergeTuple* , uint32_t , int , int);
 
 #endif // __TABLE_SORT__

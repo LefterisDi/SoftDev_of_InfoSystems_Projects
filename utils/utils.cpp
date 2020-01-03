@@ -7,6 +7,8 @@
 #include "utils.hpp"
 #include "../templates/list.hpp"
 #include "../templates/vector.hpp"
+#include "../JobScheduler/JobScheduler.hpp"
+#include "../Jobs/Jobs.hpp"
 
 uint32_t BitConversion(uint64_t num, uint32_t key)
 {//key must be between 0 and 7
@@ -22,6 +24,96 @@ void SwitchElements(uint64_t** tableMain , uint32_t sizeY , uint32_t firstElem ,
         tableMain[k][firstElem]  = tableMain[k][secondElem];
         tableMain[k][secondElem] = temp;
     }
+}
+
+void MergeJobFirst(List<uint64_t>** listdp, MergeTuple* sortedTable1, uint32_t rowNum1, MergeTuple* sortedTable2, uint32_t rowNum2 , \
+                   uint32_t** psum1 , uint32_t psumCount1 , uint32_t** psum2 , uint32_t psumCount2)
+{
+    uint32_t rowNumSmall = rowNum1;
+    uint32_t rowNumBig = rowNum2;
+
+    uint32_t psumCountSmall = psumCount1;
+    uint32_t psumCountBig = psumCount2;
+    
+    uint32_t** psumSmall = psum1;
+    uint32_t** psumBig = psum2;
+
+    MergeTuple* sortedTableSmall = sortedTable1;
+    MergeTuple* sortedTableBig = sortedTable2;
+    
+    if (psumCount2 < psumCount1){
+        
+        rowNumSmall = rowNum2;
+        rowNumBig = rowNum1;
+        
+        psumCountSmall = psumCount2;
+        psumCountBig = psumCount1;
+        
+        psumSmall = psum2;
+        psumBig = psum1;
+
+        MergeTuple* sortedTableSmall = sortedTable2;
+        MergeTuple* sortedTableBig = sortedTable1;
+        
+    }
+
+    JobScheduler* js = new JobScheduler(psumCountSmall , psumCountSmall+1);
+    MergeJobArgs* mja = new MergeJobArgs[psumCountSmall];
+
+    uint32_t indexBig = 0;
+    uint32_t indexSmall = 0;
+
+    while ( indexSmall < psumCountSmall) {
+
+        if (psumSmall[indexSmall][0] == psumBig[indexBig][0]) {
+
+            mja[indexSmall].list = listdp;
+
+            mja[indexSmall].sortedTable1 = sortedTableSmall;
+            if (indexSmall == psumCountSmall-1){
+                mja[indexSmall].size1X = rowNumSmall - psumSmall[indexSmall][1];
+            }
+            else {
+                mja[indexSmall].size1X = psumSmall[indexSmall + 1][1] - psumSmall[indexSmall][1];
+            }
+
+            mja[indexSmall].sortedTable2 = sortedTableBig;
+            if (indexBig == psumCountBig-1){
+                mja[indexSmall].size2X = rowNumBig - psumBig[indexBig][1];
+            }
+            else {
+                mja[indexSmall].size2X = psumBig[indexBig + 1][1] - psumBig[indexBig][1];
+            }
+
+            
+
+            indexBig++;
+            if (indexBig == psumCountBig)
+                break;
+            indexSmall++;
+            if (indexSmall == psumCountSmall)
+                break;
+
+        } 
+        else if (psumSmall[indexSmall][0] < psumBig[indexBig][0]) {
+
+            indexSmall++;
+            if (indexSmall == psumCountSmall)
+                break;
+
+        } 
+        else if (psumSmall[indexSmall][0] > psumBig[indexBig][0]) {
+
+            indexBig++;
+            if (indexBig == psumCountBig)
+                break;
+        }
+
+    }
+
+    js->destroyScheduler(1);
+    delete js;
+    delete[] mja;
 }
 
 void MergeTables(List<uint64_t>& list, MergeTuple* sortedTable1, uint32_t size1X, MergeTuple* sortedTable2, uint32_t size2X)

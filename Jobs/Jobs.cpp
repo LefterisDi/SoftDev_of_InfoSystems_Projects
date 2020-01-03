@@ -14,13 +14,76 @@
 #include "../templates/vector.hpp"
 #include "../utils/predicates.hpp"
 #include "../JobScheduler/JobScheduler.hpp"
-#include "../utils/String/String.hpp"
+#include "../utils/string.hpp"
 #include "./Jobs.hpp"
 #include "../sortingAlg/quicksort.hpp"
 #include "../utils/utils.hpp"
+#include "../sortingAlg/tablesort.hpp"
 
+pthread_mutex_t mergeJobMutex = PTHREAD_MUTEX_INITIALIZER;
 
 using namespace std;
+
+void MergeJob(void* arg){
+    
+    MergeJobArgs* mja = (MergeJobArgs*)arg;
+
+    uint32_t tableA_index = 0;
+    uint32_t tableB_index = 0;
+    uint32_t tableB_pin   = 0;
+
+    while (tableA_index < mja->size1X)
+    {
+        // If the keys are the same then the pair is inserted in the list
+        if (mja->sortedTable1[tableA_index].key == mja->sortedTable2[tableB_index].key) {
+
+            // We store the 2 uint32_t rowIDs into a single uint64_t integer for better performance.
+            // We combine the two numbers into one by placing the rowID1 in the lift-most 32 bits
+            // and the rowID2 in the right-most 32 bits.
+            uint64_t list_entry = mja->sortedTable1[tableA_index].rowID;
+            list_entry <<= 32;
+            list_entry |= mja->sortedTable2[tableB_index].rowID;
+
+            pthread_mutex_lock(&mergeJobMutex);
+
+            (*mja->list)->ListInsert(list_entry);
+
+            pthread_mutex_unlock(&mergeJobMutex);
+
+            // std::cout << sortedTable1[tableA_index].rowID << " " << sortedTable2[tableB_index].rowID << std::endl;
+            // std::cout << sortedTable1[tableA_index].key << " " << sortedTable2[tableB_index].key << std::endl;
+            // std::cout << std::endl;
+
+            tableB_index++;
+
+            // If the first array has two consecutive elements that are the same and we reach
+            // the end of table 2 while searching pairs for the first of the two elements then
+            // we reset the pointer for the second table so that the remaining element of the
+            // first table gets to be compared with the second array's elements.
+            if (tableB_index == mja->size2X){
+                tableB_index = tableB_pin;
+                tableA_index++;
+            }
+
+        } else if (mja->sortedTable1[tableA_index].key < mja->sortedTable2[tableB_index].key) {
+
+            tableA_index++;
+            if (tableA_index == mja->size1X)
+                break;
+
+            if (mja->sortedTable1[tableA_index-1].key == mja->sortedTable1[tableA_index].key)
+                tableB_index = tableB_pin;
+            else
+                tableB_pin = tableB_index;
+
+        } else if (mja->sortedTable1[tableA_index].key > mja->sortedTable2[tableB_index].key) {
+            tableB_index++;
+            if (tableB_index == mja->size2X){
+                break;
+            }
+        }
+    }
+}
 
 void SortJob(void* arg){
 
@@ -66,6 +129,19 @@ void SortJob(void* arg){
         }
     }
 
+    
+
+    if (sja->key == 0){
+        sja->psum = new uint32_t*[psumCount];
+        for (uint32_t k = 0; k < psumCount ; k++){
+            sja->psum[k] = new uint32_t[2];
+            sja->psum[k][0] = psum[k][0];
+            sja->psum[k][1] = psum[k][1];
+            // cout << "DORT " << psum[k][0] << " " << psum[k][1] << endl;
+        }
+        sja->psumCount = psumCount;
+    }
+
     int table2Ind = 0;
     // Sorting the second array using 8 bits dependent on the key given
     for(int i = 0 ; i < psumCount ; i++) {
@@ -82,43 +158,59 @@ void SortJob(void* arg){
         sja->table1[i] = sja->table2[i];
     }
 
-    JobScheduler* js = new JobScheduler(psumCount , psumCount+1);
-    SortJobArgs* sjaNew = new SortJobArgs[psumCount];
-
     int newKey = sja->key + 1;
 
-    for (int i = 0 ; i < psumCount ; i++) {
-        
-        if (i < psumCount-1){
-            sjaNew[i].table1 = &sja->table2[psum[i][1]];
-            sjaNew[i].table2 = &sja->table1[psum[i][1]];
-            sjaNew[i].size = psum[i+1][1] - psum[i][1];
-            sjaNew[i].key = newKey;
-            sjaNew[i].qsAfterNumOfEntries = sja->qsAfterNumOfEntries;
+    if (sja->key == 0){
+        JobScheduler* js = new JobScheduler(psumCount , psumCount+1);
+        SortJobArgs* sjaNew = new SortJobArgs[psumCount];
 
-            js->addNewJob(&SortJob , (void*)&sjaNew[i]);
+
+        for (int i = 0 ; i < psumCount ; i++) {
+            
+            if (i < psumCount-1){
+                sjaNew[i].table1 = &sja->table2[psum[i][1]];
+                sjaNew[i].table2 = &sja->table1[psum[i][1]];
+                sjaNew[i].size = psum[i+1][1] - psum[i][1];
+                sjaNew[i].key = newKey;
+                sjaNew[i].qsAfterNumOfEntries = sja->qsAfterNumOfEntries;
+
+                js->addNewJob(&SortJob , (void*)&sjaNew[i]);
+            }
+
+            else if (i == psumCount-1){
+                sjaNew[i].table1 = &sja->table2[psum[i][1]];
+                sjaNew[i].table2 = &sja->table1[psum[i][1]];
+                sjaNew[i].size = ((uint32_t)sja->size) - psum[i][1];
+                sjaNew[i].key = newKey;
+                sjaNew[i].qsAfterNumOfEntries = sja->qsAfterNumOfEntries;
+
+                js->addNewJob(&SortJob , (void*)&sjaNew[i]);
+            }
         }
 
-        else if (i == psumCount-1){
-            sjaNew[i].table1 = &sja->table2[psum[i][1]];
-            sjaNew[i].table2 = &sja->table1[psum[i][1]];
-            sjaNew[i].size = ((uint32_t)sja->size) - psum[i][1];
-            sjaNew[i].key = newKey;
-            sjaNew[i].qsAfterNumOfEntries = sja->qsAfterNumOfEntries;
+        js->destroyScheduler(1);
+        delete js;
+        delete[] sjaNew;
 
-            js->addNewJob(&SortJob , (void*)&sjaNew[i]);
+    }
+    else {
+        for (int i = 0 ; i < psumCount ; i++) {
+            if (i < psumCount-1)
+                SimpleSortRec(&sja->table2[psum[i][1]] , &sja->table1[psum[i][1]] , psum[i+1][1] - psum[i][1] , newKey , sja->qsAfterNumOfEntries);
+
+            else if (i == psumCount-1)
+                SimpleSortRec(&sja->table2[psum[i][1]] , &sja->table1[psum[i][1]] , ((uint32_t)sja->size) - psum[i][1] , newKey , sja->qsAfterNumOfEntries);
         }
     }
 
-    js->destroyScheduler(1);
-    delete[] sjaNew;
 }
 
 void QueryJob(void* arg){
 
     QueryJobArgs* qja = (QueryJobArgs*)arg;
     Query* query = qja->query;
-    jd::String resStr = "";
+    str::string resStr = "";
+    // jd::String resStr = "";
     
 
     bool* relExistsInRL = new bool[query->total_rels]();
@@ -155,10 +247,10 @@ void QueryJob(void* arg){
 
         if (sum == 0){
             if (l != query->proj->GetTotalItems()-1){
-                resStr += "NULL ";
+                resStr.append("NULL ");
             }
             else {
-                resStr += "NULL";
+                resStr.append("NULL");
             }
 
         }
@@ -166,18 +258,18 @@ void QueryJob(void* arg){
             if (l != query->proj->GetTotalItems()-1){
                 char buff[21];
                 sprintf(buff, "%" PRIu64, sum);
-                resStr += buff;
-                resStr += " ";
+                resStr.append(buff);
+                resStr.append(" ");
                 
             }
             else {
                 char buff[21];
                 sprintf(buff, "%" PRIu64, sum);
-                resStr += buff;
+                resStr.append(buff);
             }
         }
     }
-    qja->res = resStr;
+    qja->res.assign(resStr);
 
     delete[] relExistsInRL;
     for (uint32_t l = 0 ; l < resList->GetTotalItems() ; l++) {

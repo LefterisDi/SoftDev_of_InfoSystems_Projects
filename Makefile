@@ -4,7 +4,7 @@ PARSER_OBJ = ./opts/getopts.o
 SEARCH_OBJ = ./searchingAlg/binarySearch.o
 SORT_OBJS  = ./sortingAlg/quicksort.o ./sortingAlg/tablesort.o
 TMPL_OBJ   = ./templates/list.o
-UTILS_OBJ  = ./utils/utils.o ./utils/predicates.o ./utils/String/String.o
+UTILS_OBJ  = ./utils/utils.o ./utils/predicates.o 
 JOBS_OBJ   = ./Jobs/Jobs.o ./JobScheduler/JobScheduler.o
 OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(SEARCH_OBJ) $(SORT_OBJS) $(TMPL_OBJ) $(UTILS_OBJ) $(JOBS_OBJ)
 
@@ -14,7 +14,7 @@ PARSER_SRC = ./opts/getopts.cpp
 SEARCH_SRC = ./searchingAlg/binarySearch.cpp
 SORT_SRCS  = ./sortingAlg/quicksort.cpp ./sortingAlg/tablesort.cpp
 TMPL_SRC   = ./templates/list.cpp
-UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp ./utils/predicates.cpp ./utils/String/String.cpp
+UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp ./utils/predicates.cpp
 JOBS_SRC   = ./Jobs/Jobs.cpp ./JobScheduler/JobScheduler.cpp
 SOURCES    = $(MAIN_SRCS) $(PARSER_SRC) $(SEARCH_SRC) $(SORT_SRCS) $(TMPL_SRC) $(UTILS_SRC) $(JOBS_SRC)
 
@@ -24,7 +24,7 @@ PARSER_HDR = ./opts/getopts.hpp
 SEARCH_HDR = ./searchingAlg/binarySearch.hpp
 SORT_HDRS  = ./sortingAlg/quicksort.hpp ./sortingAlg/tablesort.hpp
 TMPL_HDR   = ./templates/list.hpp
-UTILS_HDR  = ./sortingAlg/quicksort.hpp ./searchingAlg/binarySearch.hpp ./utils/predicates.hpp ./utils/String/String.hpp
+UTILS_HDR  = ./sortingAlg/quicksort.hpp ./searchingAlg/binarySearch.hpp ./utils/predicates.hpp ./utils/string.hpp
 JOBS_HDR   = ./Jobs/Jobs.hpp ./JobScheduler/JobScheduler.hpp
 HEADERS    = $(PARSER_HDR) $(RELS_HDR) $(SEARCH_HDR) $(SORT_HDRS) $(TMPL_HDR) $(UTILS_HDR) $(JOBS_HDR)
 
@@ -80,8 +80,6 @@ main.o : main.cpp
 ./JobScheduler/JobScheduler.o : ./JobScheduler/JobScheduler.cpp
 	$(CC) $(DEBUG) $(THREAD_FLAGS) -o ./JobScheduler/JobScheduler.o $(FLAGS) ./JobScheduler/JobScheduler.cpp
 
-./utils/String/String.o : ./utils/String/String.cpp
-	$(CC) $(DEBUG) $(THREAD_FLAGS) -o ./utils/String/String.o $(FLAGS) ./utils/String/String.cpp
 # ------------------------------------------------- #
 
 # Cleaning Files

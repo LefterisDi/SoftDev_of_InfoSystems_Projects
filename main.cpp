@@ -54,8 +54,9 @@ int main(int argc , char* argv[])
 
         }
         js->destroyScheduler(1);
+        delete js;
         for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++){
-            cout << qja[i].res << endl;
+            cout << qja[i].res.c_str() << endl;
         }
         delete batchQueries;
         delete[] qja;

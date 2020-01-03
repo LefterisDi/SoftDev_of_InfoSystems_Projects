@@ -159,6 +159,7 @@ int JobScheduler::destroyScheduler(int flags){
     if(!err) {
         this->deleteScheduler();
     }
+
     return err;
 }
 
