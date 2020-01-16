@@ -75,10 +75,10 @@ main.o : main.cpp
 	$(CC) $(DEBUG) -o ./searchingAlg/binarySearch.o $(FLAGS) ./searchingAlg/binarySearch.cpp
 	
 ./Jobs/Jobs.o : ./Jobs/Jobs.cpp
-	$(CC) $(DEBUG) $(THREAD_FLAGS) -o ./Jobs/Jobs.o $(FLAGS) ./Jobs/Jobs.cpp
+	$(CC) $(DEBUG) -o ./Jobs/Jobs.o                 $(FLAGS) ./Jobs/Jobs.cpp                 $(THREAD_FLAGS)
 	
 ./JobScheduler/JobScheduler.o : ./JobScheduler/JobScheduler.cpp
-	$(CC) $(DEBUG) $(THREAD_FLAGS) -o ./JobScheduler/JobScheduler.o $(FLAGS) ./JobScheduler/JobScheduler.cpp
+	$(CC) $(DEBUG) -o ./JobScheduler/JobScheduler.o $(FLAGS) ./JobScheduler/JobScheduler.cpp $(THREAD_FLAGS)
 
 # ------------------------------------------------- #
 

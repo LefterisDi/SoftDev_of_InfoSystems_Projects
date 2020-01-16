@@ -3,6 +3,7 @@
         "cstdint": "cpp",
         "cstdlib": "cpp",
         "climits": "cpp",
-        "*.tcc": "cpp"
+        "*.tcc": "cpp",
+        "ostream": "cpp"
     }
 }
