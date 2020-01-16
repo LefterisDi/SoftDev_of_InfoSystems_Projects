@@ -11,6 +11,7 @@ typedef struct RelationTable {
     uint64_t   rows;
     uint64_t   cols;
     uint64_t** table;
+    Stats*     colStats;
 } RelationTable;
 
 typedef struct JoinPred {
@@ -49,4 +50,11 @@ typedef struct FullResList {
     List<ResStruct>* tableList;
 } FullResList;
 
+
+typedef struct Stats {
+    uint64_t l_lower;
+    uint64_t u_upper;
+    uint32_t f_all;
+    uint32_t d_distinct;
+}Stats;
 #endif // __RELATION_STRCUS_HEADER__

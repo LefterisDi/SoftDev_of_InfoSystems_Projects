@@ -340,6 +340,28 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
     return queries;
 }
 
+void InitialStats(RelationTable*& relTable , uint N){//NOT FINISHED !!!! DISTINCT VALUES REMAINING
+
+    relTable->colStats = new Stats[relTable->cols];
+    for (uint32_t i = 0 ; i < relTable->cols ; i++){
+
+        relTable->colStats[i].l_lower = relTable->table[i][0];
+        relTable->colStats[i].u_upper = relTable->table[i][0];
+        relTable->colStats[i].f_all = relTable->rows;
+
+        for (uint32_t j = 1; j < relTable->rows; j++){
+            if (relTable->colStats[i].l_lower > relTable->table[i][j]){
+                relTable->colStats[i].l_lower = relTable->table[i][j];
+            }
+            if (relTable->colStats[i].u_upper < relTable->table[i][j]){
+                relTable->colStats[i].u_upper = relTable->table[i][j];
+            }
+        }
+    
+    }
+}
+
+
 List<RelationTable>* ReadRelations(const char* workloads_path)
 {
     char*  line = NULL;
@@ -381,6 +403,10 @@ List<RelationTable>* ReadRelations(const char* workloads_path)
                 fread(&tmp_rel_node->table[i][j], sizeof(uint64_t), 1, rel_fp);
 
         fclose(rel_fp);
+
+        uint N = 50000000;
+
+        InitialStats(tmp_rel_node , N);
 
         relations->ListInsert(*tmp_rel_node);
 
