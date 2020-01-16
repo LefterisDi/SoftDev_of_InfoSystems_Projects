@@ -35,7 +35,7 @@ MAIN_OUT   = main
 CC           = g++
 FLAGS        = -c
 DEBUG        = -g3
-THREAD_FLAGS = -lpthread
+THREAD_FLAGS = -pthread
 
 # ------------------------------------------------- #
 
