@@ -45,6 +45,10 @@ class MiniVector {
         MiniVector() : vCapacity(1) , vSize(0) {
             vArr = new T[vCapacity]();
         }
+
+        MiniVector(uint32_t capacity) : vCapacity(capacity) , vSize(0) {
+            vArr = new T[vCapacity]();
+        }
         
         ~MiniVector(){
             delete[] vArr;

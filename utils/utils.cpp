@@ -57,7 +57,11 @@ void MergeJobFirst(List<uint64_t>** listdp, MergeTuple* sortedTable1, uint32_t r
         
     }
 
-    JobScheduler* js = new JobScheduler(psumCountSmall , psumCountSmall+1);
+    short thread_count = 4;
+    if (psumCountSmall < thread_count){
+        thread_count = psumCountSmall;
+    }
+    JobScheduler* js = new JobScheduler(thread_count , psumCountSmall+1);
     MergeJobArgs* mja = new MergeJobArgs[psumCountSmall];
 
     uint32_t indexBig = 0;

@@ -160,8 +160,12 @@ void SortJob(void* arg){
 
     int newKey = sja->key + 1;
 
-    if (sja->key == 0){
-        JobScheduler* js = new JobScheduler(psumCount , psumCount+1);
+    if (sja->key >= 6){
+        short thread_num = 4;
+        if (psumCount < thread_num){
+            thread_num = psumCount;
+        }
+        JobScheduler* js = new JobScheduler(thread_num , psumCount+1);
         SortJobArgs* sjaNew = new SortJobArgs[psumCount];
 
 

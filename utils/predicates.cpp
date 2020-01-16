@@ -79,14 +79,14 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
 
         existingRel            = new ResStruct;
         existingRel->tableID   = cpred.rel1;
-        existingRel->rowIDvec = new MiniVector<uint64_t>();
+        existingRel->rowIDvec = new MiniVector<uint64_t>(relTable[cpred.rel1]->rows);
 
         for (uint64_t i = 0 ; i < relTable[cpred.rel1]->rows ; i++)
             existingRel->rowIDvec->PushBack(i);
     }
 
     uint32_t totalItems = existingRel->rowIDvec->GetTotalItems();
-    MiniVector<uint64_t> * pvec = new MiniVector<uint64_t>();
+    MiniVector<uint64_t> * pvec = new MiniVector<uint64_t>(totalItems/4);
 
     switch (cpred.comp)
     {
@@ -97,7 +97,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] > cpred.num) == true ) {
-                    pvec->PushBack(i);
+                    pvec->PushBack(rowID);
                     // existingRel->rowIDvec->Remove(i);
                 }
 
@@ -138,7 +138,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] < cpred.num) == true ) {
-                    pvec->PushBack(i);
+                    pvec->PushBack(rowID);
                     // existingRel->rowIDvec->Remove(i);
                 }
 
@@ -165,7 +165,7 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
 
                 if ( (relTable[cpred.rel1]->table[cpred.colRel1][rowID] == cpred.num) == true ) {
-                    pvec->PushBack(i);
+                    pvec->PushBack(rowID);
                     // existingRel->rowIDvec->Remove(i);
                 }
 
@@ -276,14 +276,14 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
 
         existingRel            = new ResStruct;
         existingRel->tableID   = jpred.rel1;
-        existingRel->rowIDvec = new MiniVector<uint64_t>();
+        existingRel->rowIDvec = new MiniVector<uint64_t>(relTable[jpred.rel1]->rows);
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel1]->rows ; i++)
             existingRel->rowIDvec->PushBack(i);
     }
 
     uint32_t totalItems = existingRel->rowIDvec->GetTotalItems();
-    MiniVector<uint64_t> * pvec = new MiniVector<uint64_t>();
+    MiniVector<uint64_t> * pvec = new MiniVector<uint64_t>(totalItems/4);
 
 
     for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
@@ -292,7 +292,7 @@ int JoinSelf(RelationTable** relTable , JoinPred& jpred ,  List<FullResList>* re
 
         if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID] == relTable[jpred.rel2]->table[jpred.colRel2][rowID]) == true ) {
             // existingRel->rowIDvec->Remove(i);
-            pvec->PushBack(i);
+            pvec->PushBack(rowID);
         }
 
         if (i == 0){
@@ -334,14 +334,14 @@ void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred  
 
         existingRel1            = new ResStruct;
         existingRel1->tableID   = jpred.rel1;
-        existingRel1->rowIDvec = new MiniVector<uint64_t>();
+        existingRel1->rowIDvec = new MiniVector<uint64_t>(relTable[jpred.rel1]->rows);
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel1]->rows ; i++)
             existingRel1->rowIDvec->PushBack(i);
 
         existingRel2            = new ResStruct;
         existingRel2->tableID   = jpred.rel2;
-        existingRel2->rowIDvec = new MiniVector<uint64_t>();
+        existingRel2->rowIDvec = new MiniVector<uint64_t>(relTable[jpred.rel2]->rows);
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel2]->rows ; i++)
             existingRel2->rowIDvec->PushBack(i);
@@ -353,7 +353,7 @@ void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred  
 
         existingRel2            = new ResStruct;
         existingRel2->tableID   = jpred.rel2;
-        existingRel2->rowIDvec = new MiniVector<uint64_t>();
+        existingRel2->rowIDvec = new MiniVector<uint64_t>(relTable[jpred.rel2]->rows);
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel2]->rows ; i++)
             existingRel2->rowIDvec->PushBack(i);
@@ -365,7 +365,7 @@ void TablesExistInMidStruct(RelationTable** relTable     , JoinPred&     jpred  
 
         existingRel1            = new ResStruct;
         existingRel1->tableID   = jpred.rel1;
-        existingRel1->rowIDvec = new MiniVector<uint64_t>();
+        existingRel1->rowIDvec = new MiniVector<uint64_t>(relTable[jpred.rel1]->rows);
 
         for (uint64_t i = 0 ; i < relTable[jpred.rel1]->rows ; i++)
             existingRel1->rowIDvec->PushBack(i);
@@ -489,12 +489,13 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
         uint64_t rowID1 = (*existingRel1->rowIDvec)[i];
         uint64_t rowID2 = (*existingRel2->rowIDvec)[i];
 
-        if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID1] == relTable[jpred.rel2]->table[jpred.colRel2][rowID2]) == false ) {
+        if ( (relTable[jpred.rel1]->table[jpred.colRel1][rowID1] == relTable[jpred.rel2]->table[jpred.colRel2][rowID2]) == true ) {
 
             for (uint64_t j = 0 ; j < frl1->tableList->GetTotalItems() ; j++){
                 ResStruct* res =  &( (*(*frl1->tableList)[j])[0] );
                 // res->rowIDvec->Remove(i);
-                pvec[j]->PushBack(i);
+                pvec[j]->PushBack((*res->rowIDvec)[i]);
+
             }
         }
 
@@ -507,13 +508,16 @@ void JoinInSameBucket(RelationTable** relTable , JoinPred& jpred ,  List<FullRes
     for (uint64_t i = 0 ; i < frl1->tableList->GetTotalItems() ; i++){
         pvec[i]->Reverse();
         ResStruct* res =  &( (*(*frl1->tableList)[i])[0] );
-        res->rowIDvec->RemoveManyFromTo(pvec[i]);
+        delete res->rowIDvec;
+        res->rowIDvec = NULL;
+        res->rowIDvec = pvec[i];
+        // res->rowIDvec->RemoveManyFromTo(pvec[i]);
     }
 
 
-    for (uint64_t i = 0 ; i < frl1->tableList->GetTotalItems() ; i++){
-        delete pvec[i];
-    }
+    // for (uint64_t i = 0 ; i < frl1->tableList->GetTotalItems() ; i++){
+    //     delete pvec[i];
+    // }
     delete[] pvec;
 }
 

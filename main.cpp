@@ -8,8 +8,6 @@
 #include <random>
 #include <unistd.h>
 #include <cstdint>
-#include <semaphore.h> 
-
 
 #include "./opts/getopts.hpp"
 #include "./utils/predicates.hpp"
@@ -43,7 +41,7 @@ int main(int argc , char* argv[])
 
     while( (batchQueries = ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList) ) != NULL )
     {
-        JobScheduler* js = new JobScheduler(batchQueries->GetTotalItems() , batchQueries->GetTotalItems()+1);
+        JobScheduler* js = new JobScheduler(4 , batchQueries->GetTotalItems()+1);
         QueryJobArgs* qja = new QueryJobArgs[batchQueries->GetTotalItems()];
         for (uint32_t i = 0; i < batchQueries->GetTotalItems() ; i++)
         {   
