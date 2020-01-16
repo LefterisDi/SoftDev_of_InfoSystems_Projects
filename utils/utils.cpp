@@ -394,14 +394,8 @@ void InitialStats(RelationTable*& relTable, uint32_t N)
         
             distinctVal = new bool[relTable->colStats[i].u_upper - relTable->colStats[i].l_lower + 1]();
         
-            // cout << endl << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << relTable->colStats[i].u_upper - relTable->colStats[i].l_lower + 1 << endl;
-            // cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << relTable->rows << endl;
-            for (uint32_t j = 0; j < relTable->rows; j++) {
-                // cout << relTable->colStats[i].u_upper - relTable->table[i][j] << endl;
-                // cout << "\t" << relTable->colStats[i].u_upper << endl;
-                // cout << "\t\t" << relTable->table[i][j] << endl;
+            for (uint32_t j = 0; j < relTable->rows; j++)
                 distinctVal[relTable->colStats[i].u_upper - relTable->table[i][j]] = true;
-            }
         }
     }
 }
