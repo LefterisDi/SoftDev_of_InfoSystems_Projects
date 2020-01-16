@@ -6,6 +6,13 @@
 #include "../templates/list.hpp"
 #include "../templates/vector.hpp"
 
+typedef struct Stats {
+    uint64_t l_lower;
+    uint64_t u_upper;
+    uint32_t f_all;
+    uint32_t d_distinct;
+}Stats;
+
 typedef struct RelationTable {
     uint32_t   tableID;
     uint64_t   rows;
@@ -51,10 +58,5 @@ typedef struct FullResList {
 } FullResList;
 
 
-typedef struct Stats {
-    uint64_t l_lower;
-    uint64_t u_upper;
-    uint32_t f_all;
-    uint32_t d_distinct;
-}Stats;
+
 #endif // __RELATION_STRCUS_HEADER__

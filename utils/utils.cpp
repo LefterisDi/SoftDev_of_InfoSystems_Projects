@@ -10,6 +10,8 @@
 #include "../JobScheduler/JobScheduler.hpp"
 #include "../Jobs/Jobs.hpp"
 
+using namespace std;
+
 uint32_t BitConversion(uint64_t num, uint32_t key)
 {//key must be between 0 and 7
     return ( ( (1 << 8) - 1) & (num >> ((7-key) * 8) ) );
@@ -340,8 +342,9 @@ List<Query>* ReadQueryBatches(const char* workloads_path, const char* queries_pa
     return queries;
 }
 
-void InitialStats(RelationTable*& relTable , uint N){//NOT FINISHED !!!! DISTINCT VALUES REMAINING
+void InitialStats(RelationTable*& relTable , unsigned int N){
 
+    bool* distinctVal = NULL;
     relTable->colStats = new Stats[relTable->cols];
     for (uint32_t i = 0 ; i < relTable->cols ; i++){
 
@@ -357,7 +360,19 @@ void InitialStats(RelationTable*& relTable , uint N){//NOT FINISHED !!!! DISTINC
                 relTable->colStats[i].u_upper = relTable->table[i][j];
             }
         }
-    
+
+        if (relTable->colStats[i].u_upper - relTable->colStats[i].l_lower + 1 > N){
+            distinctVal = new bool[N]();
+            for (uint32_t j = 0; j < relTable->rows; j++){
+                distinctVal[ (relTable->table[i][j] - relTable->colStats->l_lower)%N ] = true;
+            }
+        }
+        else {
+            distinctVal = new bool[relTable->colStats[i].u_upper - relTable->colStats[i].l_lower + 1]();
+            for (uint32_t j = 0; j < relTable->rows; j++){
+                distinctVal[relTable->colStats->u_upper - relTable->table[i][j]] = true;
+            }
+        }
     }
 }
 
@@ -404,7 +419,7 @@ List<RelationTable>* ReadRelations(const char* workloads_path)
 
         fclose(rel_fp);
 
-        uint N = 50000000;
+        unsigned int N = (unsigned int)50000000;
 
         InitialStats(tmp_rel_node , N);
 
