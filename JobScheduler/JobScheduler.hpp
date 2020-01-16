@@ -27,7 +27,6 @@ typedef struct Job{
     Job *queue;
     int threadCount;
     int amountOfJobs;
-    int finished;
     int tail;
     int head;
     int count;
@@ -38,6 +37,8 @@ typedef struct Job{
     int deleteScheduler();
 
   public:
+    int finished = 0;
+
     JobScheduler(int, int);
     int waitAllTasks(int = 1);
     int addNewJob(void (*)(void *), void *);

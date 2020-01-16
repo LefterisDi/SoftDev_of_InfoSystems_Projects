@@ -603,7 +603,7 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
     if (psumCount1 != 0 && psumCount2 != 0){
         
         MergeJobFirst(&doubleKeyList, sortedTable1 , rowNum1 , sortedTable2 , rowNum2 , psum1 , psumCount1 , psum2 , psumCount2);
-        MergeTables(*doubleKeyList, sortedTable1 , rowNum1 , sortedTable2 , rowNum2);
+        // MergeTables(*doubleKeyList, sortedTable1 , rowNum1 , sortedTable2 , rowNum2);
     }
     else {
         MergeTables(*doubleKeyList, sortedTable1 , rowNum1 , sortedTable2 , rowNum2);

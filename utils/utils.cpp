@@ -85,7 +85,7 @@ void MergeJobFirst(List<uint64_t>** listdp, MergeTuple* sortedTable1, uint32_t r
                 mja[indexSmall].size2X = psumBig[indexBig + 1][1] - psumBig[indexBig][1];
             }
 
-            
+            js->addNewJob(&MergeJob , (void*)&mja[indexSmall]);
 
             indexBig++;
             if (indexBig == psumCountBig)
