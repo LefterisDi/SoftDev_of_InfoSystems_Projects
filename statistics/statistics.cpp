@@ -67,16 +67,19 @@ void InitialStats(RelationTable*& relTable, uint32_t N)
     uint32_t mod = relTable->rows * 4;
 
     bool* hash = (bool*)calloc(mod, sizeof(bool)); 
+    
+    uint64_t** tb = relTable->table;
 
-    for (uint32_t i = 0; i < relTable->cols; i++) 
+    uint64_t rows = relTable->rows;
+    uint64_t cols = relTable->cols;
+
+    for (uint32_t i = 0; i < cols; i++) 
     {
-        memset(hash,0,mod*sizeof(bool));    
+        memset(hash,0,mod*sizeof(bool));
 
         uint32_t distincts = 0;
 
-        uint64_t** tb = relTable->table;
-
-        for (int j = 0 ; j < relTable->rows ; j++) {
+        for (int j = 0 ; j < rows ; j++) {
             
             uint32_t hpos = (hash_val + tb[i][j]) % mod;
 
