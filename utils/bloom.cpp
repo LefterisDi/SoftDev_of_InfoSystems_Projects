@@ -194,12 +194,13 @@ int main() {
 
     // uint64_t** tb = reltb.table;
 
-    BloomFilter bf(int(reltb.rows * 4), hashFunctions);
+    BloomFilter bf(reltb.rows * 4, hashFunctions);
 
     // List<uint64_t>* dist = new List<uint64_t>(sizeof(uint64_t), sizeof(uint64_t));
 
     // std::vector<uint64_t> dist;
     std::unordered_map<uint64_t,bool> distincts;
+    // uint32_t distincts = reltb.rows;
 
     // for (int i = 0; i < reltb->cols; i++)
         // for (int j = 0; j < reltb->rows; j++)
@@ -210,11 +211,13 @@ int main() {
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     for (int i = 0 ; i < reltb.rows ; i++) {
-        if ( bf.addElement( reltb.table[0][i] ) )
-            distincts.erase(reltb.table[0][i]);
-        else {
-            distincts[reltb.table[0][i]] = 1;
-        }
+        // distincts -= bf.addElement( reltb.table[0][i] );
+        // std::cout << bf.addElement( reltb.table[0][i] ) << std::endl;
+        // if ( bf.addElement( reltb.table[0][i] ) )
+        //     distincts.erase(reltb.table[0][i]);
+        // else {
+        distincts[reltb.table[0][i]] = 1;
+        // }
         // std::cout << "\t" + reltb.table[0][i] << std::endl;
     }
 
