@@ -1,10 +1,10 @@
-#include <iostream>
-#include <string>
-#include <cstring>
-#include <vector>
-#include <iterator>
-#include <unordered_map>
 #include <chrono>
+#include <cstring>
+#include <iostream>
+#include <iterator>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 // #include "utils.hpp"
 #include "relationStructs.hpp"
@@ -188,7 +188,6 @@ int main() {
     // hashFunctions.push_back(SuperFastHash);
 
     List<RelationTable>* rel1 = ReadRelations("./workloads/medium");
-    
 
     RelationTable& reltb = (*rel1->GetFirst())[0];
 
@@ -213,11 +212,11 @@ int main() {
     for (int i = 0 ; i < reltb.rows ; i++) {
         // distincts -= bf.addElement( reltb.table[0][i] );
         // std::cout << bf.addElement( reltb.table[0][i] ) << std::endl;
-        // if ( bf.addElement( reltb.table[0][i] ) )
-        //     distincts.erase(reltb.table[0][i]);
-        // else {
-        distincts[reltb.table[0][i]] = 1;
-        // }
+        if ( bf.addElement( reltb.table[0][i] ) )
+            distincts.erase(reltb.table[0][i]);
+        else {
+            distincts[reltb.table[0][i]] = 1;
+        }
         // std::cout << "\t" + reltb.table[0][i] << std::endl;
     }
 
