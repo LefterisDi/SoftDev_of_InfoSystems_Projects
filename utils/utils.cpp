@@ -9,6 +9,7 @@
 #include "../templates/vector.hpp"
 #include "../JobScheduler/JobScheduler.hpp"
 #include "../Jobs/Jobs.hpp"
+#include "../statistics/statistics.hpp"
 
 using namespace std;
 
@@ -358,48 +359,6 @@ List<Query> *ReadQueryBatches(const char *workloads_path, const char *queries_pa
     return queries;
 }
 
-void InitialStats(RelationTable*& relTable, uint32_t N)
-{
-    bool *distinctVal  = NULL;
-    relTable->colStats = new Stats[relTable->cols];
-
-    for (uint32_t i = 0; i < relTable->cols; i++) 
-    {
-        relTable->colStats[i].l_lower = relTable->table[i][0];
-        relTable->colStats[i].u_upper = relTable->table[i][0];
-        relTable->colStats[i].f_all   = relTable->rows;
-
-        for (uint32_t j = 1 ; j < relTable->rows ; j++) {
-
-            if (relTable->colStats[i].l_lower > relTable->table[i][j])
-                relTable->colStats[i].l_lower = relTable->table[i][j];
-            
-            if (relTable->colStats[i].u_upper < relTable->table[i][j])
-                relTable->colStats[i].u_upper = relTable->table[i][j];
-        }
-
-        // if (distinctVal != NULL) {
-        //     delete[] distinctVal;
-        //     distinctVal = NULL;
-        // }
-
-        if (relTable->colStats[i].u_upper - relTable->colStats[i].l_lower + 1 > N) {
-
-            distinctVal = new bool[N]();
-        
-            for (uint32_t j = 0; j < relTable->rows; j++)
-                distinctVal[(relTable->table[i][j] - relTable->colStats->l_lower) % N] = true;
-        
-        } else {
-        
-            distinctVal = new bool[relTable->colStats[i].u_upper - relTable->colStats[i].l_lower + 1]();
-        
-            for (uint32_t j = 0; j < relTable->rows; j++)
-                distinctVal[relTable->colStats[i].u_upper - relTable->table[i][j]] = true;
-        }
-    }
-}
-
 List<RelationTable>* ReadRelations(const char *workloads_path)
 {
     char *line = NULL;
@@ -441,9 +400,9 @@ List<RelationTable>* ReadRelations(const char *workloads_path)
 
         fclose(rel_fp);
 
-        // unsigned int N = (unsigned int)50000000;
+        uint32_t N = (uint32_t)50000000;
 
-        // InitialStats(tmp_rel_node, N);
+        InitialStats(tmp_rel_node, N);
 
         relations->ListInsert(*tmp_rel_node);
 

@@ -6,7 +6,8 @@ SORT_OBJS  = ./sortingAlg/quicksort.o ./sortingAlg/tablesort.o
 TMPL_OBJ   = ./templates/list.o
 UTILS_OBJ  = ./utils/utils.o ./utils/predicates.o 
 JOBS_OBJ   = ./Jobs/Jobs.o ./JobScheduler/JobScheduler.o
-OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(SEARCH_OBJ) $(SORT_OBJS) $(TMPL_OBJ) $(UTILS_OBJ) $(JOBS_OBJ)
+STATS_OBJ  = ./statistics/statistics.o
+OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(SEARCH_OBJ) $(SORT_OBJS) $(TMPL_OBJ) $(UTILS_OBJ) $(JOBS_OBJ) $(STATS_OBJ)
 
 # SOURCES
 MAIN_SRC   = main.cpp
@@ -15,8 +16,9 @@ SEARCH_SRC = ./searchingAlg/binarySearch.cpp
 SORT_SRCS  = ./sortingAlg/quicksort.cpp ./sortingAlg/tablesort.cpp
 TMPL_SRC   = ./templates/list.cpp
 UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp ./utils/predicates.cpp
+STATS_SRC  = ./statistics/statistics.cpp
 JOBS_SRC   = ./Jobs/Jobs.cpp ./JobScheduler/JobScheduler.cpp
-SOURCES    = $(MAIN_SRCS) $(PARSER_SRC) $(SEARCH_SRC) $(SORT_SRCS) $(TMPL_SRC) $(UTILS_SRC) $(JOBS_SRC)
+SOURCES    = $(MAIN_SRCS) $(PARSER_SRC) $(SEARCH_SRC) $(SORT_SRCS) $(TMPL_SRC) $(UTILS_SRC) $(JOBS_SRC) $(STATS_SRC)
 
 # HEADERS
 RELS_HDR   = ./utils/relationStructs.hpp
@@ -25,8 +27,9 @@ SEARCH_HDR = ./searchingAlg/binarySearch.hpp
 SORT_HDRS  = ./sortingAlg/quicksort.hpp ./sortingAlg/tablesort.hpp
 TMPL_HDR   = ./templates/list.hpp
 UTILS_HDR  = ./sortingAlg/quicksort.hpp ./searchingAlg/binarySearch.hpp ./utils/predicates.hpp ./utils/string.hpp
+STATS_HDR  = ./statistics/statistics.hpp
 JOBS_HDR   = ./Jobs/Jobs.hpp ./JobScheduler/JobScheduler.hpp
-HEADERS    = $(PARSER_HDR) $(RELS_HDR) $(SEARCH_HDR) $(SORT_HDRS) $(TMPL_HDR) $(UTILS_HDR) $(JOBS_HDR)
+HEADERS    = $(PARSER_HDR) $(RELS_HDR) $(SEARCH_HDR) $(SORT_HDRS) $(TMPL_HDR) $(UTILS_HDR) $(JOBS_HDR) $(STATS_HDR)
 
 # EXECUTABLES
 MAIN_OUT   = main
@@ -79,6 +82,9 @@ main.o : main.cpp
 	
 ./JobScheduler/JobScheduler.o : ./JobScheduler/JobScheduler.cpp
 	$(CC) $(DEBUG) -o ./JobScheduler/JobScheduler.o $(FLAGS) ./JobScheduler/JobScheduler.cpp $(THREAD_FLAGS)
+	
+./statistics/statistics.o : ./statistics/statistics.cpp
+	$(CC) $(DEBUG) -o ./statistics/statistics.o $(FLAGS) ./statistics/statistics.cpp
 
 # ------------------------------------------------- #
 
