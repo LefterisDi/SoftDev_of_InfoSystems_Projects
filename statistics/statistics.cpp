@@ -280,3 +280,39 @@ void SelfJoinStats(RelationTable*& relTable , uint64_t rowNum){
         }
     }
 }
+
+int JoinStats(RelationTable*& relTable1 , RelationTable*& relTable2 , uint64_t rowNum1 , uint64_t rowNum2){//NOT FINISHED??!?!?!?!?!?!!!!?!!?!?
+
+    uint64_t new_lower;
+    uint64_t new_upper;
+
+    if (relTable1->colStats[rowNum1].l_lower > relTable2->colStats[rowNum2].l_lower){
+        new_lower = relTable1->colStats[rowNum1].l_lower;
+    }
+    else {
+        new_lower = relTable2->colStats[rowNum2].l_lower;
+    }
+
+    if (relTable1->colStats[rowNum1].u_upper < relTable2->colStats[rowNum2].u_upper){
+        new_upper = relTable1->colStats[rowNum1].u_upper;
+    }
+    else {
+        new_upper = relTable2->colStats[rowNum2].u_upper;
+    }
+
+    if (new_lower > new_upper){
+        return 1;
+    } 
+
+    FilterBetweenTwoValsStats(relTable1 , rowNum1 , new_lower , new_upper);
+    FilterBetweenTwoValsStats(relTable2 , rowNum2 , new_lower , new_upper);
+
+    relTable1->colStats[rowNum1].l_lower = new_lower;
+    relTable1->colStats[rowNum2].l_lower = new_lower;
+
+    relTable1->colStats[rowNum1].u_upper = new_upper;
+    relTable1->colStats[rowNum1].u_upper = new_upper;
+
+
+    return 0;
+}
