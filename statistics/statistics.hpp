@@ -4,5 +4,6 @@
 #include "../utils/relationStructs.hpp"
 
 void InitialStats(RelationTable*&, uint32_t);
+void _InitialStats(RelationTable*&, uint32_t);
 
 #endif

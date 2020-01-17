@@ -1,59 +1,101 @@
 #include "../utils/relationStructs.hpp"
 #include "../utils/utils.hpp"
 
+#include <unordered_map>
+#include <vector>
+#include <cstring>
+
+typedef unsigned int (*HashFunction)(uint64_t);
+
+class BloomFilter {
+    unsigned int numberOfCells;
+    unsigned int numberOfFunctions;
+    bool* cell;
+    // std::vector<HashFunction> hashFunctions;
+    unsigned int (*hash)(uint64_t);
+
+public:
+
+    BloomFilter(unsigned int numbCells, unsigned int (*hf)(uint64_t)) : numberOfCells(numbCells), hash(hf) {
+        cell = (bool*)calloc(numbCells, sizeof(bool));
+    }
+
+    bool addElement(uint64_t str) {
+        bool ret = true;
+        // for (std::vector<HashFunction>::iterator iter = hashFunctions.begin(); iter != hashFunctions.end(); iter++) {
+        uint32_t pos = hash(str) % numberOfCells;
+
+        ret &= cell[pos];
+        cell[pos] = true;
+        // }
+        return ret;
+    }
+
+    // bool searchElement(uint64_t str) {
+    //     bool strInSet = true;
+
+    //     for (std::vector<HashFunction>::iterator iter = hashFunctions.begin(); iter != hashFunctions.end(); iter++) {
+    //         if (cell[(*iter)(str) % numberOfCells] == false) {
+    //             strInSet = false;
+    //             break;
+    //         }
+    //     }
+
+    //     return strInSet;
+    // }
+
+    ~BloomFilter() {
+        free(cell);
+        cell = NULL;
+    }
+};
+
+unsigned int sdbm(uint64_t str) {
+    unsigned int hash = 1254;
+
+    hash = ((hash << 7) + (hash << 12) - (hash >> 5) ) + str;
+
+    return hash;
+}
+
 void InitialStats(RelationTable*& relTable, uint32_t N)
 {
-    bool *distinctVal  = NULL;
-    uint32_t boolTableSize = 0;
-    uint64_t criteria = 0;
-    relTable->colStats = new Stats[relTable->cols];
+    // hash = 1254;
+
+    uint32_t hash_val = ((1254 << 7) + (1254 << 12) - (1254 >> 5) );
+
+    uint32_t mod = relTable->rows * 4;
+
+    bool* hash = (bool*)calloc(mod, sizeof(bool)); 
 
     for (uint32_t i = 0; i < relTable->cols; i++) 
     {
-        relTable->colStats[i].l_lower = relTable->table[i][0];
-        relTable->colStats[i].u_upper = relTable->table[i][0];
-        relTable->colStats[i].f_all   = relTable->rows;
+        memset(hash,0,mod*sizeof(bool));    
 
-        for (uint32_t j = 1 ; j < relTable->rows ; j++) {
+        uint32_t distincts = 0;
 
-            if (relTable->colStats[i].l_lower > relTable->table[i][j])
-                relTable->colStats[i].l_lower = relTable->table[i][j];
+        uint64_t** tb = relTable->table;
+
+        for (int j = 0 ; j < relTable->rows ; j++) {
             
-            if (relTable->colStats[i].u_upper < relTable->table[i][j])
-                relTable->colStats[i].u_upper = relTable->table[i][j];
-        }
+            uint32_t hpos = (hash_val + tb[i][j]) % mod;
 
-        if (relTable->colStats[i].u_upper - relTable->colStats[i].l_lower + 1 > N) {
-
-            boolTableSize = N;
-            relTable->colStats[i].N = N;
-            distinctVal = new bool[N]();
-
-        
-            for (uint32_t j = 0; j < relTable->rows; j++)
-                distinctVal[(relTable->table[i][j] - relTable->colStats->l_lower) % N] = true;
-        
-        } else {
-        
-            boolTableSize = relTable->colStats[i].u_upper - relTable->colStats[i].l_lower + 1;
-            relTable->colStats[i].N = 0;
-            distinctVal = new bool[boolTableSize]();
-
-            for (uint32_t j = 0; j < relTable->rows; j++)
-                distinctVal[relTable->colStats[i].u_upper - relTable->table[i][j]] = true;
-        }
-
-        for (uint32_t k = 0 ; k < boolTableSize ; k++){
-            if (distinctVal[k] == true){
-                relTable->colStats[i].d_distinct++;
+            if ( hash[hpos] ) {
+                hash[hpos] = false;
+                distincts--;
+            }
+            else {
+                hash[hpos] = true;
+                distincts++;
             }
         }
-
-        relTable->colStats[i].distinctArray = distinctVal;
         
-        distinctVal = NULL;
-        boolTableSize = 0;
+        // std::cout << std::endl << relTable->rows << std::endl;
+        // std::cout << distincts << std::endl;
+
     }
+    
+    free(hash);
 }
 
 void _InitialStats(RelationTable*& relTable, uint32_t N)
@@ -108,6 +150,10 @@ void _InitialStats(RelationTable*& relTable, uint32_t N)
         
         distinctVal = NULL;
         boolTableSize = 0;
+
+        
+        // std::cout << std::endl << relTable->rows << std::endl;
+        // std::cout << relTable->colStats[i].d_distinct << std::endl;
     }
 }
 
