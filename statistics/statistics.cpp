@@ -60,15 +60,25 @@ unsigned int sdbm(uint64_t str) {
 
 void InitialStats(RelationTable*& relTable, uint32_t N)
 {
+    // hash = 1254;
+
+    uint32_t hash_val = ((1254 << 7) + (1254 << 12) - (1254 >> 5) );
+
+    uint32_t mod = relTable->rows * 4;
+
+    bool* hash = (bool*)calloc(mod, sizeof(bool)); 
+
     for (uint32_t i = 0; i < relTable->cols; i++) 
     {
-        bool* hash = (bool*)calloc(relTable->rows * 4, sizeof(bool)); 
+        memset(hash,0,mod*sizeof(bool));    
 
         uint32_t distincts = 0;
 
+        uint64_t** tb = relTable->table;
+
         for (int j = 0 ; j < relTable->rows ; j++) {
             
-            uint32_t hpos = sdbm( relTable->table[i][j] )  % (relTable->rows * 4);
+            uint32_t hpos = (hash_val + tb[i][j]) % mod;
 
             if ( hash[hpos] ) {
                 hash[hpos] = false;
@@ -80,8 +90,70 @@ void InitialStats(RelationTable*& relTable, uint32_t N)
             }
         }
         
-        std::cout << std::endl << relTable->rows << std::endl;
-        std::cout << distincts << std::endl;
+        // std::cout << std::endl << relTable->rows << std::endl;
+        // std::cout << distincts << std::endl;
+
+    }
+    
+    free(hash);
+}
+
+void _InitialStats(RelationTable*& relTable, uint32_t N)
+{
+    bool *distinctVal  = NULL;
+    uint32_t boolTableSize = 0;
+    uint64_t criteria = 0;
+    relTable->colStats = new Stats[relTable->cols];
+
+    for (uint32_t i = 0; i < relTable->cols; i++) 
+    {
+        relTable->colStats[i].l_lower = relTable->table[i][0];
+        relTable->colStats[i].u_upper = relTable->table[i][0];
+        relTable->colStats[i].f_all   = relTable->rows;
+
+        for (uint32_t j = 1 ; j < relTable->rows ; j++) {
+
+            if (relTable->colStats[i].l_lower > relTable->table[i][j])
+                relTable->colStats[i].l_lower = relTable->table[i][j];
+            
+            if (relTable->colStats[i].u_upper < relTable->table[i][j])
+                relTable->colStats[i].u_upper = relTable->table[i][j];
+        }
+
+        if (relTable->colStats[i].u_upper - relTable->colStats[i].l_lower + 1 > N) {
+
+            boolTableSize = N;
+            relTable->colStats[i].N = N;
+            distinctVal = new bool[N]();
+
+        
+            for (uint32_t j = 0; j < relTable->rows; j++)
+                distinctVal[(relTable->table[i][j] - relTable->colStats->l_lower) % N] = true;
+        
+        } else {
+        
+            boolTableSize = relTable->colStats[i].u_upper - relTable->colStats[i].l_lower + 1;
+            relTable->colStats[i].N = 0;
+            distinctVal = new bool[boolTableSize]();
+
+            for (uint32_t j = 0; j < relTable->rows; j++)
+                distinctVal[relTable->colStats[i].u_upper - relTable->table[i][j]] = true;
+        }
+
+        for (uint32_t k = 0 ; k < boolTableSize ; k++){
+            if (distinctVal[k] == true){
+                relTable->colStats[i].d_distinct++;
+            }
+        }
+
+        relTable->colStats[i].distinctArray = distinctVal;
+        
+        distinctVal = NULL;
+        boolTableSize = 0;
+
+        
+        // std::cout << std::endl << relTable->rows << std::endl;
+        // std::cout << relTable->colStats[i].d_distinct << std::endl;
     }
 }
 
