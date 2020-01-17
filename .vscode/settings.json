@@ -5,6 +5,12 @@
         "climits": "cpp",
         "*.tcc": "cpp",
         "ostream": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "iostream": "cpp",
+        "bitset": "cpp",
+        "memory": "cpp",
+        "system_error": "cpp",
+        "type_traits": "cpp",
+        "xstring": "cpp"
     }
 }
