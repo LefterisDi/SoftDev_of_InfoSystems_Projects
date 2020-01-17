@@ -17,5 +17,5 @@ uint32_t             BitConversion   (uint64_t, uint32_t);
 void                 SwitchElements  (uint64_t **, uint32_t, uint32_t, uint32_t);
 void                 MergeTables     (List<uint64_t> &, MergeTuple*, uint32_t, MergeTuple*, uint32_t);
 void MergeJobFirst(List<uint64_t>**, MergeTuple*, uint32_t, MergeTuple*, uint32_t ,uint32_t** , uint32_t , uint32_t** , uint32_t);
-
+uint64_t raiseToPower( uint64_t, uint64_t = 0 );
 #endif // __UTILS_HEADER__

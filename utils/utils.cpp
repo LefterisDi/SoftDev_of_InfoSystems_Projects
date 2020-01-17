@@ -413,3 +413,9 @@ List<RelationTable>* ReadRelations(const char *workloads_path)
 
     return relations;
 }
+
+uint64_t raiseToPower( uint64_t val, uint64_t pow=0 ) {
+	if ( pow <= 0 )
+		return 1;
+	return val * raiseToPower( val, pow-1 );
+}
