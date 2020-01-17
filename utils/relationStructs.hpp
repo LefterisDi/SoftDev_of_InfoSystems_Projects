@@ -11,6 +11,8 @@ typedef struct Stats {
     uint64_t u_upper;
     uint32_t f_all;
     uint32_t d_distinct;
+    bool*    distinctArray;
+    uint32_t N;
 }Stats;
 
 typedef struct RelationTable {
