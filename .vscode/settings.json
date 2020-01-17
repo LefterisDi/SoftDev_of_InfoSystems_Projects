@@ -4,6 +4,7 @@
         "cstdlib": "cpp",
         "climits": "cpp",
         "*.tcc": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "vector": "cpp"
     }
 }

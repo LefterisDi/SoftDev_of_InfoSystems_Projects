@@ -4,6 +4,7 @@
 #include <vector>
 #include <iterator>
 #include <unordered_map>
+#include <chrono>
 
 // #include "utils.hpp"
 #include "relationStructs.hpp"
@@ -25,10 +26,13 @@ public:
         cell = (bool*)calloc(numbCells, sizeof(bool));
     }
 
-    void addElement(uint64_t str) {
+    bool addElement(uint64_t str) {
+        bool ret = true;
         for (std::vector<HashFunction>::iterator iter = hashFunctions.begin(); iter != hashFunctions.end(); iter++) {
+            ret &= cell[(*iter)(str) % numberOfCells];
             cell[(*iter)(str) % numberOfCells] = true;
         }
+        return ret;
     }
 
     bool searchElement(uint64_t str) {
@@ -63,13 +67,14 @@ unsigned int djb2(uint64_t str) {
 }
 
 unsigned int sdbm(uint64_t str) {
-    unsigned int hash = 1254;
+    unsigned int hash = 0;
 
     // for (std::string::iterator iter = str.begin(); iter != str.end(); iter++) {
         // hash = ((hash << 5) + hash) + (str >> 10) - (str << 3);
         hash = ((hash << 7) + (hash << 12) - (hash >> 5) ) + str;
     // }
 
+    // std::cout << hash << std::endl;
     return hash;
 }
 
@@ -178,15 +183,18 @@ List<RelationTable>* ReadRelations(const char *workloads_path)
 int main() {
     // create bloom filter
     std::vector<HashFunction> hashFunctions;
-    hashFunctions.push_back(djb2);
+    // hashFunctions.push_back(djb2);
     hashFunctions.push_back(sdbm);
-    hashFunctions.push_back(SuperFastHash);
+    // hashFunctions.push_back(SuperFastHash);
 
     List<RelationTable>* rel1 = ReadRelations("./workloads/medium");
     
+
     RelationTable& reltb = (*rel1->GetFirst())[0];
 
-    BloomFilter bf(int(reltb.rows * 6), hashFunctions);
+    // uint64_t** tb = reltb.table;
+
+    BloomFilter bf(int(reltb.rows * 4), hashFunctions);
 
     // List<uint64_t>* dist = new List<uint64_t>(sizeof(uint64_t), sizeof(uint64_t));
 
@@ -198,16 +206,21 @@ int main() {
             // fread(&reltb->table[i][j], sizeof(uint64_t), 1, rel_fp);
 
     std::cout << reltb.rows << std::endl;
+    
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     for (int i = 0 ; i < reltb.rows ; i++) {
-        if ( bf.searchElement( reltb.table[0][i] ) )
+        if ( bf.addElement( reltb.table[0][i] ) )
             distincts.erase(reltb.table[0][i]);
         else {
-            bf.addElement( reltb.table[0][i] );
             distincts[reltb.table[0][i]] = 1;
         }
         // std::cout << "\t" + reltb.table[0][i] << std::endl;
     }
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    
+    std::cout << "Time difference (sec) = " << (std::chrono::duration_cast<std::chrono::microseconds>(end - begin).count()) / 1000000.0 << std::endl;
     
     // // testing a set of strings against the bloom filter
     // for (std::vector<std::string>::iterator iter = testSetOfStrings.begin(); iter != testSetOfStrings.end(); iter++) {
