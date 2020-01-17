@@ -400,7 +400,7 @@ void InitialStats(RelationTable*& relTable, uint32_t N)
     }
 }
 
-List<RelationTable> *ReadRelations(const char *workloads_path)
+List<RelationTable>* ReadRelations(const char *workloads_path)
 {
     char *line = NULL;
     size_t len = 0;
@@ -411,7 +411,6 @@ List<RelationTable> *ReadRelations(const char *workloads_path)
 
     while (getline(&line, &len, stdin) != -1)
     {
-
         RelationTable *tmp_rel_node = new RelationTable;
 
         char rel_path[work_len + strlen(line) + 2];
@@ -442,9 +441,9 @@ List<RelationTable> *ReadRelations(const char *workloads_path)
 
         fclose(rel_fp);
 
-        unsigned int N = (unsigned int)50000000;
+        // unsigned int N = (unsigned int)50000000;
 
-        InitialStats(tmp_rel_node, N);
+        // InitialStats(tmp_rel_node, N);
 
         relations->ListInsert(*tmp_rel_node);
 
