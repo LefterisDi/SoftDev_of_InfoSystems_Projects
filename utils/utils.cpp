@@ -21,11 +21,8 @@ uint32_t BitConversion(uint64_t num, uint32_t key)
 
 void SwitchElements(uint64_t **tableMain, uint32_t sizeY, uint32_t firstElem, uint32_t secondElem)
 {
-    uint64_t temp;
-
-    for (uint32_t k = 0; k < sizeY; k++)
-    {
-        temp = tableMain[k][firstElem];
+    for (uint32_t k = 0; k < sizeY; k++) {
+        uint64_t temp = tableMain[k][firstElem];
         tableMain[k][firstElem] = tableMain[k][secondElem];
         tableMain[k][secondElem] = temp;
     }
@@ -415,7 +412,7 @@ List<RelationTable>* ReadRelations(const char *workloads_path)
         delete tmp_rel_node;
     }
 
-    free(line);
+    free(line);     
 
     return relations;
 }
