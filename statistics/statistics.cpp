@@ -86,8 +86,8 @@ void InitialStats(RelationTable*& relTable, uint32_t N)
             if ( hash[hpos] ) {
                 hash[hpos] = false;
                 distincts--;
-            
-            } else {
+            }
+            else {
                 hash[hpos] = true;
                 distincts++;
             }
@@ -97,6 +97,7 @@ void InitialStats(RelationTable*& relTable, uint32_t N)
         // std::cout << distincts << std::endl;
 
     }
+    
     free(hash);
 }
 
@@ -250,7 +251,7 @@ void FilterBetweenTwoColumnsStats(RelationTable*& relTable , uint64_t rowNum1 , 
     relTable->colStats[rowNum2].f_all = relTable->colStats[rowNum1].f_all;
 
     relTable->colStats[rowNum1].d_distinct = \
-            relTable->colStats[rowNum1].d_distinct * (1 - raiseToPower( (1 -  (relTable->colStats[rowNum1].f_all / f_all_old) ) , f_all_old / relTable->colStats[rowNum1].d_distinct) );
+            relTable->colStats[rowNum1].d_distinct * (1 - raiseToPower( 1 -  (relTable->colStats[rowNum1].f_all / f_all_old)  , f_all_old / relTable->colStats[rowNum1].d_distinct) );
     
     relTable->colStats[rowNum2].d_distinct = relTable->colStats[rowNum1].d_distinct;
 
@@ -258,7 +259,7 @@ void FilterBetweenTwoColumnsStats(RelationTable*& relTable , uint64_t rowNum1 , 
 
         if (i != rowNum1 && i != rowNum2){
             relTable->colStats[i].d_distinct = \
-            relTable->colStats[i].d_distinct * (1 - raiseToPower( (1 -  (relTable->colStats[rowNum1].f_all / f_all_old) ) , relTable->colStats[i].f_all / relTable->colStats[i].d_distinct) );
+            relTable->colStats[i].d_distinct * (1 - raiseToPower( 1 -  (relTable->colStats[rowNum1].f_all / f_all_old) , relTable->colStats[i].f_all / relTable->colStats[i].d_distinct) );
         
             relTable->colStats[i].f_all = relTable->colStats[rowNum1].f_all;
         }
@@ -280,7 +281,7 @@ void SelfJoinStats(RelationTable*& relTable , uint64_t rowNum){
     }
 }
 
-int JoinStats(RelationTable*& relTable1 , RelationTable*& relTable2 , uint64_t rowNum1 , uint64_t rowNum2){//NOT FINISHED??!?!?!?!?!?!!!!?!!?!?
+int JoinStats(RelationTable*& relTable1 , RelationTable*& relTable2 , uint64_t rowNum1 , uint64_t rowNum2){
 
     uint64_t new_lower;
     uint64_t new_upper;
@@ -306,12 +307,40 @@ int JoinStats(RelationTable*& relTable1 , RelationTable*& relTable2 , uint64_t r
     FilterBetweenTwoValsStats(relTable1 , rowNum1 , new_lower , new_upper);
     FilterBetweenTwoValsStats(relTable2 , rowNum2 , new_lower , new_upper);
 
+
     relTable1->colStats[rowNum1].l_lower = new_lower;
-    relTable1->colStats[rowNum2].l_lower = new_lower;
+    relTable2->colStats[rowNum2].l_lower = new_lower;
 
     relTable1->colStats[rowNum1].u_upper = new_upper;
-    relTable1->colStats[rowNum1].u_upper = new_upper;
+    relTable2->colStats[rowNum2].u_upper = new_upper;
 
+    uint64_t n = relTable1->colStats[rowNum1].u_upper - relTable1->colStats[rowNum1].l_lower + 1;
+    uint64_t d_distinct_old1 = relTable1->colStats[rowNum1].d_distinct;
+    uint64_t d_distinct_old2 = relTable2->colStats[rowNum2].d_distinct;
+
+    relTable1->colStats[rowNum1].f_all = (relTable1->colStats[rowNum1].f_all * relTable2->colStats[rowNum2].f_all) / n;
+    relTable2->colStats[rowNum2].f_all = relTable1->colStats[rowNum1].f_all;
+
+    relTable1->colStats[rowNum1].d_distinct = (relTable1->colStats[rowNum1].d_distinct * relTable2->colStats[rowNum2].d_distinct) / n;
+    relTable2->colStats[rowNum2].d_distinct = relTable1->colStats[rowNum1].d_distinct;
+
+    for (uint64_t i = 0 ; i < relTable1->cols ; i++){
+        
+        if (i != rowNum1){
+            relTable1->colStats[i].f_all = relTable1->colStats[rowNum1].f_all;
+            relTable1->colStats[i].d_distinct = \
+            relTable1->colStats[i].d_distinct * (1 - raiseToPower( 1 - (relTable1->colStats[rowNum1].d_distinct / d_distinct_old1) , relTable1->colStats[i].f_all / relTable1->colStats[i].d_distinct) );
+        }
+    }
+
+    for (uint64_t i = 0 ; i < relTable2->cols ; i++){
+        
+        if (i != rowNum2){
+            relTable2->colStats[i].f_all = relTable2->colStats[rowNum2].f_all;
+            relTable2->colStats[i].d_distinct = \
+            relTable2->colStats[i].d_distinct * (1 - raiseToPower( 1 - (relTable2->colStats[rowNum2].d_distinct / d_distinct_old2) , relTable2->colStats[i].f_all / relTable2->colStats[i].d_distinct) );
+        }
+    }
 
     return 0;
 }
