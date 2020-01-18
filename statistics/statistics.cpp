@@ -86,8 +86,8 @@ void InitialStats(RelationTable*& relTable, uint32_t N)
             if ( hash[hpos] ) {
                 hash[hpos] = false;
                 distincts--;
-            }
-            else {
+            
+            } else {
                 hash[hpos] = true;
                 distincts++;
             }
@@ -97,7 +97,6 @@ void InitialStats(RelationTable*& relTable, uint32_t N)
         // std::cout << distincts << std::endl;
 
     }
-    
     free(hash);
 }
 

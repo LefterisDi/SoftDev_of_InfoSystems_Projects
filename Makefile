@@ -7,7 +7,7 @@ TMPL_OBJ   = ./templates/list.o
 UTILS_OBJ  = ./utils/utils.o ./utils/predicates.o 
 JOBS_OBJ   = ./Jobs/Jobs.o ./JobScheduler/JobScheduler.o
 STATS_OBJ  = ./statistics/statistics.o
-OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(SEARCH_OBJ) $(SORT_OBJS) $(TMPL_OBJ) $(UTILS_OBJ) $(JOBS_OBJ) $(STATS_OBJ)
+OBJECTS    = $(MAIN_OBJ) $(PARSER_OBJ) $(SEARCH_OBJ) $(SORT_OBJS) $(TMPL_OBJ) $(STATS_OBJ) $(UTILS_OBJ) $(JOBS_OBJ)
 
 # SOURCES
 MAIN_SRC   = main.cpp
@@ -18,7 +18,7 @@ TMPL_SRC   = ./templates/list.cpp
 UTILS_SRC  = ./sortingAlg/quicksort.cpp ./searchingAlg/binarySearch.cpp ./utils/predicates.cpp
 STATS_SRC  = ./statistics/statistics.cpp
 JOBS_SRC   = ./Jobs/Jobs.cpp ./JobScheduler/JobScheduler.cpp
-SOURCES    = $(MAIN_SRCS) $(PARSER_SRC) $(SEARCH_SRC) $(SORT_SRCS) $(TMPL_SRC) $(UTILS_SRC) $(JOBS_SRC) $(STATS_SRC)
+SOURCES    = $(MAIN_SRCS) $(PARSER_SRC) $(SEARCH_SRC) $(SORT_SRCS) $(TMPL_SRC) $(STATS_SRC) $(UTILS_SRC) $(JOBS_SRC)
 
 # HEADERS
 RELS_HDR   = ./utils/relationStructs.hpp
@@ -29,16 +29,16 @@ TMPL_HDR   = ./templates/list.hpp
 UTILS_HDR  = ./sortingAlg/quicksort.hpp ./searchingAlg/binarySearch.hpp ./utils/predicates.hpp ./utils/string.hpp
 STATS_HDR  = ./statistics/statistics.hpp
 JOBS_HDR   = ./Jobs/Jobs.hpp ./JobScheduler/JobScheduler.hpp
-HEADERS    = $(PARSER_HDR) $(RELS_HDR) $(SEARCH_HDR) $(SORT_HDRS) $(TMPL_HDR) $(UTILS_HDR) $(JOBS_HDR) $(STATS_HDR)
+HEADERS    = $(PARSER_HDR) $(RELS_HDR) $(SEARCH_HDR) $(SORT_HDRS) $(TMPL_HDR) $(STATS_HDR) $(UTILS_HDR) $(JOBS_HDR)
 
 # EXECUTABLES
 MAIN_OUT   = main
 
 # FLAGS
-CC           = g++
-FLAGS        = -c
-DEBUG        = -g3
-THREAD_FLAGS = -pthread
+CC         = g++
+FLAGS      = -c
+DEBUG      = -g3
+THREADS    = -pthread
 
 # ------------------------------------------------- #
 
@@ -47,7 +47,8 @@ all: $(OBJECTS) $(MAIN_OUT)
 # Creating Executables
 main : $(OBJECTS)
 	@echo "\n\033[1;33mCompiling executables\033[0m";
-	$(CC) $(DEBUG) $(THREAD_FLAGS) -o $(MAIN_OUT) $(OBJECTS)
+	$(CC) $(DEBUG) $(THREADS) -o $(MAIN_OUT) $(OBJECTS)
+	@echo "";
 
 # ------------------------------------------------- #
 
@@ -78,13 +79,13 @@ main.o : main.cpp
 	$(CC) $(DEBUG) -o ./searchingAlg/binarySearch.o $(FLAGS) ./searchingAlg/binarySearch.cpp
 	
 ./Jobs/Jobs.o : ./Jobs/Jobs.cpp
-	$(CC) $(DEBUG) -o ./Jobs/Jobs.o                 $(FLAGS) ./Jobs/Jobs.cpp                 $(THREAD_FLAGS)
+	$(CC) $(DEBUG) -o ./Jobs/Jobs.o                 $(FLAGS) ./Jobs/Jobs.cpp                 $(THREADS)
 	
 ./JobScheduler/JobScheduler.o : ./JobScheduler/JobScheduler.cpp
-	$(CC) $(DEBUG) -o ./JobScheduler/JobScheduler.o $(FLAGS) ./JobScheduler/JobScheduler.cpp $(THREAD_FLAGS)
+	$(CC) $(DEBUG) -o ./JobScheduler/JobScheduler.o $(FLAGS) ./JobScheduler/JobScheduler.cpp $(THREADS)
 	
 ./statistics/statistics.o : ./statistics/statistics.cpp
-	$(CC) $(DEBUG) -o ./statistics/statistics.o $(FLAGS) ./statistics/statistics.cpp
+	$(CC) $(DEBUG) -o ./statistics/statistics.o     $(FLAGS) ./statistics/statistics.cpp
 
 # ------------------------------------------------- #
 
