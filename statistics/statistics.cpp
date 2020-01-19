@@ -16,7 +16,7 @@ class BloomFilter {
 
 public:
 
-    BloomFilter(unsigned int numbCells, unsigned int (*hf)(uint64_t)) : numberOfCells(numbCells), hash(hf) {
+    BloomFilter(unsigned int numbCells, unsigned int (*hf)(uint64_t)) : numberOfCells(numbCells), numberOfFunctions(0), hash(hf) {
         cell = (bool*)calloc(numbCells, sizeof(bool));
     }
 

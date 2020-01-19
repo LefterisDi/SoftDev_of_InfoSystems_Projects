@@ -107,9 +107,9 @@ class MiniVector {
 
 
         // template <typename T>
-        void Reserve(uint64_t n, bool copy){
+        void Reserve(uint64_t n, bool copy) {
             T *newArr;
-            uint64_t i;
+            // uint64_t i;
             
             // allocate a new dynamic array with n elements
             newArr = new T[n];
@@ -120,8 +120,8 @@ class MiniVector {
             
             // if copy is true, copy elements from the old list to the new list
             if (copy)
-                for(i = 0; i < vSize; i++)
-                newArr[i] = vArr[i];
+                for(int i = 0; i < vSize; i++)
+                    newArr[i] = vArr[i];
             
             // delete original dynamic array. if vArr is NULL, the vector was
             // originally empty and there is no memory to delete

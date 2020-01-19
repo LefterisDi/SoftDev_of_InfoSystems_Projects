@@ -213,7 +213,7 @@ void QueryJob(void* arg){
 
     QueryJobArgs* qja = (QueryJobArgs*)arg;
     Query* query = qja->query;
-    str::string resStr = "";
+    str::string* resStr = new str::string(32);
     // jd::String resStr = "";
     
 
@@ -251,10 +251,10 @@ void QueryJob(void* arg){
 
         if (sum == 0){
             if (l != query->proj->GetTotalItems()-1){
-                resStr.append("NULL ");
+                resStr->append("NULL ");
             }
             else {
-                resStr.append("NULL");
+                resStr->append("NULL");
             }
 
         }
@@ -262,18 +262,18 @@ void QueryJob(void* arg){
             if (l != query->proj->GetTotalItems()-1){
                 char buff[21];
                 sprintf(buff, "%" PRIu64, sum);
-                resStr.append(buff);
-                resStr.append(" ");
+                resStr->append(buff);
+                resStr->append(" ");
                 
             }
             else {
                 char buff[21];
                 sprintf(buff, "%" PRIu64, sum);
-                resStr.append(buff);
+                resStr->append(buff);
             }
         }
     }
-    qja->res.assign(resStr);
+    qja->res.assign(*resStr);
 
     delete[] relExistsInRL;
     for (uint32_t l = 0 ; l < resList->GetTotalItems() ; l++) {
@@ -284,7 +284,7 @@ void QueryJob(void* arg){
         delete tableList;
     }
     delete resList;
-
+    delete resStr;
     delete query->comp_preds;
     delete query->join_preds;
     delete query->proj;
