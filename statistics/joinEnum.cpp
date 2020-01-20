@@ -177,9 +177,8 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
     MyHashMap< int , JoinHashEntry > hmap( raiseToPower(2 , relTSize) - 1);
 	JoinHashEntry* res = new JoinHashEntry;
 
-	int num = 1;
-    for (int i = 0 ; i < relTSize ; i++) {
-
+	// int num = 1;
+    for (int i = 0 ; i < relTSize ; i++){
         JoinHashEntry jhe;
 		
 		jhe.vectJPnum.PushBack(-1);
@@ -198,7 +197,7 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 		}
 
 		jhe.cost = 0;
-        hmap.set( (num<<1) , jhe);
+        hmap.set( raiseToPower(2 , i) , jhe);
     }
 
 	for (int i = 0 ; i < relTSize-1 ; i++) {
