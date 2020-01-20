@@ -12,6 +12,7 @@
 #include "../Jobs/Jobs.hpp"
 #include "../JobScheduler/JobScheduler.hpp"
 #include "../statistics/joinEnum.hpp"
+#include "../statistics/statistics.hpp"
 
 using namespace std;
 
@@ -93,6 +94,12 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
     {
         case '>':
 
+            TableStats ts1;
+            ts1.cols = relTable[cpred.rel1]->cols;
+            ts1.statsPerCol = relTable[cpred.rel1]->colStats;
+
+            FilterBetweenTwoValsStats(ts1 , cpred.colRel1 ,  cpred.num , ts1.statsPerCol->u_upper);
+
             for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
 
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
@@ -134,6 +141,12 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
 
         case '<':
 
+            TableStats ts2;
+            ts2.cols = relTable[cpred.rel1]->cols;
+            ts2.statsPerCol = relTable[cpred.rel1]->colStats;
+
+            FilterBetweenTwoValsStats(ts2 , cpred.colRel1 ,  ts2.statsPerCol->l_lower , cpred.num);
+
             for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
 
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
@@ -160,6 +173,12 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
         break;
 
         case '=':
+
+            TableStats ts3;
+            ts3.cols = relTable[cpred.rel1]->cols;
+            ts3.statsPerCol = relTable[cpred.rel1]->colStats;
+
+            FilterEqualToValStats(ts3 , cpred.colRel1 , cpred.num);
 
             for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
 
@@ -666,7 +685,7 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
     bool     last      = false;
     bool     firstTime = true;
 
-    JoinEnumeration(relTable , relTSize , joinList);
+    // JoinEnumeration(relTable , relTSize , joinList);
 
     while (joinList->GetTotalItems() > 0) {
         JoinPred* jpredp = &( (*(*joinList)[i])[0] );

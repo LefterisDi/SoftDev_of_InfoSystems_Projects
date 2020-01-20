@@ -7,5 +7,8 @@ void InitialStats(RelationTable*&, uint32_t);
 void _InitialStats(RelationTable*&, uint32_t);
 void SelfJoinStats(TableStats& , uint64_t , uint64_t&);
 int JoinStats(TableStats& , TableStats& , uint64_t , uint64_t , uint64_t&);
+void FilterBetweenTwoColumnsStats(TableStats& , uint64_t , uint64_t , uint64_t);
+void FilterBetweenTwoValsStats(TableStats&  ,uint64_t , uint64_t , uint64_t);
+void FilterEqualToValStats(TableStats&  , uint64_t , uint64_t);
 
 #endif

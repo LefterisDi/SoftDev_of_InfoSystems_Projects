@@ -62,6 +62,8 @@ int main(int argc, char *argv[])
     {
 
         RelationTable *rtable = &((*(*relTableList)[l])[0]);
+        delete rtable->colStats->distinctArray;
+        delete rtable->colStats;
         for (uint32_t i = 0; i < rtable->cols; i++)
             delete[] rtable->table[i];
         delete[] rtable->table;
