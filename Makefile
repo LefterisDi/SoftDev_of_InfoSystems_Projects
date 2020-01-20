@@ -78,17 +78,17 @@ main.o : main.cpp
 ./searchingAlg/binarySearch.o : ./searchingAlg/binarySearch.cpp
 	$(CC) $(DEBUG) -o ./searchingAlg/binarySearch.o $(FLAGS) ./searchingAlg/binarySearch.cpp
 	
+./statistics/joinEnum.o : ./statistics/joinEnum.cpp
+	$(CC) $(DEBUG) -o ./statistics/joinEnum.o       $(FLAGS) ./statistics/joinEnum.cpp
+
+./statistics/statistics.o : ./statistics/statistics.cpp
+	$(CC) $(DEBUG) -o ./statistics/statistics.o     $(FLAGS) ./statistics/statistics.cpp
+
 ./Jobs/Jobs.o : ./Jobs/Jobs.cpp
 	$(CC) $(DEBUG) -o ./Jobs/Jobs.o                 $(FLAGS) ./Jobs/Jobs.cpp                 $(THREADS)
 	
 ./JobScheduler/JobScheduler.o : ./JobScheduler/JobScheduler.cpp
 	$(CC) $(DEBUG) -o ./JobScheduler/JobScheduler.o $(FLAGS) ./JobScheduler/JobScheduler.cpp $(THREADS)
-	
-./statistics/statistics.o : ./statistics/statistics.cpp
-	$(CC) $(DEBUG) -o ./statistics/statistics.o     $(FLAGS) ./statistics/statistics.cpp
-	
-./statistics/joinEnum.o : ./statistics/joinEnum.cpp
-	$(CC) $(DEBUG) -o ./statistics/joinEnum.o     $(FLAGS) ./statistics/joinEnum.cpp
 
 # ------------------------------------------------- #
 

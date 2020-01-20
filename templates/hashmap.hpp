@@ -20,11 +20,11 @@ struct HashCompute {
 };
 
 template <class K, class V>
-struct Bucket
+struct HBucket
 {
 	K key;
 	V value;
-	Bucket(const K &key, const V &value){
+	HBucket(const K &key, const V &value){
 		this->key = key;
 		this->value = value;
 	}
@@ -32,18 +32,25 @@ struct Bucket
 
 template<class K, class V, class F = HashCompute<K>>
 class MyHashMap{
+    
+
+private:
+	HBucket<K,V> **Hashtable;
+	size_t used_buckets;
+	size_t size;
+	F hashCompute;
+	bool *dflags;
+
 public:
 	MyHashMap(size_t sz=1000){
 		size = sz;
 		used_buckets = 0;
-		Hashtable = new Bucket<K,V> *[size];
+		Hashtable = new HBucket<K,V> *[size];
 		dflags = new bool[size];
 		for(size_t t = 0; t < size; t++){
 			Hashtable[t] = nullptr;
 			dflags[t] = false;
 		}
-
-
 	}
 	~MyHashMap(){
 		for(size_t t = 0; t < size; t++){
@@ -65,7 +72,7 @@ public:
 			start = (start+1) % size;
 		}
 		if(start == end) return false;
-		Hashtable[start] = new Bucket<K,V>(key, value);
+		Hashtable[start] = new HBucket<K,V>(key, value);
 		dflags[start] = false;
 		used_buckets += 1;
 		return true;
@@ -152,15 +159,6 @@ public:
 		}
 		throw std::invalid_argument( "Key not found" );
 	}
-
-
-
-private:
-	Bucket<K,V> **Hashtable;
-	size_t used_buckets;
-	size_t size;
-	F hashCompute;
-	bool *dflags;
 };
 
 #endif /* HASHMAP_H_ */

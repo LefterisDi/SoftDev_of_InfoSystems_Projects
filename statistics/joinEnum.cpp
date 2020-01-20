@@ -2,8 +2,9 @@
 #include <iostream>
 #include <semaphore.h> 
 #include <unistd.h>
-#include<bits/stdc++.h> 
+#include <bits/stdc++.h> 
 
+#include "statistics.hpp"
 #include "../utils/relationStructs.hpp"
 #include "../sortingAlg/tablesort.hpp"
 #include "../templates/list.hpp"
@@ -11,7 +12,6 @@
 #include "../templates/hashmap.hpp"
 #include "../Jobs/Jobs.hpp"
 #include "../JobScheduler/JobScheduler.hpp"
-#include "./statistics.hpp"
 
 
 // A function to print all combination of a given length from the given array.
