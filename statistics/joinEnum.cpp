@@ -46,41 +46,102 @@ void GenSubSet(MiniVector<MiniVector<uint32_t>* >& resVec , int reqLen, int star
 	GenSubSet(resVec , reqLen, start + 1, currLen, check, len);
 }
 
+bool existsInS(MiniVector<uint32_t>* set , int relNum){
+	
+	for (int i = 0 ; i < set->GetTotalItems() ; i++){
+		if (relNum == (*set)[i] ){
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool connected( MiniVector<uint32_t>* set , int relNum , List<JoinPred>* joinList){
+	
+	for(uint32_t i = 0 ; i < joinList->GetTotalItems() ; i++){
+		
+		JoinPred* jp = &( (*(*joinList)[i])[0] );
+		
+		for (uint32_t j = 0 ; j < set->GetTotalItems() ; j++){
+
+			
+			if ( (*set)[j] == jp->rel1 && relNum == jp->rel2 ){
+				return true;
+			}
+			else if ( (*set)[j] == jp->rel2 && relNum == jp->rel1 ){
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+int findPlace(MiniVector<uint32_t>* set , int relNum){
+
+	int res = 0;
+	for (uint32_t i = 0 ; i < set->GetTotalItems() ; i++){
+		res = res + raiseToPower(2 , (*set)[i] );
+	}
+	res = res + raiseToPower(2 , relNum);
+}
+
+uint32_t TreeCost(){
+
+
+}
 
 void JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList)
 {
     MyHashMap< uint32_t , MiniVector<JoinPred> > hmap( raiseToPower(2 , relTSize) - 1 );
 	uint32_t numEntries = 0;
 
+    MyHashMap< uint , JoinHashEntry > hmap( raiseToPower(2 , relTSize) - 1);
+    
 	int num = 1;
-    for (uint32_t i = 0 ; i < relTSize ; i++) {
-        MiniVector<JoinPred> v;
-        v.PushBack(i);
-        hmap.set( (num<<1) , v);
-    }
-	numEntries++;
-
-    MiniVector< MiniVector<uint32_t>* > sets;
-    bool check[2];
-    GenSubSet(sets , 2 , 0 , 0 , check , relTSize);
-
-    for (int i = 0 ; i < relTSize ; i++) {
-        for (int j = 0 ; j < sets.GetTotalItems() ; j++) {
-
-        }
-
+    for (int i = 0 ; i < relTSize ; i++){
+        JoinHashEntry jhe;
+		JoinPred jp;
+		jp.rel1 = i;
+		jp.rel2 = i;
+		jp.colRel1 = 0;
+		jp.colRel2 = 0;
+        jhe.vectJP.PushBack(jp);
+		jhe.cost = 0;
+        hmap.set( (num<<1) , jhe);
     }
 
-}
-
-uint32_t TreeCost(RelationTable** relTable , MyHashMap< uint32_t , MiniVector<uint32_t> > givenTree , uint16_t relTSize , uint32_t numEntries){
-
-	// try {
-	// 	hmap.get(12);
-	// }catch(const std::invalid_argument& arg){
-	// 	cout << "EXception" << endl;
-	// }
-
+	for (int i = 0 ; i < relTSize-1 ; i++){
+		MiniVector< MiniVector<uint32_t>* > sets;
+		bool check[relTSize];
+		GenSubSet(sets , i+1 , 0 , 0 , check , relTSize);
+		for (int sCount = 0 ; sCount < sets.GetTotalItems() ; sCount++){
+			
+			for (int j = 0 ; j < relTSize ; j++){
 	
+				bool isNull = false;
 
-}
+				if (existsInS(sets[sCount] , j)){
+					continue;
+				}
+				else if ( connected(sets[sCount] , j , joinList) == false ){
+					continue;
+				}
+
+				try {
+					hmap.get( findPlace(sets[sCount] , j) );
+				}catch(const std::invalid_argument& arg){
+					isNull = true;
+				}
+
+				// if (isNull == true || )
+
+			}
+
+			delete sets[sCount];
+		}
+		
+	}
+   
+} 
