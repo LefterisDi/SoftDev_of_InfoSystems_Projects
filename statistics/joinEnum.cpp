@@ -47,13 +47,13 @@ void GenSubSet(MiniVector<MiniVector<uint32_t>* >& resVec , int reqLen, int star
 }
 
 
-void JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList){
+void JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList)
+{
+    MyHashMap< uint32_t , MiniVector<JoinPred> > hmap( raiseToPower(2 , relTSize) - 1 );
+	uint32_t numEntries = 0;
 
-    MyHashMap< uint , MiniVector<JoinPred> > hmap( raiseToPower(2 , relTSize) - 1);
-	uint numEntries = 0;
-    
 	int num = 1;
-    for (uint i = 0 ; i < relTSize ; i++){
+    for (uint32_t i = 0 ; i < relTSize ; i++) {
         MiniVector<JoinPred> v;
         v.PushBack(i);
         hmap.set( (num<<1) , v);
@@ -64,16 +64,16 @@ void JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPre
     bool check[2];
     GenSubSet(sets , 2 , 0 , 0 , check , relTSize);
 
-    for (int i = 0 ; i < v.GetTotalItems() ; i++) {
+    for (int i = 0 ; i < relTSize ; i++) {
         for (int j = 0 ; j < sets.GetTotalItems() ; j++) {
-            
+
         }
-        
+
     }
 
-} 
+}
 
-uint TreeCost(RelationTable** relTable , MyHashMap< uint , MiniVector<uint> > givenTree , uint16_t relTSize , uint numEntries){
+uint32_t TreeCost(RelationTable** relTable , MyHashMap< uint32_t , MiniVector<uint32_t> > givenTree , uint16_t relTSize , uint32_t numEntries){
 
 	// try {
 	// 	hmap.get(12);
