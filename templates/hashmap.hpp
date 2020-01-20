@@ -1,3 +1,9 @@
+/*
+ * HashMap.h
+ *
+ *  Created on: Sep 10, 2017
+ *  Author: chinmay naik
+ */
 #include <functional>
 #include <cstddef>
 
@@ -157,4 +163,4 @@ private:
 	bool *dflags;
 };
 
-#endif /* HASHMAP_H_ */ 
+#endif /* HASHMAP_H_ */
