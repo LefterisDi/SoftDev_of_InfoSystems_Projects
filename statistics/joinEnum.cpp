@@ -123,9 +123,9 @@ uint64_t TreeCost(TableStats* relTableStats , JoinPred& jp){
 		if (jp.rel1 == jp.rel2 && jp.colRel1 == jp.colRel2){
 			SelfJoinStats(relTableStats[jp.rel1] , jp.colRel1 , cost);
 		}
-		else if (jp.rel1 == jp.rel2){
+		// else if (jp.rel1 == jp.rel2){
 
-		}
+		// }
 		else {
 			JoinStats(relTableStats[jp.rel1] , relTableStats[jp.rel2] , jp.colRel1 , jp.colRel2 , cost);
 		}
@@ -172,13 +172,14 @@ JoinHashEntry* CreateJoinTree(RelationTable** relTable , JoinHashEntry jhe , int
 	return newJhe;
 }
 
-JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList){
-
+JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList)
+{
     MyHashMap< int , JoinHashEntry > hmap( raiseToPower(2 , relTSize) - 1);
 	JoinHashEntry* res = new JoinHashEntry;
 
 	int num = 1;
-    for (int i = 0 ; i < relTSize ; i++){
+    for (int i = 0 ; i < relTSize ; i++) {
+
         JoinHashEntry jhe;
 		
 		jhe.vectJPnum.PushBack(-1);
@@ -186,7 +187,7 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 		jhe.tableNum = relTSize;
 		jhe.relTableStats = new TableStats[relTSize];
 
-		for (int i = 0; i < jhe.tableNum ; i++){
+		for (int i = 0; i < jhe.tableNum ; i++) {
 			
 			jhe.relTableStats[i].cols = relTable[i]->cols;
 			jhe.relTableStats[i].statsPerCol = new Stats[relTable[i]->cols];
@@ -195,59 +196,56 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 				jhe.relTableStats[i].statsPerCol[j] = relTable[i]->colStats[j];
 			}
 		}
-		
+
 		jhe.cost = 0;
         hmap.set( (num<<1) , jhe);
     }
 
-	for (int i = 0 ; i < relTSize-1 ; i++){
+	for (int i = 0 ; i < relTSize-1 ; i++) {
+
 		MiniVector< MiniVector<uint32_t>* > sets;
 		bool check[relTSize];
 		GenSubSet(sets , i+1 , 0 , 0 , check , relTSize);
-		for (int sCount = 0 ; sCount < sets.GetTotalItems() ; sCount++){
-			
-			for (int j = 0 ; j < relTSize ; j++){
+		
+        for (int sCount = 0 ; sCount < sets.GetTotalItems() ; sCount++) {
+
+			for (int j = 0 ; j < relTSize ; j++) {
 	
 				bool isNull = false;
 				JoinHashEntry* jhe = NULL;
 				JoinHashEntry existingJHE;
 
-				if (existsInS(sets[sCount] , j)){
+				// if (  )
+					// continue;
+                if ( existsInS(sets[sCount] , j) || connected(sets[sCount] , j , joinList) == false )
 					continue;
-				}
-				else if ( connected(sets[sCount] , j , joinList) == false ){
-					continue;
-				}
 
 				jhe = CreateJoinTree( relTable , hmap.get( findPlace(sets[sCount]) ) , j , joinList );
 
 				try {
 					existingJHE =  hmap.get( findPlace(sets[sCount] , j) );
-				}catch(const std::invalid_argument& arg){
+				} catch(const std::invalid_argument& arg) {
 					isNull = true;
 				}
 
-				if (isNull == true){
+				if (isNull == true) {
 					hmap.set(findPlace(sets[sCount] , j) , *jhe);
-				}
-				else if (existingJHE.cost > jhe->cost ){
+				
+                } else if (existingJHE.cost > jhe->cost ) {
 					hmap.delete_key( findPlace(sets[sCount] , j) );
 					hmap.set(findPlace(sets[sCount] , j) , *jhe);
 				}
-
 			}
-
 			delete sets[sCount];
 		}
-		
 	}
 
 	try {
 		*res = hmap.get( raiseToPower(2 , relTSize) - 1 ) ;
-	}catch(const std::invalid_argument& arg){
+	} catch(const std::invalid_argument& arg) {
 		perror("Error finding best path!");
 		exit(1);
 	}
-   
+    
    return res;
 } 

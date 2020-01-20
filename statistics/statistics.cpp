@@ -267,13 +267,13 @@ void FilterBetweenTwoColumnsStats(TableStats& relTableStats , uint64_t colNum , 
 
 }
 
-void SelfJoinStats(TableStats& relTableStats, uint64_t colNum , uint64_t rowNum , uint64_t& cost){
-
+void SelfJoinStats(TableStats& relTableStats, uint64_t rowNum , uint64_t& cost) 
+{
     uint64_t n = relTableStats.statsPerCol[rowNum].u_upper - relTableStats.statsPerCol[rowNum].l_lower + 1;
 
     relTableStats.statsPerCol[rowNum].f_all = raiseToPower(relTableStats.statsPerCol[rowNum].f_all , 2) / n;
 
-    for (uint64_t i = 0 ; i < colNum ; i++) {
+    for (uint64_t i = 0 ; i < relTableStats.cols ; i++) {
         if (i != rowNum) {
             relTableStats.statsPerCol[i].f_all = relTableStats.statsPerCol[rowNum].f_all; 
         }
@@ -282,7 +282,7 @@ void SelfJoinStats(TableStats& relTableStats, uint64_t colNum , uint64_t rowNum 
     cost = relTableStats.statsPerCol[rowNum].f_all;
 }
 
-int JoinStats(TableStats& relTableStats1 , TableStats& relTableStats2 , uint64_t colNum1 , uint64_t colNum2 , uint64_t rowNum1 , uint64_t rowNum2 , uint64_t& cost) 
+int JoinStats(TableStats& relTableStats1 , TableStats& relTableStats2 , uint64_t rowNum1 , uint64_t rowNum2 , uint64_t& cost) 
 {
     uint64_t new_lower;
     uint64_t new_upper;
@@ -305,8 +305,8 @@ int JoinStats(TableStats& relTableStats1 , TableStats& relTableStats2 , uint64_t
         return 1;
     } 
 
-    FilterBetweenTwoValsStats(relTableStats1 , colNum1 , rowNum1 , new_lower , new_upper);
-    FilterBetweenTwoValsStats(relTableStats2 , colNum2 , rowNum2 , new_lower , new_upper);
+    FilterBetweenTwoValsStats(relTableStats1 , relTableStats1.cols , rowNum1 , new_lower , new_upper);
+    FilterBetweenTwoValsStats(relTableStats2 , relTableStats2.cols , rowNum2 , new_lower , new_upper);
 
     relTableStats1.statsPerCol[rowNum1].l_lower = new_lower;
     relTableStats2.statsPerCol[rowNum2].l_lower = new_lower;
@@ -324,7 +324,7 @@ int JoinStats(TableStats& relTableStats1 , TableStats& relTableStats2 , uint64_t
     relTableStats1.statsPerCol[rowNum1].d_distinct = (relTableStats1.statsPerCol[rowNum1].d_distinct * relTableStats2.statsPerCol[rowNum2].d_distinct) / n;
     relTableStats2.statsPerCol[rowNum2].d_distinct = relTableStats1.statsPerCol[rowNum1].d_distinct;
 
-    for (uint64_t i = 0 ; i < colNum1 ; i++){
+    for (uint64_t i = 0 ; i < relTableStats1.cols ; i++){
         
         if (i != rowNum1){
             relTableStats1.statsPerCol[i].f_all = relTableStats1.statsPerCol[rowNum1].f_all;
@@ -333,7 +333,7 @@ int JoinStats(TableStats& relTableStats1 , TableStats& relTableStats2 , uint64_t
         }
     }
 
-    for (uint64_t i = 0 ; i < colNum2 ; i++){
+    for (uint64_t i = 0 ; i < relTableStats2.cols ; i++){
         
         if (i != rowNum2){
             relTableStats2.statsPerCol[i].f_all = relTableStats2.statsPerCol[rowNum2].f_all;
