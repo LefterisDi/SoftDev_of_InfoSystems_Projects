@@ -412,7 +412,7 @@ List<RelationTable>* ReadRelations(const char *workloads_path)
         delete tmp_rel_node;
     }
 
-    free(line);     
+    free(line);
 
     return relations;
 }

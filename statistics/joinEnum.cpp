@@ -1,7 +1,7 @@
-#include <iostream>
-#include <unistd.h>
 #include <cstdint>
+#include <iostream>
 #include <semaphore.h> 
+#include <unistd.h>
 
 #include "../utils/relationStructs.hpp"
 #include "../sortingAlg/tablesort.hpp"
@@ -13,7 +13,7 @@
 
 
 // A function to print all combination of a given length from the given array.
-void GenSubSet(MiniVector< MiniVector<uint>* >& resVec , int reqLen, int start, int currLen, bool check[], uint16_t len) 
+void GenSubSet(MiniVector<MiniVector<uint32_t>* >& resVec , int reqLen, int start, int currLen, bool check[], uint16_t len) 
 {
 	// Return if the currrLen is more than the required length.
 	if(currLen > reqLen)
@@ -21,7 +21,7 @@ void GenSubSet(MiniVector< MiniVector<uint>* >& resVec , int reqLen, int start, 
 	// If currLen is equal to required length then print the sequence.
 	else if (currLen == reqLen) 
 	{
-		MiniVector<uint>* vec = new MiniVector<uint>;
+		MiniVector<uint32_t>* vec = new MiniVector<uint32_t>;
 		for (int i = 0; i < len; i++) 
 		{
 			if (check[i] == true) 
@@ -44,25 +44,28 @@ void GenSubSet(MiniVector< MiniVector<uint>* >& resVec , int reqLen, int start, 
 	// Second is, we don't select it, means put false in check[] and only start incremented.
 	check[start] = false;
 	GenSubSet(resVec , reqLen, start + 1, currLen, check, len);
-} 
+}
 
 
-void JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList){
+void JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList)
+{
+    // MyHashMap< uint32_t , MiniVector<uint32_t> > hmap( raiseToPower(2 , relTSize) - 1);
 
-    MyHashMap< uint , MiniVector<uint> > hmap( raiseToPower(2 , relTSize) - 1);
-
-    for (uint i = 0 ; i < relTSize ; i++){
-        int num = 1;
-        MiniVector<uint> v;
+    MiniVector<uint32_t> v(4);
+    for (uint32_t i = 0 ; i < relTSize ; i++) {
+        // int num = 1;
         v.PushBack(i);
-        hmap.set( (num<<1) , i);
+        // hmap.set( (num << 1) , i);
     }
 
-    for (int sNum = 1 ; sNum <= relTSize ; sNum++){
-        MiniVector< MiniVector<uint>* > sets;
-        bool check[sNum];
-        GenSubSet(sets , sNum , 0 , 0 , check , relTSize);
+    MiniVector< MiniVector<uint32_t>* > sets;
+    bool check[2];
+    GenSubSet(sets , 2 , 0 , 0 , check , relTSize);
+
+    for (int i = 0 ; i < v.GetTotalItems() ; i++) {
+        for (int j = 0 ; j < sets.GetTotalItems() ; j++) {
+            
+        }
         
     }
-
-} 
+}
