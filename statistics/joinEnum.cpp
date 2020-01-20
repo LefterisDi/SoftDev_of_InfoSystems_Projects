@@ -49,14 +49,16 @@ void GenSubSet(MiniVector< MiniVector<uint>* >& resVec , int reqLen, int start, 
 
 void JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList){
 
-    MyHashMap< uint , MiniVector<uint> > hmap( raiseToPower(2 , relTSize) - 1);
-
+    MyHashMap< uint , MiniVector<JoinPred> > hmap( raiseToPower(2 , relTSize) - 1);
+	uint numEntries = 0;
+    
+	int num = 1;
     for (uint i = 0 ; i < relTSize ; i++){
-        int num = 1;
-        MiniVector<uint> v;
+        MiniVector<JoinPred> v;
         v.PushBack(i);
-        hmap.set( (num<<1) , i);
+        hmap.set( (num<<1) , v);
     }
+	numEntries++;
 
     for (int sNum = 1 ; sNum <= relTSize ; sNum++){
         MiniVector< MiniVector<uint>* > sets;
@@ -66,3 +68,15 @@ void JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPre
     }
 
 } 
+
+uint TreeCost(RelationTable** relTable , MyHashMap< uint , MiniVector<uint> > givenTree , uint16_t relTSize , uint numEntries){
+
+	// try {
+	// 	hmap.get(12);
+	// }catch(const std::invalid_argument& arg){
+	// 	cout << "EXception" << endl;
+	// }
+
+	
+
+}
