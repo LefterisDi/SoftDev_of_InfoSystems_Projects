@@ -268,8 +268,8 @@ void FilterBetweenTwoColumnsStats(TableStats& relTableStats , uint64_t colNum , 
 
 }
 
-void SelfJoinStats(TableStats& relTableStats , uint64_t rowNum , uint64_t& cost){
-
+void SelfJoinStats(TableStats& relTableStats, uint64_t rowNum , uint64_t& cost) 
+{
     uint64_t n = relTableStats.statsPerCol[rowNum].u_upper - relTableStats.statsPerCol[rowNum].l_lower + 1;
 
     relTableStats.statsPerCol[rowNum].f_all = powl((long double)relTableStats.statsPerCol[rowNum].f_all , 2.0) / (long double)n;
