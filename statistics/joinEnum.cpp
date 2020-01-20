@@ -174,7 +174,7 @@ JoinHashEntry* CreateJoinTree(RelationTable** relTable , JoinHashEntry jhe , int
 
 JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList){
 
-    MyHashMap< uint , JoinHashEntry > hmap( raiseToPower(2 , relTSize) - 1);
+    MyHashMap< int , JoinHashEntry > hmap( raiseToPower(2 , relTSize) - 1);
 	JoinHashEntry* res = new JoinHashEntry;
 
 	int num = 1;
