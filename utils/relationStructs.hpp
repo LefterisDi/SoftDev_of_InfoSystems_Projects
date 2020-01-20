@@ -30,9 +30,17 @@ typedef struct JoinPred {
     uint64_t colRel2;
 } JoinPred;
 
+typedef struct TableStats {
+    Stats* statsPerCol;
+    uint64_t cols;
+}TableStats;
+
 typedef struct JoinHashEntry {
-    MiniVector<JoinPred> vectJP;
-    uint32_t cost;
+    MiniVector<int> vectJPnum;
+    MiniVector<int> rels;
+    TableStats* relTableStats;
+    uint32_t tableNum;
+    uint64_t cost;
 }JoinHashEntry;
 
 typedef struct CompPred {

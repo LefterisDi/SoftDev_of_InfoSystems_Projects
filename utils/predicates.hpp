@@ -18,6 +18,6 @@ int        JoinPredicate      (RelationTable **, JoinPred &, List<FullResList> *
 int        ComparisonPredicate(RelationTable **, CompPred &, List<FullResList> *);
 
 int        DoAllCompPreds     (RelationTable **, List<CompPred> *, List<FullResList> *, bool *);
-int        DoAllJoinPreds     (RelationTable **, List<JoinPred> *, List<FullResList> *, bool *);
+int        DoAllJoinPreds     (RelationTable **, List<JoinPred> *, List<FullResList> *, bool * , uint16_t);
 
 #endif // __PREDICATES_HEADER__

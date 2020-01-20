@@ -160,41 +160,41 @@ void _InitialStats(RelationTable*& relTable, uint32_t N)
     }
 }
 
-void FilterEqualToValStats(RelationTable*& relTable , uint64_t rowNum , uint64_t val){
+void FilterEqualToValStats(TableStats& relTableStats , uint64_t colNum , uint64_t rowNum , uint64_t val){
 
-    uint64_t f_all_old = relTable->colStats[rowNum].f_all;
+    uint64_t f_all_old = relTableStats.statsPerCol[rowNum].f_all;
     bool isDistinct = false;
 
-    relTable->colStats[rowNum].l_lower = val;
-    relTable->colStats[rowNum].u_upper = val;
+    relTableStats.statsPerCol[rowNum].l_lower = val;
+    relTableStats.statsPerCol[rowNum].u_upper = val;
 
-    if (relTable->colStats[rowNum].N != 0 && relTable->colStats[rowNum].distinctArray[(val - relTable->colStats->l_lower) % relTable->colStats[rowNum].N] == true){
+    if (relTableStats.statsPerCol[rowNum].N != 0 && relTableStats.statsPerCol[rowNum].distinctArray[(val - relTableStats.statsPerCol->l_lower) % relTableStats.statsPerCol[rowNum].N] == true){
         isDistinct = true;
     }
-    else if (relTable->colStats[rowNum].N == 0 && relTable->colStats[rowNum].distinctArray[relTable->colStats[rowNum].u_upper - val] == true){
+    else if (relTableStats.statsPerCol[rowNum].N == 0 && relTableStats.statsPerCol[rowNum].distinctArray[relTableStats.statsPerCol[rowNum].u_upper - val] == true){
         isDistinct = true;
     }
 
     if (isDistinct == false){
-        relTable->colStats[rowNum].f_all = 0;
-        relTable->colStats[rowNum].d_distinct = 0;
+        relTableStats.statsPerCol[rowNum].f_all = 0;
+        relTableStats.statsPerCol[rowNum].d_distinct = 0;
     }
     else {
-        relTable->colStats[rowNum].f_all = relTable->colStats[rowNum].f_all / relTable->colStats[rowNum].d_distinct;
-        relTable->colStats[rowNum].d_distinct = 1;
+        relTableStats.statsPerCol[rowNum].f_all = relTableStats.statsPerCol[rowNum].f_all / relTableStats.statsPerCol[rowNum].d_distinct;
+        relTableStats.statsPerCol[rowNum].d_distinct = 1;
     }
 
-    for (uint64_t i = 0 ; i < relTable->cols ; i++){
+    for (uint64_t i = 0 ; i < colNum ; i++){
         if (i != rowNum){
-            relTable->colStats[i].d_distinct = \
-            relTable->colStats[i].d_distinct * (1 - raiseToPower( (1 -  (relTable->colStats[rowNum].f_all / f_all_old) ) , relTable->colStats[i].f_all / relTable->colStats[i].d_distinct) );
+            relTableStats.statsPerCol[i].d_distinct = \
+            relTableStats.statsPerCol[i].d_distinct * (1 - raiseToPower( (1 -  (relTableStats.statsPerCol[rowNum].f_all / f_all_old) ) , relTableStats.statsPerCol[i].f_all / relTableStats.statsPerCol[i].d_distinct) );
         
-            relTable->colStats[i].f_all = relTable->colStats[rowNum].f_all;
+            relTableStats.statsPerCol[i].f_all = relTableStats.statsPerCol[rowNum].f_all;
         }
     }
 }
 
-void FilterBetweenTwoValsStats(RelationTable*& relTable , uint64_t rowNum , uint64_t val1 , uint64_t val2){
+void FilterBetweenTwoValsStats(TableStats& relTableStats , uint64_t colNum ,uint64_t rowNum , uint64_t val1 , uint64_t val2){
     
     if (val1 > val2){
         uint64_t tmp = val1;
@@ -202,143 +202,147 @@ void FilterBetweenTwoValsStats(RelationTable*& relTable , uint64_t rowNum , uint
         val2 = tmp;
     }
 
-    uint64_t f_all_old = relTable->colStats[rowNum].f_all;
+    uint64_t f_all_old = relTableStats.statsPerCol[rowNum].f_all;
 
-    if (val1 < relTable->colStats[rowNum].l_lower){
-        val1 = relTable->colStats[rowNum].l_lower;
+    if (val1 < relTableStats.statsPerCol[rowNum].l_lower){
+        val1 = relTableStats.statsPerCol[rowNum].l_lower;
     }
-    if (val2 > relTable->colStats[rowNum].u_upper){
-        val2 = relTable->colStats[rowNum].u_upper;
+    if (val2 > relTableStats.statsPerCol[rowNum].u_upper){
+        val2 = relTableStats.statsPerCol[rowNum].u_upper;
     }
 
-    relTable->colStats[rowNum].d_distinct = ( (val2 - val1) / (relTable->colStats[rowNum].u_upper - relTable->colStats[rowNum].l_lower) ) * relTable->colStats[rowNum].d_distinct;
-    relTable->colStats[rowNum].f_all = ( (val2 - val1) / (relTable->colStats[rowNum].u_upper - relTable->colStats[rowNum].l_lower) ) * relTable->colStats[rowNum].f_all;
+    relTableStats.statsPerCol[rowNum].d_distinct = ( (val2 - val1) / (relTableStats.statsPerCol[rowNum].u_upper - relTableStats.statsPerCol[rowNum].l_lower) ) * relTableStats.statsPerCol[rowNum].d_distinct;
+    relTableStats.statsPerCol[rowNum].f_all = ( (val2 - val1) / (relTableStats.statsPerCol[rowNum].u_upper - relTableStats.statsPerCol[rowNum].l_lower) ) * relTableStats.statsPerCol[rowNum].f_all;
 
-    relTable->colStats[rowNum].l_lower = val1;
-    relTable->colStats[rowNum].u_upper = val2;
+    relTableStats.statsPerCol[rowNum].l_lower = val1;
+    relTableStats.statsPerCol[rowNum].u_upper = val2;
 
-    for (uint64_t i = 0; i < relTable->cols ; i++){
+    for (uint64_t i = 0; i < colNum ; i++){
 
         if (i != rowNum){
-            relTable->colStats[i].d_distinct = \
-            relTable->colStats[i].d_distinct * (1 - raiseToPower( (1 -  (relTable->colStats[rowNum].f_all / f_all_old) ) , relTable->colStats[i].f_all / relTable->colStats[i].d_distinct) );
+            relTableStats.statsPerCol[i].d_distinct = \
+            relTableStats.statsPerCol[i].d_distinct * (1 - raiseToPower( (1 -  (relTableStats.statsPerCol[rowNum].f_all / f_all_old) ) , relTableStats.statsPerCol[i].f_all / relTableStats.statsPerCol[i].d_distinct) );
         
-            relTable->colStats[i].f_all = relTable->colStats[rowNum].f_all;
+            relTableStats.statsPerCol[i].f_all = relTableStats.statsPerCol[rowNum].f_all;
         }
     }
 }
 
-void FilterBetweenTwoColumnsStats(RelationTable*& relTable , uint64_t rowNum1 , uint64_t rowNum2){
+void FilterBetweenTwoColumnsStats(TableStats& relTableStats , uint64_t colNum , uint64_t rowNum1 , uint64_t rowNum2){
 
-    if (relTable->colStats[rowNum1].l_lower > relTable->colStats[rowNum2].l_lower){
-        relTable->colStats[rowNum2].l_lower = relTable->colStats[rowNum1].l_lower;
+    if (relTableStats.statsPerCol[rowNum1].l_lower > relTableStats.statsPerCol[rowNum2].l_lower){
+        relTableStats.statsPerCol[rowNum2].l_lower = relTableStats.statsPerCol[rowNum1].l_lower;
     }
     else {
-        relTable->colStats[rowNum1].l_lower = relTable->colStats[rowNum2].l_lower;
+        relTableStats.statsPerCol[rowNum1].l_lower = relTableStats.statsPerCol[rowNum2].l_lower;
     }
 
-    if (relTable->colStats[rowNum1].u_upper < relTable->colStats[rowNum2].u_upper){
-        relTable->colStats[rowNum2].u_upper = relTable->colStats[rowNum1].u_upper;
+    if (relTableStats.statsPerCol[rowNum1].u_upper < relTableStats.statsPerCol[rowNum2].u_upper){
+        relTableStats.statsPerCol[rowNum2].u_upper = relTableStats.statsPerCol[rowNum1].u_upper;
     }
     else {
-        relTable->colStats[rowNum1].u_upper = relTable->colStats[rowNum2].u_upper;
+        relTableStats.statsPerCol[rowNum1].u_upper = relTableStats.statsPerCol[rowNum2].u_upper;
     }
 
-    uint64_t f_all_old = relTable->colStats[rowNum1].f_all;
-    uint64_t n = relTable->colStats[rowNum1].u_upper - relTable->colStats[rowNum1].l_lower + 1;
+    uint64_t f_all_old = relTableStats.statsPerCol[rowNum1].f_all;
+    uint64_t n = relTableStats.statsPerCol[rowNum1].u_upper - relTableStats.statsPerCol[rowNum1].l_lower + 1;
 
-    relTable->colStats[rowNum1].f_all = f_all_old / n ;
-    relTable->colStats[rowNum2].f_all = relTable->colStats[rowNum1].f_all;
+    relTableStats.statsPerCol[rowNum1].f_all = f_all_old / n ;
+    relTableStats.statsPerCol[rowNum2].f_all = relTableStats.statsPerCol[rowNum1].f_all;
 
-    relTable->colStats[rowNum1].d_distinct = \
-            relTable->colStats[rowNum1].d_distinct * (1 - raiseToPower( 1 -  (relTable->colStats[rowNum1].f_all / f_all_old)  , f_all_old / relTable->colStats[rowNum1].d_distinct) );
+    relTableStats.statsPerCol[rowNum1].d_distinct = \
+            relTableStats.statsPerCol[rowNum1].d_distinct * (1 - raiseToPower( 1 -  (relTableStats.statsPerCol[rowNum1].f_all / f_all_old)  , f_all_old / relTableStats.statsPerCol[rowNum1].d_distinct) );
     
-    relTable->colStats[rowNum2].d_distinct = relTable->colStats[rowNum1].d_distinct;
+    relTableStats.statsPerCol[rowNum2].d_distinct = relTableStats.statsPerCol[rowNum1].d_distinct;
 
-    for (uint64_t i = 0; i < relTable->cols ; i++){
+    for (uint64_t i = 0; i < colNum ; i++){
 
         if (i != rowNum1 && i != rowNum2){
-            relTable->colStats[i].d_distinct = \
-            relTable->colStats[i].d_distinct * (1 - raiseToPower( 1 -  (relTable->colStats[rowNum1].f_all / f_all_old) , relTable->colStats[i].f_all / relTable->colStats[i].d_distinct) );
+            relTableStats.statsPerCol[i].d_distinct = \
+            relTableStats.statsPerCol[i].d_distinct * (1 - raiseToPower( 1 -  (relTableStats.statsPerCol[rowNum1].f_all / f_all_old) , relTableStats.statsPerCol[i].f_all / relTableStats.statsPerCol[i].d_distinct) );
         
-            relTable->colStats[i].f_all = relTable->colStats[rowNum1].f_all;
+            relTableStats.statsPerCol[i].f_all = relTableStats.statsPerCol[rowNum1].f_all;
         }
     }
 
 }
 
-void SelfJoinStats(RelationTable*& relTable , uint64_t rowNum){
+void SelfJoinStats(TableStats& relTableStats, uint64_t colNum , uint64_t rowNum , uint64_t& cost){
 
-    uint64_t n = relTable->colStats[rowNum].u_upper - relTable->colStats[rowNum].l_lower + 1;
+    uint64_t n = relTableStats.statsPerCol[rowNum].u_upper - relTableStats.statsPerCol[rowNum].l_lower + 1;
 
-    relTable->colStats[rowNum].f_all = raiseToPower(relTable->colStats[rowNum].f_all , 2) / n;
+    relTableStats.statsPerCol[rowNum].f_all = raiseToPower(relTableStats.statsPerCol[rowNum].f_all , 2) / n;
 
-    for (uint64_t i = 0 ; i < relTable->cols ; i++) {
+    for (uint64_t i = 0 ; i < colNum ; i++) {
         if (i != rowNum) {
-            relTable->colStats[i].f_all = relTable->colStats[rowNum].f_all; 
+            relTableStats.statsPerCol[i].f_all = relTableStats.statsPerCol[rowNum].f_all; 
         }
     }
+
+    cost = relTableStats.statsPerCol[rowNum].f_all;
 }
 
-int JoinStats(RelationTable*& relTable1 , RelationTable*& relTable2 , uint64_t rowNum1 , uint64_t rowNum2) 
+int JoinStats(TableStats& relTableStats1 , TableStats& relTableStats2 , uint64_t colNum1 , uint64_t colNum2 , uint64_t rowNum1 , uint64_t rowNum2 , uint64_t& cost) 
 {
     uint64_t new_lower;
     uint64_t new_upper;
 
-    if (relTable1->colStats[rowNum1].l_lower > relTable2->colStats[rowNum2].l_lower) {
-        new_lower = relTable1->colStats[rowNum1].l_lower;
+    if (relTableStats1.statsPerCol[rowNum1].l_lower > relTableStats2.statsPerCol[rowNum2].l_lower) {
+        new_lower = relTableStats1.statsPerCol[rowNum1].l_lower;
     
     } else {
-        new_lower = relTable2->colStats[rowNum2].l_lower;
+        new_lower = relTableStats2.statsPerCol[rowNum2].l_lower;
     }
 
-    if (relTable1->colStats[rowNum1].u_upper < relTable2->colStats[rowNum2].u_upper) {
-        new_upper = relTable1->colStats[rowNum1].u_upper;
+    if (relTableStats1.statsPerCol[rowNum1].u_upper < relTableStats2.statsPerCol[rowNum2].u_upper) {
+        new_upper = relTableStats1.statsPerCol[rowNum1].u_upper;
     
     } else {
-        new_upper = relTable2->colStats[rowNum2].u_upper;
+        new_upper = relTableStats2.statsPerCol[rowNum2].u_upper;
     }
 
     if (new_lower > new_upper) {
         return 1;
     } 
 
-    FilterBetweenTwoValsStats(relTable1 , rowNum1 , new_lower , new_upper);
-    FilterBetweenTwoValsStats(relTable2 , rowNum2 , new_lower , new_upper);
+    FilterBetweenTwoValsStats(relTableStats1 , colNum1 , rowNum1 , new_lower , new_upper);
+    FilterBetweenTwoValsStats(relTableStats2 , colNum2 , rowNum2 , new_lower , new_upper);
 
-    relTable1->colStats[rowNum1].l_lower = new_lower;
-    relTable2->colStats[rowNum2].l_lower = new_lower;
+    relTableStats1.statsPerCol[rowNum1].l_lower = new_lower;
+    relTableStats2.statsPerCol[rowNum2].l_lower = new_lower;
 
-    relTable1->colStats[rowNum1].u_upper = new_upper;
-    relTable2->colStats[rowNum2].u_upper = new_upper;
+    relTableStats1.statsPerCol[rowNum1].u_upper = new_upper;
+    relTableStats2.statsPerCol[rowNum2].u_upper = new_upper;
 
-    uint64_t n = relTable1->colStats[rowNum1].u_upper - relTable1->colStats[rowNum1].l_lower + 1;
-    uint64_t d_distinct_old1 = relTable1->colStats[rowNum1].d_distinct;
-    uint64_t d_distinct_old2 = relTable2->colStats[rowNum2].d_distinct;
+    uint64_t n = relTableStats1.statsPerCol[rowNum1].u_upper - relTableStats1.statsPerCol[rowNum1].l_lower + 1;
+    uint64_t d_distinct_old1 = relTableStats1.statsPerCol[rowNum1].d_distinct;
+    uint64_t d_distinct_old2 = relTableStats2.statsPerCol[rowNum2].d_distinct;
 
-    relTable1->colStats[rowNum1].f_all = (relTable1->colStats[rowNum1].f_all * relTable2->colStats[rowNum2].f_all) / n;
-    relTable2->colStats[rowNum2].f_all = relTable1->colStats[rowNum1].f_all;
+    relTableStats1.statsPerCol[rowNum1].f_all = (relTableStats1.statsPerCol[rowNum1].f_all * relTableStats2.statsPerCol[rowNum2].f_all) / n;
+    relTableStats2.statsPerCol[rowNum2].f_all = relTableStats1.statsPerCol[rowNum1].f_all;
 
-    relTable1->colStats[rowNum1].d_distinct = (relTable1->colStats[rowNum1].d_distinct * relTable2->colStats[rowNum2].d_distinct) / n;
-    relTable2->colStats[rowNum2].d_distinct = relTable1->colStats[rowNum1].d_distinct;
+    relTableStats1.statsPerCol[rowNum1].d_distinct = (relTableStats1.statsPerCol[rowNum1].d_distinct * relTableStats2.statsPerCol[rowNum2].d_distinct) / n;
+    relTableStats2.statsPerCol[rowNum2].d_distinct = relTableStats1.statsPerCol[rowNum1].d_distinct;
 
-    for (uint64_t i = 0 ; i < relTable1->cols ; i++){
+    for (uint64_t i = 0 ; i < colNum1 ; i++){
         
         if (i != rowNum1){
-            relTable1->colStats[i].f_all = relTable1->colStats[rowNum1].f_all;
-            relTable1->colStats[i].d_distinct = \
-            relTable1->colStats[i].d_distinct * (1 - raiseToPower( 1 - (relTable1->colStats[rowNum1].d_distinct / d_distinct_old1) , relTable1->colStats[i].f_all / relTable1->colStats[i].d_distinct) );
+            relTableStats1.statsPerCol[i].f_all = relTableStats1.statsPerCol[rowNum1].f_all;
+            relTableStats1.statsPerCol[i].d_distinct = \
+            relTableStats1.statsPerCol[i].d_distinct * (1 - raiseToPower( 1 - (relTableStats1.statsPerCol[rowNum1].d_distinct / d_distinct_old1) , relTableStats1.statsPerCol[i].f_all / relTableStats1.statsPerCol[i].d_distinct) );
         }
     }
 
-    for (uint64_t i = 0 ; i < relTable2->cols ; i++){
+    for (uint64_t i = 0 ; i < colNum2 ; i++){
         
         if (i != rowNum2){
-            relTable2->colStats[i].f_all = relTable2->colStats[rowNum2].f_all;
-            relTable2->colStats[i].d_distinct = \
-            relTable2->colStats[i].d_distinct * (1 - raiseToPower( 1 - (relTable2->colStats[rowNum2].d_distinct / d_distinct_old2) , relTable2->colStats[i].f_all / relTable2->colStats[i].d_distinct) );
+            relTableStats2.statsPerCol[i].f_all = relTableStats2.statsPerCol[rowNum2].f_all;
+            relTableStats2.statsPerCol[i].d_distinct = \
+            relTableStats2.statsPerCol[i].d_distinct * (1 - raiseToPower( 1 - (relTableStats2.statsPerCol[rowNum2].d_distinct / d_distinct_old2) , relTableStats2.statsPerCol[i].f_all / relTableStats2.statsPerCol[i].d_distinct) );
         }
     }
+
+    cost = relTableStats1.statsPerCol[rowNum1].f_all;
 
     return 0;
 }

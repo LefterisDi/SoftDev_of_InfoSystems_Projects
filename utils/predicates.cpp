@@ -11,6 +11,7 @@
 #include "../templates/vector.hpp"
 #include "../Jobs/Jobs.hpp"
 #include "../JobScheduler/JobScheduler.hpp"
+#include "../statistics/joinEnum.hpp"
 
 using namespace std;
 
@@ -659,11 +660,13 @@ int DoAllCompPreds(RelationTable** relTable , List<CompPred>* compList , List<Fu
     return 1;
 }
 
-int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<FullResList>* resList ,  bool* relExistsInRL)
+int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<FullResList>* resList ,  bool* relExistsInRL , uint16_t relTSize)
 {
     uint32_t i         = 0;
     bool     last      = false;
     bool     firstTime = true;
+
+    JoinEnumeration(relTable , relTSize , joinList);
 
     while (joinList->GetTotalItems() > 0) {
         JoinPred* jpredp = &( (*(*joinList)[i])[0] );
