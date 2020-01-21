@@ -92,7 +92,8 @@ int findPlace(MiniVector<uint32_t>* set , int relNum = -1){
 	int res = 0;
 	for (uint32_t i = 0 ; i < set->GetTotalItems() ; i++){
 		uint32_t slide = 1;
-		res = res + slide<<(*set)[i];
+		cout << "SET " << (*set)[i] << endl;
+		res = res + ( slide<<(*set)[i] );
 	}
 
 	if (relNum > -1){
@@ -174,36 +175,33 @@ JoinHashEntry* CreateJoinTree(RelationTable** relTable , JoinHashEntry* jhe , in
 	}
 	
 
-	// for (int i = 0 ; i < joinList->GetTotalItems() ; i++){
-	// 	JoinPred* jp = &( (*(*joinList)[i])[0] );
+	for (int i = 0 ; i < joinList->GetTotalItems() ; i++){
+		JoinPred* jp = &( (*(*joinList)[i])[0] );
 		
-	// 	if (jp->rel1 == relNum && ExistsInJheRels(jhe , jp->rel2) == true && ExistsInJheJoinPreds(jhe , i) == false ){
-	// 		uint64_t newCost;
-	// 		if ( ( newCost = TreeCost(jhe->relTableStats , *jp) ) < minCost){
-	// 			minCost = newCost;
-	// 			indexKeeper = i;
-	// 		}
-	// 	}
-	// 	else if (jp->rel2 == relNum && ExistsInJheRels(jhe , jp->rel1) == true && ExistsInJheJoinPreds(jhe , i) == false ){
-	// 		uint64_t newCost;
-	// 		if ( ( newCost = TreeCost(jhe->relTableStats , *jp) ) < minCost){
-	// 			minCost = newCost;
-	// 			indexKeeper = i;
-	// 		}
-	// 	}
-	// }
+		if (jp->rel1 == relNum && ExistsInJheRels(jhe , jp->rel2) == true && ExistsInJheJoinPreds(jhe , i) == false ){
+			uint64_t newCost;
+			if ( ( newCost = TreeCost(jhe->relTableStats , *jp) ) < minCost){
+				minCost = newCost;
+				indexKeeper = i;
+			}
+		}
+		else if (jp->rel2 == relNum && ExistsInJheRels(jhe , jp->rel1) == true && ExistsInJheJoinPreds(jhe , i) == false ){
+			uint64_t newCost;
+			if ( ( newCost = TreeCost(jhe->relTableStats , *jp) ) < minCost){
+				minCost = newCost;
+				indexKeeper = i;
+			}
+		}
+	}
 
-	// if (indexKeeper == -1){
-	// 	perror("Index keeper -1 error!");
-	// 	exit(1);
-	// }
+	if (indexKeeper == -1){
+		perror("Index keeper -1 error!");
+		exit(1);
+	}
 
-	// newJhe->cost = minCost;
-	// for (int i = 0 ; i < jhe->rels.GetTotalItems() ; i++){
-	// 	newJhe->rels.
-	// }
-	// newJhe->rels.PushBack(relNum);
-	// newJhe->vectJPnum.PushBack(indexKeeper);
+	newJhe->cost = minCost;
+	newJhe->rels.PushBack(relNum);
+	newJhe->vectJPnum.PushBack(indexKeeper);
 
 	return newJhe;
 }
@@ -261,15 +259,14 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 
                 if ( existsInS(sets[sCount] , j))
 					continue;
-				else{
-					try {
-						hmap.get( findPlace(sets[sCount]) );
-					} catch(const std::invalid_argument& arg) {
-						continue;
-					}
-					if (connected(sets[sCount] , j , joinList) == false){
-						continue;
-					}
+
+				try {
+					hmap.get( findPlace(sets[sCount]) );
+				} catch(const std::invalid_argument& arg) {
+					continue;
+				}
+				if (connected(sets[sCount] , j , joinList) == false){
+					continue;
 				}
 
 				jhe = CreateJoinTree( relTable , hmap.get( findPlace(sets[sCount]) ) , j , joinList );
