@@ -12,7 +12,7 @@ typedef struct tuple {
 } MergeTuple;
 
 List<Query>*         ReadQueryBatches(const char *, const char *, List<RelationTable> &);
-List<RelationTable>* ReadRelations   (const char *);
+List<RelationTable>* ReadRelations   (const char * , bool);
 uint32_t             BitConversion   (uint64_t, uint32_t);
 void                 SwitchElements  (uint64_t **, uint32_t, uint32_t, uint32_t);
 void                 MergeTables     (List<uint64_t> &, MergeTuple*, uint32_t, MergeTuple*, uint32_t);

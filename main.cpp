@@ -21,21 +21,21 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
-    struct opt_types args[2];
+    struct opt_types args[3];
 
     /*
      * +------------------------------------+
      * | args[0].optType.cp = <relA file>   |
      * +------------------------------------+
      */
-    if (!getopts(argc, argv, (char *)"w:p,q:p", args))
+    if (!getopts(argc, argv, (char *)"w:p,q:p,s:n", args))
         return -1;
 
     List<RelationTable> *relTableList;
 
     List<Query> *batchQueries = NULL;
 
-    relTableList = ReadRelations(args[0].optType.cp);
+    relTableList = ReadRelations(args[0].optType.cp , args[2].optType.b);
 
     while ((batchQueries = ReadQueryBatches(args[0].optType.cp, args[1].optType.cp, *relTableList)) != NULL)
     {
@@ -45,7 +45,7 @@ int main(int argc, char *argv[])
         {
             qja[i].query = &((*(*batchQueries)[i])[0]);
             qja[i].qNum = i;
-
+            qja[i].stats = args[2].optType.b;
             js->addNewJob(&QueryJob, (void *)&qja[i]);
         }
         js->destroyScheduler(1);
@@ -62,8 +62,11 @@ int main(int argc, char *argv[])
     {
 
         RelationTable *rtable = &((*(*relTableList)[l])[0]);
-        delete[] rtable->colStats->distinctArray;
-        delete[] rtable->colStats;
+
+        if (args[2].optType.b == true){
+            delete[] rtable->colStats->distinctArray;
+            delete[] rtable->colStats;
+        }
         for (uint32_t i = 0; i < rtable->cols; i++)
             delete[] rtable->table[i];
         delete[] rtable->table;

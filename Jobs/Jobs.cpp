@@ -223,8 +223,8 @@ void QueryJob(void* arg){
 
     List<FullResList>* resList = new List<FullResList>(sizeof(ResStruct) , sizeof(ResStruct));
 
-    DoAllCompPreds( query->query_rels , query->comp_preds , resList , relExistsInRL);//must make parallel
-    DoAllJoinPreds( query->query_rels , query->join_preds , resList , relExistsInRL , query->total_rels );
+    DoAllCompPreds( query->query_rels , query->comp_preds , resList , relExistsInRL , qja->stats);
+    DoAllJoinPreds( query->query_rels , query->join_preds , resList , relExistsInRL , query->total_rels , qja->stats );
 
     for (uint32_t l = 0 ; l < query->proj->GetTotalItems() ; l++) {
 

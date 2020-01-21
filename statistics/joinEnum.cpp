@@ -126,17 +126,16 @@ bool ExistsInJheJoinPreds(JoinHashEntry* jhe , int predNum){
 	return false;
 }
 
-uint64_t TreeCost(TableStats* relTableStats , JoinPred& jp){
+uint64_t TreeCost(TableStats* relTableStats , JoinPred& jp , JoinHashEntry* jhe){
 
 		uint64_t cost = 0;
 
 		if (jp.rel1 == jp.rel2 && jp.colRel1 == jp.colRel2){
 			SelfJoinStats(relTableStats[jp.rel1] , jp.colRel1 , cost);
 		}
-		else if (jp.rel1 == jp.rel2){
-			cout << "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD" << endl;
-			// FilterBetweenTwoColumnsStats(relTableStats ,colNum , rowNum1 ,rowNum2);
-		}
+		// else if (ExistsInJheRels(jhe , jp.rel1) == true && ExistsInJheRels(jhe , jp.rel2) == true){
+		// 	FilterBetweenTwoColumnsStats(relTableStats[jp.rel1] , relTableStats[jp.rel2] , jp.rel1 , jp.rel2);
+		// }
 		else {
 			JoinStats(relTableStats[jp.rel1] , relTableStats[jp.rel2] , jp.colRel1 , jp.colRel2 , cost);
 		}
@@ -180,14 +179,14 @@ JoinHashEntry* CreateJoinTree(RelationTable** relTable , JoinHashEntry* jhe , in
 		
 		if (jp->rel1 == relNum && ExistsInJheRels(jhe , jp->rel2) == true && ExistsInJheJoinPreds(jhe , i) == false ){
 			uint64_t newCost;
-			if ( ( newCost = TreeCost(jhe->relTableStats , *jp) ) < minCost){
+			if ( ( newCost = TreeCost(jhe->relTableStats , *jp , newJhe) ) < minCost){
 				minCost = newCost;
 				indexKeeper = i;
 			}
 		}
 		else if (jp->rel2 == relNum && ExistsInJheRels(jhe , jp->rel1) == true && ExistsInJheJoinPreds(jhe , i) == false ){
 			uint64_t newCost;
-			if ( ( newCost = TreeCost(jhe->relTableStats , *jp) ) < minCost){
+			if ( ( newCost = TreeCost(jhe->relTableStats , *jp , newJhe) ) < minCost){
 				minCost = newCost;
 				indexKeeper = i;
 			}

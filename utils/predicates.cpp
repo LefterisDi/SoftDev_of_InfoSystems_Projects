@@ -59,7 +59,7 @@ ResStruct* FindInResVec(MiniVector<ResStruct>* resVec , uint64_t elemID)
     return found;
 }
 
-int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullResList>* resList)
+int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullResList>* resList , bool stats)
 {
     ResStruct*   existingRel = NULL;
     FullResList* frl         = NULL;
@@ -94,12 +94,14 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
     {
         case '>':
 
-            TableStats ts1;
-            ts1.cols = relTable[cpred.rel1]->cols;
-            ts1.statsPerCol = relTable[cpred.rel1]->colStats;
+            if (stats == true){
+                TableStats ts1;
+                ts1.cols = relTable[cpred.rel1]->cols;
+                ts1.statsPerCol = relTable[cpred.rel1]->colStats;
 
-            FilterBetweenTwoValsStats(ts1 , cpred.colRel1 ,  cpred.num , ts1.statsPerCol->u_upper);
-
+                FilterBetweenTwoValsStats(ts1 , cpred.colRel1 ,  cpred.num , ts1.statsPerCol->u_upper);
+            }
+          
             for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
 
                 uint64_t rowID = (*existingRel->rowIDvec)[i];
@@ -141,11 +143,14 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
 
         case '<':
 
-            TableStats ts2;
-            ts2.cols = relTable[cpred.rel1]->cols;
-            ts2.statsPerCol = relTable[cpred.rel1]->colStats;
+            if (stats == true){
+                TableStats ts2;
+                ts2.cols = relTable[cpred.rel1]->cols;
+                ts2.statsPerCol = relTable[cpred.rel1]->colStats;
 
-            FilterBetweenTwoValsStats(ts2 , cpred.colRel1 ,  ts2.statsPerCol->l_lower , cpred.num);
+                FilterBetweenTwoValsStats(ts2 , cpred.colRel1 ,  ts2.statsPerCol->l_lower , cpred.num);
+            }
+          
 
             for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
 
@@ -174,11 +179,14 @@ int ComparisonPredicate(RelationTable** relTable , CompPred& cpred , List<FullRe
 
         case '=':
 
-            TableStats ts3;
-            ts3.cols = relTable[cpred.rel1]->cols;
-            ts3.statsPerCol = relTable[cpred.rel1]->colStats;
+            if (stats == true){
+                TableStats ts3;
+                ts3.cols = relTable[cpred.rel1]->cols;
+                ts3.statsPerCol = relTable[cpred.rel1]->colStats;
 
-            FilterEqualToValStats(ts3 , cpred.colRel1 , cpred.num);
+                FilterEqualToValStats(ts3 , cpred.colRel1 , cpred.num);
+            }
+          
 
             for (uint64_t i = totalItems - 1; i >= 0 ; i--) {
 
@@ -668,111 +676,118 @@ int JoinPredicate(RelationTable** relTable , JoinPred& jpred ,  List<FullResList
     return 1;
 }
 
-int DoAllCompPreds(RelationTable** relTable , List<CompPred>* compList , List<FullResList>* resList , bool* relExistsInRL)
+int DoAllCompPreds(RelationTable** relTable , List<CompPred>* compList , List<FullResList>* resList , bool* relExistsInRL , bool stats)
 {
     for (uint32_t i = 0 ; i < compList->GetTotalItems() ; i++) {
 
         CompPred* cpredp = &( (*(*compList)[i])[0] );
-        ComparisonPredicate(relTable , *cpredp , resList);
+        ComparisonPredicate(relTable , *cpredp , resList , stats);
         relExistsInRL[cpredp->rel1] = true;
     }
     return 1;
 }
 
-int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<FullResList>* resList ,  bool* relExistsInRL , uint16_t relTSize)
+int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<FullResList>* resList ,  bool* relExistsInRL , uint16_t relTSize , bool stats)
 {
     uint32_t i         = 0;
     bool     last      = false;
     bool     firstTime = true;
     JoinHashEntry* joinEnumRes = NULL;
 
-    joinEnumRes = JoinEnumeration(relTable , relTSize , joinList);
+    if (stats == true){
+         joinEnumRes = JoinEnumeration(relTable , relTSize , joinList);
 
-    for (uint32_t i = 0 ; i < joinEnumRes->vectJPnum.GetTotalItems() ; i++){
-        JoinPred* jpredp = &( (*(*joinList)[joinEnumRes->vectJPnum[i]])[0] );
+        for (uint32_t i = 0 ; i < joinEnumRes->vectJPnum.GetTotalItems() ; i++){
+            JoinPred* jpredp = &( (*(*joinList)[joinEnumRes->vectJPnum[i]])[0] );
 
-        if (jpredp->rel1 == jpredp->rel2) {
+            if (jpredp->rel1 == jpredp->rel2) {
 
-            if (jpredp->colRel1 != jpredp->colRel2) {
-                JoinSelf(relTable , *jpredp , resList);
-                relExistsInRL[jpredp->rel1] = true;
+                if (jpredp->colRel1 != jpredp->colRel2) {
+                    JoinSelf(relTable , *jpredp , resList);
+                    relExistsInRL[jpredp->rel1] = true;
+                }
+                continue;
             }
-            continue;
+
+            JoinPredicate(relTable , *jpredp , resList);
+            relExistsInRL[jpredp->rel1] = true;
+            relExistsInRL[jpredp->rel2] = true;
+        }
+        
+        delete[] joinEnumRes->relTableStats->statsPerCol;
+
+        delete[] joinEnumRes->relTableStats;
+
+        delete joinEnumRes;
+    }
+    else {
+        
+        while (joinList->GetTotalItems() > 0) {
+            JoinPred* jpredp = &( (*(*joinList)[i])[0] );
+
+            if ( (*joinList)[i] == joinList->GetLast() )
+                last = true;
+
+            if (jpredp->rel1 == jpredp->rel2) {
+                if (jpredp->colRel1 == jpredp->colRel2) {
+                    joinList->DeleteBucket(i);
+                    if (last == true) {
+                        i = 0;
+                        last = false;
+                        firstTime = false;
+                    }
+                    continue;
+
+                } else {
+                    JoinSelf(relTable , *jpredp , resList);
+                    relExistsInRL[jpredp->rel1] = true;
+                    joinList->DeleteBucket(i);
+                    if (last == true) {
+                        i = 0;
+                        last = false;
+                        firstTime = false;
+                    }
+                    continue;
+                }
+            }
+        
+        if (last == false)
+                i++;
+
+            else {
+                break;
+            }
         }
 
-        JoinPredicate(relTable , *jpredp , resList);
-        relExistsInRL[jpredp->rel1] = true;
-        relExistsInRL[jpredp->rel2] = true;
+        i = 0;
+        last = false;
+        while (joinList->GetTotalItems() > 0) {
+
+            JoinPred* jpredp = &( (*(*joinList)[i])[0] );
+
+            if ( (*joinList)[i] == joinList->GetLast() )
+                last = true;
+
+            if ( firstTime == true && relExistsInRL[jpredp->rel1] == false && relExistsInRL[jpredp->rel2] == false) {
+                i++;
+                continue;
+            }
+
+            JoinPredicate(relTable , *jpredp , resList);
+            relExistsInRL[jpredp->rel1] = true;
+            relExistsInRL[jpredp->rel2] = true;
+            joinList->DeleteBucket(i);
+
+            if (last == true) {
+                i = 0;
+                last = false;
+                firstTime = false;
+            }
+        }
+
     }
-    
-    delete[] joinEnumRes->relTableStats->statsPerCol;
 
-	delete[] joinEnumRes->relTableStats;
-
-	delete joinEnumRes;
-
-    // while (joinList->GetTotalItems() > 0) {
-    //     JoinPred* jpredp = &( (*(*joinList)[i])[0] );
-
-    //     if ( (*joinList)[i] == joinList->GetLast() )
-    //         last = true;
-
-    //     if (jpredp->rel1 == jpredp->rel2) {
-    //          if (jpredp->colRel1 == jpredp->colRel2) {
-    //             joinList->DeleteBucket(i);
-    //             if (last == true) {
-    //                 i = 0;
-    //                 last = false;
-    //                 firstTime = false;
-    //             }
-    //             continue;
-
-    //         } else {
-    //             JoinSelf(relTable , *jpredp , resList);
-    //             relExistsInRL[jpredp->rel1] = true;
-    //             joinList->DeleteBucket(i);
-    //             if (last == true) {
-    //                 i = 0;
-    //                 last = false;
-    //                 firstTime = false;
-    //             }
-    //             continue;
-    //         }
-    //     }
-       
-    //    if (last == false)
-    //         i++;
-
-    //     else {
-    //         break;
-    //     }
-    // }
-
-    // i = 0;
-    // last = false;
-    // while (joinList->GetTotalItems() > 0) {
-
-    //     JoinPred* jpredp = &( (*(*joinList)[i])[0] );
-
-    //     if ( (*joinList)[i] == joinList->GetLast() )
-    //         last = true;
-
-    //     if ( firstTime == true && relExistsInRL[jpredp->rel1] == false && relExistsInRL[jpredp->rel2] == false) {
-    //         i++;
-    //         continue;
-    //     }
-
-    //     JoinPredicate(relTable , *jpredp , resList);
-    //     relExistsInRL[jpredp->rel1] = true;
-    //     relExistsInRL[jpredp->rel2] = true;
-    //     joinList->DeleteBucket(i);
-
-    //     if (last == true) {
-    //         i = 0;
-    //         last = false;
-    //         firstTime = false;
-    //     }
-    // }
+   
 
     return 1;
 }

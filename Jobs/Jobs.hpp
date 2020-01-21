@@ -9,6 +9,7 @@ typedef struct QueryJobArgs{
     Query* query;
     uint16_t qNum;
     str::string res;
+    bool stats;
 }QueryJobArgs;
 
 typedef struct SortJobArgs{
