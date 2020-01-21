@@ -128,12 +128,13 @@ bool ExistsInJheJoinPreds(JoinHashEntry* jhe , int predNum){
 
 uint64_t TreeCost(TableStats* relTableStats , JoinPred& jp){
 
-		uint64_t cost;
+		uint64_t cost = 0;
 
 		if (jp.rel1 == jp.rel2 && jp.colRel1 == jp.colRel2){
 			SelfJoinStats(relTableStats[jp.rel1] , jp.colRel1 , cost);
 		}
 		else if (jp.rel1 == jp.rel2){
+			cout << "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD" << endl;
 			// FilterBetweenTwoColumnsStats(relTableStats ,colNum , rowNum1 ,rowNum2);
 		}
 		else {
@@ -264,6 +265,7 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 				} catch(const std::invalid_argument& arg) {
 					continue;
 				}
+
 				if (connected(sets[sCount] , j , joinList) == false){
 					continue;
 				}
@@ -279,7 +281,8 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 				if (isNull == true) {
 					hmap.set(findPlace(sets[sCount] , j) , jhe);
 				
-                } else if (existingJHE->cost > jhe->cost ) {
+                } else if (existingJHE->cost >
+				 jhe->cost ) {
 					hmap.delete_key( findPlace(sets[sCount] , j) );
 					hmap.set(findPlace(sets[sCount] , j) , jhe);
 				}

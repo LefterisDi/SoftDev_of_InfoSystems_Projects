@@ -292,6 +292,7 @@ void SelfJoinStats(TableStats& relTableStats, uint64_t rowNum , uint64_t& cost)
     }
 
     cost = relTableStats.statsPerCol[rowNum].f_all;
+
 }
 
 int JoinStats(TableStats& relTableStats1 , TableStats& relTableStats2 , uint64_t rowNum1 , uint64_t rowNum2 , uint64_t& cost) 
@@ -314,6 +315,7 @@ int JoinStats(TableStats& relTableStats1 , TableStats& relTableStats2 , uint64_t
     }
 
     if (new_lower > new_upper) {
+        cost = 0;
         return 1;
     } 
 

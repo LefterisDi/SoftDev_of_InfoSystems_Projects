@@ -59,7 +59,7 @@ void MergeJobFirst(List<uint64_t> **listdp, MergeTuple *sortedTable1, uint32_t r
         MergeTuple *sortedTableBig = sortedTable1;
     }
 
-    short thread_count = 1;
+    short thread_count = 4;
     if (psumCountSmall < thread_count)
     {
         thread_count = psumCountSmall;

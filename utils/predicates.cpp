@@ -704,6 +704,12 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
         relExistsInRL[jpredp->rel1] = true;
         relExistsInRL[jpredp->rel2] = true;
     }
+    
+    delete[] joinEnumRes->relTableStats->statsPerCol;
+
+	delete[] joinEnumRes->relTableStats;
+
+	delete joinEnumRes;
 
     // while (joinList->GetTotalItems() > 0) {
     //     JoinPred* jpredp = &( (*(*joinList)[i])[0] );

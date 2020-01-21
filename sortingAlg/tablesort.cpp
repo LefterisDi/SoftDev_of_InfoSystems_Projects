@@ -159,7 +159,7 @@ void SortJobFirst(SortJobArgs*& arg){
         sja->table1[i] = sja->table2[i];
     }
 
-    JobScheduler* js = new JobScheduler(1 , psumCount+1);
+    JobScheduler* js = new JobScheduler(4 , psumCount+1);
     SortJobArgs* sjaNew = new SortJobArgs[psumCount];
 
     int newKey = sja->key + 1;
