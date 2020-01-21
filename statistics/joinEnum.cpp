@@ -92,7 +92,6 @@ int findPlace(MiniVector<uint32_t>* set , int relNum = -1){
 	int res = 0;
 	for (uint32_t i = 0 ; i < set->GetTotalItems() ; i++){
 		uint32_t slide = 1;
-		cout << "SET " << (*set)[i] << endl;
 		res = res + ( slide<<(*set)[i] );
 	}
 
@@ -208,7 +207,7 @@ JoinHashEntry* CreateJoinTree(RelationTable** relTable , JoinHashEntry* jhe , in
 
 JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList)
 {
-    MyHashMap< int , JoinHashEntry* > hmap( raiseToPower(2 , relTSize) - 1);
+    MyHashMap< int , JoinHashEntry* > hmap( (1<<relTSize) - 1);
 	JoinHashEntry* res = new JoinHashEntry;
 
 	int num = 1;
@@ -244,12 +243,12 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 		
         for (int sCount = 0 ; sCount < sets.GetTotalItems() ; sCount++) {
 
-			cout << "SIZE " << sets[sCount]->GetTotalItems() << endl;
+			// cout << "SIZE " << sets[sCount]->GetTotalItems() << endl;
 
-			for (uint32_t l = 0 ; l < sets[sCount]->GetTotalItems() ; l++){
-				cout << (*sets[sCount])[l] << " "; 
-			}
-			cout << endl;
+			// for (uint32_t l = 0 ; l < sets[sCount]->GetTotalItems() ; l++){
+			// 	cout << (*sets[sCount])[l] << " "; 
+			// }
+			// cout << endl;
 
 			for (int j = 0 ; j < relTSize ; j++) {
 	
@@ -271,33 +270,33 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 
 				jhe = CreateJoinTree( relTable , hmap.get( findPlace(sets[sCount]) ) , j , joinList );
 
-	// 			try {
-	// 				existingJHE =  hmap.get( findPlace(sets[sCount] , j) );
-	// 			} catch(const std::invalid_argument& arg) {
-	// 				isNull = true;
-	// 			}
+				try {
+					existingJHE =  hmap.get( findPlace(sets[sCount] , j) );
+				} catch(const std::invalid_argument& arg) {
+					isNull = true;
+				}
 
-	// 			if (isNull == true) {
-	// 				hmap.set(findPlace(sets[sCount] , j) , *jhe);
+				if (isNull == true) {
+					hmap.set(findPlace(sets[sCount] , j) , jhe);
 				
-    //             } else if (existingJHE.cost > jhe->cost ) {
-	// 				hmap.delete_key( findPlace(sets[sCount] , j) );
-	// 				hmap.set(findPlace(sets[sCount] , j) , *jhe);
-	// 			}
+                } else if (existingJHE->cost > jhe->cost ) {
+					hmap.delete_key( findPlace(sets[sCount] , j) );
+					hmap.set(findPlace(sets[sCount] , j) , jhe);
+				}
 			}
 			delete sets[sCount];
 		}
 
 	}
 
-	// try {
-	// 	*res = hmap.get( raiseToPower(2 , relTSize) - 1 ) ;
-	// } catch(const std::invalid_argument& arg) {
-	// 	perror("Error finding best path!");
-	// 	exit(1);
-	// }
+	try {
+		res = hmap.get( (1<<relTSize) - 1 );
+	} catch(const std::invalid_argument& arg) {
+		perror("Error finding best path!");
+		exit(1);
+	}
 
-	for (int i = 0; i < raiseToPower(2 , relTSize) - 1 ; i++){
+	for (int i = 0; i < (1<<relTSize) - 2 ; i++){
 		JoinHashEntry* tmp = NULL;
 		try {
 			tmp = hmap.get(i);
