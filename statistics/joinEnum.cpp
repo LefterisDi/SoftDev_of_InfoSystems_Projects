@@ -143,8 +143,8 @@ uint64_t TreeCost(TableStats* relTableStats , JoinPred& jp , JoinHashEntry* jhe)
 		return cost;
 }
 
-JoinHashEntry* CreateJoinTree(RelationTable** relTable , JoinHashEntry* jhe , int relNum ,  List<JoinPred>* joinList){
-
+JoinHashEntry* CreateJoinTree(RelationTable** relTable , JoinHashEntry* jhe , int relNum ,  List<JoinPred>* joinList)
+{
 	JoinHashEntry* newJhe = new JoinHashEntry;
 
 	int indexKeeper = -1;
@@ -232,7 +232,7 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 
 		jhe->cost = 0;
         hmap.set( num , jhe);
-		num<<=1;
+		num <<= 1;
     }
 
 	for (int i = 0 ; i < relTSize-1 ; i++) {
@@ -281,13 +281,13 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 					hmap.set(findPlace(sets[sCount] , j) , jhe);
 				
                 } else if (existingJHE->cost > jhe->cost ) {
+                    // cout << "!!!!!!!!!!!!!!!!!!!!!!" << endl;
 					hmap.delete_key( findPlace(sets[sCount] , j) );
 					hmap.set(findPlace(sets[sCount] , j) , jhe);
 				}
 			}
 			delete sets[sCount];
 		}
-
 	}
 
 	try {
@@ -297,7 +297,7 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 		exit(1);
 	}
 
-	for (int i = 0; i < (1<<relTSize) - 2 ; i++){
+	for (int i = 0; i < (1<<relTSize) - 1 ; i++){
 		JoinHashEntry* tmp = NULL;
 		try {
 			tmp = hmap.get(i);
@@ -314,6 +314,7 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 
 		hmap.delete_key(i);
 	}
+    // hmap.delete_key((1<<relTSize) - 1);
     
    return res;
 } 

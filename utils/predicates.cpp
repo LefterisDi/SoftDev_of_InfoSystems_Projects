@@ -689,13 +689,9 @@ int DoAllCompPreds(RelationTable** relTable , List<CompPred>* compList , List<Fu
 
 int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<FullResList>* resList ,  bool* relExistsInRL , uint16_t relTSize , bool stats)
 {
-    uint32_t i         = 0;
-    bool     last      = false;
-    bool     firstTime = true;
-    JoinHashEntry* joinEnumRes = NULL;
 
-    if (stats == true){
-        joinEnumRes = JoinEnumeration(relTable , relTSize , joinList);
+    if (stats == true) {
+        JoinHashEntry* joinEnumRes = JoinEnumeration(relTable , relTSize , joinList);
 
         for (uint32_t i = 0 ; i < joinEnumRes->vectJPnum.GetTotalItems() ; i++) {
             JoinPred* jpredp = &( (*(*joinList)[joinEnumRes->vectJPnum[i]])[0] );
@@ -720,10 +716,15 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
         delete[] joinEnumRes->relTableStats;
         
         delete joinEnumRes;
-    }
-    else {
+    
+    } else {
+    
+        uint32_t i         = 0;
+        bool     last      = false;
+        bool     firstTime = true;
         
         while (joinList->GetTotalItems() > 0) {
+
             JoinPred* jpredp = &( (*(*joinList)[i])[0] );
 
             if ( (*joinList)[i] == joinList->GetLast() )
@@ -752,12 +753,10 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
                 }
             }
         
-        if (last == false)
+            if (last == false)
                 i++;
-
-            else {
+            else 
                 break;
-            }
         }
 
         i = 0;
@@ -787,8 +786,6 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
         }
 
     }
-
-   
 
     return 1;
 }
