@@ -208,7 +208,7 @@ JoinHashEntry* CreateJoinTree(RelationTable** relTable , JoinHashEntry* jhe , in
 JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , List<JoinPred>* joinList)
 {
     MyHashMap< int , JoinHashEntry* > hmap( (1<<relTSize) - 1);
-	JoinHashEntry* res = new JoinHashEntry;
+	JoinHashEntry* res = NULL;
 
 	int num = 1;
     for (int i = 0 ; i < relTSize ; i++){
@@ -280,8 +280,7 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 				if (isNull == true) {
 					hmap.set(findPlace(sets[sCount] , j) , jhe);
 				
-                } else if (existingJHE->cost >
-				 jhe->cost ) {
+                } else if (existingJHE->cost > jhe->cost ) {
 					hmap.delete_key( findPlace(sets[sCount] , j) );
 					hmap.set(findPlace(sets[sCount] , j) , jhe);
 				}
@@ -306,10 +305,11 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 			continue;
 		}
 
-		delete[] tmp->relTableStats->statsPerCol;
+        for (int j = 0; j < tmp->tableNum ; j++) {
+		    delete[] tmp->relTableStats[j].statsPerCol;
+        }
 
-		delete[] tmp->relTableStats;
-
+        delete[] tmp->relTableStats;
 		delete tmp;
 
 		hmap.delete_key(i);

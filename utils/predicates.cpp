@@ -695,9 +695,9 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
     JoinHashEntry* joinEnumRes = NULL;
 
     if (stats == true){
-         joinEnumRes = JoinEnumeration(relTable , relTSize , joinList);
+        joinEnumRes = JoinEnumeration(relTable , relTSize , joinList);
 
-        for (uint32_t i = 0 ; i < joinEnumRes->vectJPnum.GetTotalItems() ; i++){
+        for (uint32_t i = 0 ; i < joinEnumRes->vectJPnum.GetTotalItems() ; i++) {
             JoinPred* jpredp = &( (*(*joinList)[joinEnumRes->vectJPnum[i]])[0] );
 
             if (jpredp->rel1 == jpredp->rel2) {
@@ -714,10 +714,11 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
             relExistsInRL[jpredp->rel2] = true;
         }
         
-        delete[] joinEnumRes->relTableStats->statsPerCol;
-
+        for (int i = 0; i < joinEnumRes->tableNum ; i++) {
+		    delete[] joinEnumRes->relTableStats[i].statsPerCol;
+        }
         delete[] joinEnumRes->relTableStats;
-
+        
         delete joinEnumRes;
     }
     else {

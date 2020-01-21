@@ -64,13 +64,15 @@ int main(int argc, char *argv[])
         RelationTable *rtable = &((*(*relTableList)[l])[0]);
 
         if (args[2].optType.b == true){
-            delete[] rtable->colStats->distinctArray;
+            for (uint32_t i = 0; i < rtable->cols; i++) 
+                delete[] rtable->colStats[i].distinctArray;
             delete[] rtable->colStats;
         }
         for (uint32_t i = 0; i < rtable->cols; i++)
             delete[] rtable->table[i];
         delete[] rtable->table;
     }
+
     delete relTableList;
 
     return 0;
