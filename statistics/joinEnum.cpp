@@ -281,7 +281,14 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 					hmap.set(findPlace(sets[sCount] , j) , jhe);
 				
                 } else if (existingJHE->cost > jhe->cost ) {
-                    // cout << "!!!!!!!!!!!!!!!!!!!!!!" << endl;
+                    
+                    for (int k = 0; k < existingJHE->tableNum ; k++) {
+                        delete[] existingJHE->relTableStats[k].statsPerCol;
+                    }
+
+                    delete[] existingJHE->relTableStats;
+                    delete existingJHE;
+                    
 					hmap.delete_key( findPlace(sets[sCount] , j) );
 					hmap.set(findPlace(sets[sCount] , j) , jhe);
 				}
