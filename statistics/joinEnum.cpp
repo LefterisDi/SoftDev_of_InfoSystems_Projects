@@ -83,11 +83,15 @@ bool connected( MiniVector<uint32_t>* set , int relNum , List<JoinPred>* joinLis
 int findPlace(MiniVector<uint32_t>* set , int relNum = -1){
 
 	int res = 0;
-	for (uint32_t i = 0 ; i < set->GetTotalItems() ; i++){
-		res = res + raiseToPower(2 , (*set)[i] );
+	uint32_t pl = set->GetTotalItems();
+	for (uint32_t i = 0 ; i < pl ; i++){
+		uint32_t st = (*set)[i];
+		uint32_t slide = (1<<st);
+		res = res + slide;
 	}
+
 	if (relNum > -1){
-		res = res + raiseToPower(2 , relNum);
+		res = res + (1<<relNum);
 	}
 
 	return res;
