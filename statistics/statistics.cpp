@@ -114,6 +114,7 @@ void _InitialStats(RelationTable*& relTable, uint32_t N)
         relTable->colStats[i].l_lower = relTable->table[i][0];
         relTable->colStats[i].u_upper = relTable->table[i][0];
         relTable->colStats[i].f_all   = relTable->rows;
+        relTable->colStats[i].d_distinct = 0;
 
         for (uint32_t j = 1 ; j < relTable->rows ; j++) {
 
@@ -181,14 +182,20 @@ void FilterEqualToValStats(TableStats& relTableStats , uint64_t rowNum , uint64_
         relTableStats.statsPerCol[rowNum].d_distinct = 0;
     }
     else {
-        relTableStats.statsPerCol[rowNum].f_all = (long double)relTableStats.statsPerCol[rowNum].f_all / relTableStats.statsPerCol[rowNum].d_distinct;
+        long double f_all = (long double)relTableStats.statsPerCol[rowNum].f_all;
+        long double d_distinct = (long double)relTableStats.statsPerCol[rowNum].d_distinct;
+        relTableStats.statsPerCol[rowNum].f_all =  (uint64_t)roundl(f_all / d_distinct) ;
         relTableStats.statsPerCol[rowNum].d_distinct = 1;
     }
 
     for (uint64_t i = 0 ; i < relTableStats.cols ; i++){
         if (i != rowNum){
-            relTableStats.statsPerCol[i].d_distinct = \
-            relTableStats.statsPerCol[i].d_distinct * (1 - powl( (1 -  ((long double)relTableStats.statsPerCol[rowNum].f_all / (long double)f_all_old) ) , (long double)relTableStats.statsPerCol[i].f_all / (long double)relTableStats.statsPerCol[i].d_distinct) );
+            long double i_d_distinct = (long double)relTableStats.statsPerCol[i].d_distinct;
+            long double f_all = (long double)relTableStats.statsPerCol[rowNum].f_all;
+            long double i_f_all = (long double)relTableStats.statsPerCol[i].f_all;
+            long double firstParam =  1.0 - f_all / (long double)f_all_old;
+            long double secondParam = i_f_all / i_d_distinct;
+            relTableStats.statsPerCol[i].d_distinct = (uint32_t)roundl( i_d_distinct * (1.0 - powl( firstParam ,  secondParam ) ) );
         
             relTableStats.statsPerCol[i].f_all = relTableStats.statsPerCol[rowNum].f_all;
         }
@@ -212,8 +219,11 @@ void FilterBetweenTwoValsStats(TableStats& relTableStats ,uint64_t rowNum , uint
         val2 = relTableStats.statsPerCol[rowNum].u_upper;
     }
 
-    relTableStats.statsPerCol[rowNum].d_distinct = ( (long double)(val2 - val1) / (long double)(relTableStats.statsPerCol[rowNum].u_upper - relTableStats.statsPerCol[rowNum].l_lower) ) * relTableStats.statsPerCol[rowNum].d_distinct;
-    relTableStats.statsPerCol[rowNum].f_all = ( (long double)(val2 - val1) / (long double)(relTableStats.statsPerCol[rowNum].u_upper - relTableStats.statsPerCol[rowNum].l_lower) ) * relTableStats.statsPerCol[rowNum].f_all;
+    long double val2_val1 = (long double)(val2 - val1);
+    long double upper_lower = (long double)(relTableStats.statsPerCol[rowNum].u_upper - relTableStats.statsPerCol[rowNum].l_lower);
+
+    relTableStats.statsPerCol[rowNum].d_distinct = (uint32_t)roundl( ( val2_val1 / upper_lower ) * (long double)relTableStats.statsPerCol[rowNum].d_distinct );
+    relTableStats.statsPerCol[rowNum].f_all = (uint32_t)roundl( ( val2_val1 / upper_lower ) * (long double)relTableStats.statsPerCol[rowNum].f_all );
 
     relTableStats.statsPerCol[rowNum].l_lower = val1;
     relTableStats.statsPerCol[rowNum].u_upper = val2;
@@ -221,8 +231,9 @@ void FilterBetweenTwoValsStats(TableStats& relTableStats ,uint64_t rowNum , uint
     for (uint64_t i = 0; i < relTableStats.cols ; i++){
 
         if (i != rowNum){
+            long double f_all = (long double)relTableStats.statsPerCol[rowNum].f_all;
             relTableStats.statsPerCol[i].d_distinct = \
-            relTableStats.statsPerCol[i].d_distinct * (1 - powl( (1 -  ((long double)relTableStats.statsPerCol[rowNum].f_all / (long double)f_all_old) ) , (long double)relTableStats.statsPerCol[i].f_all / (long double)relTableStats.statsPerCol[i].d_distinct) );
+            (uint32_t)roundl( (long double)relTableStats.statsPerCol[i].d_distinct * (1.0 - powl( (1.0 -  ( f_all / (long double)f_all_old) ) , (long double)relTableStats.statsPerCol[i].f_all / (long double)relTableStats.statsPerCol[i].d_distinct) ) );
         
             relTableStats.statsPerCol[i].f_all = relTableStats.statsPerCol[rowNum].f_all;
         }
