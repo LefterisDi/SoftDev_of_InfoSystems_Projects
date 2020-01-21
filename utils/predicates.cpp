@@ -691,8 +691,8 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
 {
 
     if (stats == true) {
-
         JoinHashEntry* joinEnumRes = JoinEnumeration(relTable , relTSize , joinList);
+
         for (uint32_t i = 0 ; i < joinEnumRes->vectJPnum.GetTotalItems() ; i++) {
             JoinPred* jpredp = &( (*(*joinList)[joinEnumRes->vectJPnum[i]])[0] );
 
