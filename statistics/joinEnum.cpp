@@ -134,7 +134,7 @@ uint64_t TreeCost(TableStats* relTableStats , JoinPred& jp){
 			SelfJoinStats(relTableStats[jp.rel1] , jp.colRel1 , cost);
 		}
 		else if (jp.rel1 == jp.rel2){
-			std::cout << "RELLLLLLLLS" << std::endl;
+			// FilterBetweenTwoColumnsStats(relTableStats ,colNum , rowNum1 ,rowNum2);
 		}
 		else {
 			JoinStats(relTableStats[jp.rel1] , relTableStats[jp.rel2] , jp.colRel1 , jp.colRel2 , cost);

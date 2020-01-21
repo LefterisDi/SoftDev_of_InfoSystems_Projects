@@ -684,71 +684,89 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
     uint32_t i         = 0;
     bool     last      = false;
     bool     firstTime = true;
+    JoinHashEntry* joinEnumRes = NULL;
 
-    JoinEnumeration(relTable , relTSize , joinList);
+    joinEnumRes = JoinEnumeration(relTable , relTSize , joinList);
 
-    while (joinList->GetTotalItems() > 0) {
-        JoinPred* jpredp = &( (*(*joinList)[i])[0] );
-
-        if ( (*joinList)[i] == joinList->GetLast() )
-            last = true;
+    for (uint32_t i = 0 ; i < joinEnumRes->vectJPnum.GetTotalItems() ; i++){
+        JoinPred* jpredp = &( (*(*joinList)[joinEnumRes->vectJPnum[i]])[0] );
 
         if (jpredp->rel1 == jpredp->rel2) {
-             if (jpredp->colRel1 == jpredp->colRel2) {
-                joinList->DeleteBucket(i);
-                if (last == true) {
-                    i = 0;
-                    last = false;
-                    firstTime = false;
-                }
-                continue;
 
-            } else {
+            if (jpredp->colRel1 != jpredp->colRel2) {
                 JoinSelf(relTable , *jpredp , resList);
                 relExistsInRL[jpredp->rel1] = true;
-                joinList->DeleteBucket(i);
-                if (last == true) {
-                    i = 0;
-                    last = false;
-                    firstTime = false;
-                }
-                continue;
             }
-        }
-       
-       if (last == false)
-            i++;
-
-        else {
-            break;
-        }
-    }
-
-    i = 0;
-    last = false;
-    while (joinList->GetTotalItems() > 0) {
-
-        JoinPred* jpredp = &( (*(*joinList)[i])[0] );
-
-        if ( (*joinList)[i] == joinList->GetLast() )
-            last = true;
-
-        if ( firstTime == true && relExistsInRL[jpredp->rel1] == false && relExistsInRL[jpredp->rel2] == false) {
-            i++;
             continue;
         }
 
         JoinPredicate(relTable , *jpredp , resList);
         relExistsInRL[jpredp->rel1] = true;
         relExistsInRL[jpredp->rel2] = true;
-        joinList->DeleteBucket(i);
-
-        if (last == true) {
-            i = 0;
-            last = false;
-            firstTime = false;
-        }
     }
+
+    // while (joinList->GetTotalItems() > 0) {
+    //     JoinPred* jpredp = &( (*(*joinList)[i])[0] );
+
+    //     if ( (*joinList)[i] == joinList->GetLast() )
+    //         last = true;
+
+    //     if (jpredp->rel1 == jpredp->rel2) {
+    //          if (jpredp->colRel1 == jpredp->colRel2) {
+    //             joinList->DeleteBucket(i);
+    //             if (last == true) {
+    //                 i = 0;
+    //                 last = false;
+    //                 firstTime = false;
+    //             }
+    //             continue;
+
+    //         } else {
+    //             JoinSelf(relTable , *jpredp , resList);
+    //             relExistsInRL[jpredp->rel1] = true;
+    //             joinList->DeleteBucket(i);
+    //             if (last == true) {
+    //                 i = 0;
+    //                 last = false;
+    //                 firstTime = false;
+    //             }
+    //             continue;
+    //         }
+    //     }
+       
+    //    if (last == false)
+    //         i++;
+
+    //     else {
+    //         break;
+    //     }
+    // }
+
+    // i = 0;
+    // last = false;
+    // while (joinList->GetTotalItems() > 0) {
+
+    //     JoinPred* jpredp = &( (*(*joinList)[i])[0] );
+
+    //     if ( (*joinList)[i] == joinList->GetLast() )
+    //         last = true;
+
+    //     if ( firstTime == true && relExistsInRL[jpredp->rel1] == false && relExistsInRL[jpredp->rel2] == false) {
+    //         i++;
+    //         continue;
+    //     }
+
+    //     JoinPredicate(relTable , *jpredp , resList);
+    //     relExistsInRL[jpredp->rel1] = true;
+    //     relExistsInRL[jpredp->rel2] = true;
+    //     joinList->DeleteBucket(i);
+
+    //     if (last == true) {
+    //         i = 0;
+    //         last = false;
+    //         firstTime = false;
+    //     }
+    // }
 
     return 1;
 }
