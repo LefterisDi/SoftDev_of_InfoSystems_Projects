@@ -264,7 +264,6 @@ List<Query> *ReadQueryBatches(const char *workloads_path, const char *queries_pa
 
             if (pred_symb == '=')
             {
-
                 char *rel2 = strtok_r(right_pred, ".", &bak_tok);
                 char *colRel2 = strtok_r(NULL, "", &bak_tok);
 
@@ -285,9 +284,7 @@ List<Query> *ReadQueryBatches(const char *workloads_path, const char *queries_pa
                     delete jp;
 
                     // Otherwise, we have a Comparison Predicate (=)
-                }
-                else
-                {
+                } else {
 
                     CompPred *cp = new CompPred;
 
@@ -302,9 +299,7 @@ List<Query> *ReadQueryBatches(const char *workloads_path, const char *queries_pa
                 }
 
                 // We have a Comparison Predicate (< or >)
-            }
-            else
-            {
+            } else {
 
                 CompPred *cp = new CompPred;
 
@@ -330,7 +325,6 @@ List<Query> *ReadQueryBatches(const char *workloads_path, const char *queries_pa
         index = 0;
         while ((tbl = strtok((tbl == NULL) ? projections : NULL, " \0")) != NULL)
         {
-
             Projection *pr = new Projection;
 
             char *bak_tok = NULL;
@@ -351,8 +345,10 @@ List<Query> *ReadQueryBatches(const char *workloads_path, const char *queries_pa
     fclose(query_fp);
     free(line);
 
-    if (res == -1)
+    if (res == -1) {
+        delete queries;
         return NULL;
+    }
 
     return queries;
 }

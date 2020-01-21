@@ -104,9 +104,9 @@ void InitialStats(RelationTable*& relTable, uint32_t N)
 
 void _InitialStats(RelationTable*& relTable, uint32_t N)
 {
-    bool *distinctVal  = NULL;
+    bool* distinctVal = NULL;
     uint32_t boolTableSize = 0;
-    uint64_t criteria = 0;
+    // uint64_t criteria = 0;
     relTable->colStats = new Stats[relTable->cols];
 
     for (uint32_t i = 0; i < relTable->cols; i++) 
