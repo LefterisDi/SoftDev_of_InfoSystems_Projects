@@ -149,6 +149,29 @@ JoinHashEntry* CreateJoinTree(RelationTable** relTable , JoinHashEntry* jhe , in
 
 	int indexKeeper = -1;
 	uint64_t minCost = INT_MAX;
+
+	newJhe->cost = jhe->cost;
+	newJhe->tableNum = jhe->tableNum;
+	for (uint32_t i = 0; i < jhe->rels.GetTotalItems() ; i++){
+		newJhe->rels.PushBack(jhe->rels[i]);
+	}
+	newJhe->vectJPnum.Reverse();
+	for (uint32_t i = 0; i < jhe->vectJPnum.GetTotalItems() ; i++){
+		newJhe->vectJPnum.PushBack(jhe->vectJPnum[i]);
+	}
+	newJhe->vectJPnum.Reverse();
+
+	newJhe->relTableStats = new TableStats[newJhe->tableNum];
+
+	for (int i = 0; i < jhe->tableNum ; i++) {
+		
+		newJhe->relTableStats[i].cols = jhe->relTableStats[i].cols;
+		newJhe->relTableStats[i].statsPerCol = new Stats[jhe->relTableStats[i].cols];
+
+		for (int j = 0 ; j < newJhe->relTableStats[i].cols ; j++){
+			newJhe->relTableStats[i].statsPerCol[j] = jhe->relTableStats[i].statsPerCol[j];
+		}
+	}
 	
 
 	// for (int i = 0 ; i < joinList->GetTotalItems() ; i++){
@@ -285,13 +308,13 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 			continue;
 		}
 
+		delete[] tmp->relTableStats->statsPerCol;
+
+		delete[] tmp->relTableStats;
+
+		delete tmp;
+
 		hmap.delete_key(i);
-
-		// for (int j = 0; j < tmp->tableNum ; j++) {
-		// 	delete tmp->relTableStats[i].statsPerCol;
-		// }
-
-		// delete tmp->relTableStats;
 	}
     
    return res;
