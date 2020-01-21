@@ -685,7 +685,7 @@ int DoAllJoinPreds(RelationTable** relTable , List<JoinPred>* joinList , List<Fu
     bool     last      = false;
     bool     firstTime = true;
 
-    // JoinEnumeration(relTable , relTSize , joinList);
+    JoinEnumeration(relTable , relTSize , joinList);
 
     while (joinList->GetTotalItems() > 0) {
         JoinPred* jpredp = &( (*(*joinList)[i])[0] );

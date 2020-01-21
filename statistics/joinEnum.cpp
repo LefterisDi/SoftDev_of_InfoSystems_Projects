@@ -177,7 +177,7 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
     MyHashMap< int , JoinHashEntry > hmap( raiseToPower(2 , relTSize) - 1);
 	JoinHashEntry* res = new JoinHashEntry;
 
-	// int num = 1;
+	int num = 1;
     for (int i = 0 ; i < relTSize ; i++){
         JoinHashEntry jhe;
 		
@@ -197,13 +197,14 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 		}
 
 		jhe.cost = 0;
-        hmap.set( raiseToPower(2 , i) , jhe);
+        hmap.set( num , jhe);
+		num<<=1;
     }
 
 	for (int i = 0 ; i < relTSize-1 ; i++) {
 
 		MiniVector< MiniVector<uint32_t>* > sets;
-		bool check[relTSize];
+		bool check[relTSize] = {};
 		GenSubSet(sets , i+1 , 0 , 0 , check , relTSize);
 		
         for (int sCount = 0 ; sCount < sets.GetTotalItems() ; sCount++) {
@@ -214,10 +215,18 @@ JoinHashEntry* JoinEnumeration(RelationTable** relTable , uint16_t relTSize , Li
 				JoinHashEntry* jhe = NULL;
 				JoinHashEntry existingJHE;
 
-				// if (  )
-					// continue;
-                if ( existsInS(sets[sCount] , j) || connected(sets[sCount] , j , joinList) == false )
+                if ( existsInS(sets[sCount] , j))
 					continue;
+				else{
+					try {
+						hmap.get( findPlace(sets[sCount]) );
+					} catch(const std::invalid_argument& arg) {
+						continue;
+					}
+					if (connected(sets[sCount] , j , joinList) == false){
+						continue;
+					}
+				}
 
 				jhe = CreateJoinTree( relTable , hmap.get( findPlace(sets[sCount]) ) , j , joinList );
 
