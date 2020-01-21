@@ -111,9 +111,9 @@ void _InitialStats(RelationTable*& relTable, uint32_t N)
 
     for (uint32_t i = 0; i < relTable->cols; i++) 
     {
-        relTable->colStats[i].l_lower = relTable->table[i][0];
-        relTable->colStats[i].u_upper = relTable->table[i][0];
-        relTable->colStats[i].f_all   = relTable->rows;
+        relTable->colStats[i].l_lower    = relTable->table[i][0];
+        relTable->colStats[i].u_upper    = relTable->table[i][0];
+        relTable->colStats[i].f_all      = relTable->rows;
         relTable->colStats[i].d_distinct = 0;
 
         for (uint32_t j = 1 ; j < relTable->rows ; j++) {

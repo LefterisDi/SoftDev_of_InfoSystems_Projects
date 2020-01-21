@@ -9,7 +9,12 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/main",
-            "args": [ "-w" , "./workloads/small/" , "-q" , "small.work" ],
+            "args": [
+                "-w",
+                "./workloads/small/",
+                "-q",
+                "small.work"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
